@@ -5,20 +5,21 @@
     <title>Login</title>
     <script src="../script/socketConnection.js"></script>
     <link rel="stylesheet" href="../style/general.css">
+    <link rel="stylesheet" href="../style/login.css">
 </head>
 <body>
     <h1>Login</h1>
     <form action='' target='_self' method='post'>
-        <label>username</label><input type="text" name="usr" placeholder="name" value="" ><br>
-        <label>password</label><input type="password" name="pwd" placeholder="password"  value="" ><br>
-        <input type='submit'>
+       <input type="text" id="usr" placeholder="name" value="" ><br>
+       <input type="password" id="pwd" placeholder="password"  value="" ><br>
+        <a>Forget Password</a>
+        <a href="">Signup</a>
+        <input type='submit' onclick="fire()">
     </form><br>
 
     <footer>
-        <ul>
-            <li><a>Imprint</a></li>
-            <li><a>Privacy</a></li>
-        </ul>
+            <a class="footerLink">Imprint</a>
+            <a class="footerLink">Privacy</a>
     </footer>
 </body>
 </html>

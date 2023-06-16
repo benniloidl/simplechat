@@ -1,4 +1,25 @@
+body{
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-content: center;*/
+    /*flex-direction: column;*/
+}
+
 footer{
     background-color: grey;
     height: 2rem;
+    /*display: flex;*/
+    flex-flow: row nowrap;
+    /*justify-content: space-evenly;*/
+    justify-content: flex-end;
+    gap: 1rem;
+
+    font-family: Calibri, sans-serif;
+}
+
+footer .footerLink{
+    color: black;
+    border: 1pt solid gold;
+    background-color: moccasin;
+    list-style-type: none;
 }
