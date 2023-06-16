@@ -1,4 +1,4 @@
-const socket = new WebSocket("ws://localhost:3000");
+const socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
 
 socket.onopen = function () {
     // Verbindungsaufbau behandeln
@@ -31,7 +31,6 @@ function getValues(){
 
 
 function fire(){
-
     sendEvent('login', {username: 'wert1', password: 'wert2'})
     console.log("like");
 }
