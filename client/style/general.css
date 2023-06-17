@@ -1,25 +1,69 @@
-body{
-    /*display: flex;*/
-    /*justify-content: center;*/
-    /*align-content: center;*/
-    /*flex-direction: column;*/
+html{
+    /*Initialise CSS-Variables*/
+    --text-color-normal: #0a244d;
+    --text-color-light: #8cabd9;
+
+    --background-color: #FFFFFF;
+    --background-color-acent: hsl(0deg, 0%, 13%);
+}
+
+html[data-theme='dark']{
+    --background-color: hsl(0deg, 0%, 5%);
+    --text-color-normal: #d9d9d9;
+
+    --link-color-normal: hsl(237deg, 68%, 70%);
+    --link-color-active: hsl(237deg, 68%, 60%);
+    --link-color-used: hsl(237deg, 68%, 50%);
+}
+
+@media (prefers-color-scheme: dark) {
+    /*Do Nothing*/
+}
+body {
+    margin: 0;
+    padding: 0;
+    /*overflow: hidden;*/
+    background-color: var(--background-color);
+    color: var(--text-color-normal);
+}
+
+a {
+   color: var(--link-color-used);
+}
+
+a:hover, a:focus {
+    color: var(--link-color-active);
+}
+
+a:visited {
+    color: var(--link-color-used);
 }
 
 footer{
-    background-color: grey;
-    height: 2rem;
-    /*display: flex;*/
+    position: sticky;
+    bottom: 0;
+    width: 100vw;
+    /*height: 100vh;*/
+    background-color: var(--background-color-acent);
+    height: 3rem;
+    display: flex;
     flex-flow: row nowrap;
     /*justify-content: space-evenly;*/
     justify-content: flex-end;
+    align-items: center;
     gap: 1rem;
 
     font-family: Calibri, sans-serif;
+
 }
 
 footer .footerLink{
     color: black;
-    border: 1pt solid gold;
-    background-color: moccasin;
+    /*border: 1pt solid gold;*/
+    /*background-color: moccasin;*/
     list-style-type: none;
+}
+
+footer .footerLink:last-child{
+    margin-right: 2em;
 }

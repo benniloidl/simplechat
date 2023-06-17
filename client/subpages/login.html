@@ -8,16 +8,54 @@
     <link rel="stylesheet" href="../style/login.css">
 </head>
 <body>
-    <h1>Login</h1>
-    <label hidden="hidden" for="usr"></label><input type="text" id="usr" placeholder="name" value="" ><br>
-    <label hidden="hidden" for="pwd"></label><input type="password" id="pwd" placeholder="password"  value="" ><br>
-    <a>Forget Password</a>
-    <a href="">Signup</a>
-    <button onclick="fire()">Submit</button>
-
+<div class="wrappeQr">
+    <div class="loginForm">
+        <h1>Login</h1>
+        <h2>Let's Chat</h2>
+        <label hidden="hidden" for="usr"></label><input type="text" id="usr" placeholder="Username" value="" tabindex="1"><br>
+        <label hidden="hidden" for="pwd"></label><input type="password" id="pwd" placeholder="Password"  value="" tabindex="2"><br>
+        <div>
+            <a href="">Forgot Password</a>
+            <a href=""><b>Signup</b></a>
+        </div>
+        <button onclick="fire()" id="submit" tabindex="3">Login</button>
+    </div>
+</div>
     <footer>
-            <a class="footerLink">Imprint</a>
-            <a class="footerLink">Privacy</a>
+            <a class="footerLink" href="imprint.html">Imprint</a>
+            <a class="footerLink" href="privacy.html">Privacy</a>
     </footer>
+    <script>
+        const input = document.querySelectorAll("input");
+        for (let inputElement of input) {
+            inputElement.addEventListener("keyup", (event) => {
+                if(event.key === "Enter"){
+                    fire()
+                }
+            })
+        }
+
+        function detectColorScheme(){
+            let theme="light";    //default to light
+            //local storage is used to override OS theme settings
+            if(localStorage.getItem("theme")){
+                if(localStorage.getItem("theme") === "dark"){
+                    theme = "dark";
+                }
+            } else if(!window.matchMedia) {
+                //matchMedia method not supported
+                return false;
+            } else if(window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                //OS theme setting detected as dark
+                theme = "dark";
+            }
+
+            //dark theme preferred, set document with a `data-theme` attribute
+            if (theme==="dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+            }
+        }
+        detectColorScheme();
+    </script>
 </body>
 </html>
