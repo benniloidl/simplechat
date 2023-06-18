@@ -47,7 +47,7 @@ function changeColorScheme(){
     localStorage.setItem("theme", theme)
     document.documentElement.setAttribute("data-theme", theme);
 }
-mediaQuery.addEventListener('change', e =>{
+mediaQuery.addEventListener('change', () =>{
     localStorage.removeItem("theme");
     detectColorScheme()
 });
