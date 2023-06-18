@@ -1,14 +1,18 @@
+:root{
+    --login-hue: calc(155 - 75 + 180);
+
+    --login-color: hsl(var(--login-hue), 100%, 70%);
+    --login-accent-color: hsl(var(--login-hue), 100%, 60%);
+
+    --color-error: hsl(0deg, 100%, 50%);
+}
+
+:root[data-theme='dark']{
+    --login-color: hsl(calc(var(--login-hue) - 180), 100%, 50%);
+    --login-accent-color: hsl(calc(var(--login-hue) - 180), 100%, 40%);
+}
 
 
-/*.wrapper{*/
-/*    background-color: #111;*/
-/*    display: flex;*/
-/*    justify-content: center;*/
-/*    align-items: center;*/
-/*    !*width: 100vw;*!*/
-/*    height: 100vh;*/
-
-/*}*/
 .wrapper{
     /*font-family: -apple-system, system-ui, sans-serif;*/
     width: 90%;
@@ -24,20 +28,21 @@
 
 .loginForm{
     /*position: relative;*/
+    /*position: absolute;*/
+    /*top: 20em;*/
     box-sizing: border-box;
-    margin: 20px auto;
+    margin: calc(50vh - 200px) auto;
+    max-width: 400px;
+    /*height: 360px;*/
 
-    border: green solid 1pt;
+    border: var(--footer-background-color) solid 1pt;
     border-radius: 15px 15px 0 15px;
     padding: 2em;
 
-    font-family: Calibri, sans-serif;
-    background-color: #333333;
+    /*font-family: Calibri, sans-serif;*/
+    background-color: var(--background-color-accent);
     display: flex;
     flex-direction: column;
-    width: 300px;
-    max-width: 400px;
-    /*width: 500px;*/
 
 }
 
@@ -47,7 +52,7 @@
 
 }
 .loginForm div a{
-    border: solid black 1pt;
+    /*border: solid black 1pt;*/
 }
 
 .loginForm h1{
@@ -60,28 +65,35 @@
 }
 
 .loginForm input::placeholder{
-    color: #AAA;
+    color: var(--text-color-light);
 }
 .loginForm input{
-    height: 2em;
-    color: #DDD;
-    background-color: #444444;
-    border-radius: 5px;
+    padding: var(--spacing);
+    color: var(--text-color-normal);
+    background-color: var(--background-color);
+    border-radius: var(--border-radius);
     /*border: solid black 1pt;*/
-    border: hidden;
+    border: 2px solid var(--background-color-accent);
+    /*border: hidden;*/
+    outline: none;
 }
 
 .loginForm a:nth-child(2){
-    color: gold;
+    color: var(--login-color);
 
 }
 
 #submit {
-    background-color: yellow;
+    background-color: var(--login-color);
     border-radius: 5px;
     height: 3em;
 }
 
 #submit:hover, #submit:focus{
-    background-color: gold;
+    background-color: var(--login-accent-color);
+}
+
+.error{
+    color: var(--color-error);
+
 }

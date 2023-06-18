@@ -1,30 +1,61 @@
-html{
+:root{
     /*Initialise CSS-Variables*/
-    --text-color-normal: #0a244d;
-    --text-color-light: #8cabd9;
+    --width: 100%;
+    --max-width: 1200px;
+    --spacing: 1rem;
+    --sidebar-width: 300px;
 
-    --background-color: #FFFFFF;
-    --background-color-acent: hsl(0deg, 0%, 13%);
-}
+    --border-radius: 16px;
+    --font-size: 14px;
 
-html[data-theme='dark']{
-    --background-color: hsl(0deg, 0%, 5%);
-    --text-color-normal: #d9d9d9;
+    --text-color-normal: hsl(217deg, 77%, 17%);
+    --text-color-light: hsl(217deg, 9%, 9%);
+
+    --background-color: hsl(0deg, 0%, 100%);
+    --background-color-accent: hsl(0deg, 12%, 95%);
 
     --link-color-normal: hsl(237deg, 68%, 70%);
     --link-color-active: hsl(237deg, 68%, 60%);
     --link-color-used: hsl(237deg, 68%, 50%);
+
+    --footer-color: hsl(217deg, 9%, 50%);
+    --footer-background-color: hsl(0deg, 0%, 13%);
+
+    --appearance-switch: '\263E';
+}
+
+:root[data-theme='dark']{
+    --text-color-normal: hsl(0deg, 0%, 85%);
+    --text-color-light: hsl(0deg, 100%, 85%);
+
+    --background-color: hsl(0deg, 0%, 5%);
+    --background-color-accent: hsl(0deg, 12%, 15%);
+    /*--background-color-accent: hsl(0deg, 0%, 13%);*/
+
+    --link-color-normal: hsl(237deg, 68%, 70%);
+    --link-color-active: hsl(237deg, 68%, 60%);
+    --link-color-used: hsl(237deg, 68%, 65%);
+
+    /*--appearance-switch: '\263C';*/
+    --appearance-switch: '\2600';
 }
 
 @media (prefers-color-scheme: dark) {
     /*Do Nothing*/
 }
 body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    font-size: var(--font-size);
+    line-height: 1.6;
     margin: 0;
     padding: 0;
     /*overflow: hidden;*/
     background-color: var(--background-color);
     color: var(--text-color-normal);
+}
+body, article{
+    transition: all 500ms;
+    transition-delay: 0ms;
 }
 
 a {
@@ -39,12 +70,17 @@ a:visited {
     color: var(--link-color-used);
 }
 
+article{
+    background-color: var(--background-color-accent);
+}
+
 footer{
-    position: sticky;
+    position: fixed;
+    z-index: 100;
     bottom: 0;
     width: 100vw;
     /*height: 100vh;*/
-    background-color: var(--background-color-acent);
+    background-color: var(--footer-background-color);
     height: 3rem;
     display: flex;
     flex-flow: row nowrap;
@@ -58,12 +94,19 @@ footer{
 }
 
 footer .footerLink{
-    color: black;
-    /*border: 1pt solid gold;*/
-    /*background-color: moccasin;*/
-    list-style-type: none;
+    color: var(--footer-color);
 }
 
 footer .footerLink:last-child{
     margin-right: 2em;
+}
+
+footer .appereanceMode{
+    margin-right: auto;
+    margin-left: 2em;
+}
+.appereanceMode:after{
+    color: white;
+    font-size: calc(2 * var(--font-size));
+    content: var(--appearance-switch);
 }

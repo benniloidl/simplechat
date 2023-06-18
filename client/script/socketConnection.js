@@ -30,14 +30,33 @@ function getValues(){
 
     // further client side checking
     if (usr === "" || pwd === ""){
+        pwdError("Please fill in the missing fields!")
         return null;
     }
+
+    if(
+        !(
+            pwd.match(/[a-z]/g) &&
+            pwd.match(/[A-Z]/g) &&
+            pwd.match(/[0-9]/g) &&
+            pwd.match(/\W/g) &&
+            pwd.length >= 8
+        )
+    ){
+        pwdError("Password must at least 8 characters and upper- and lowercase character, " +
+            "number and a special character")
+        return null;
+    }
+
     return{
         username: usr,
         password: pwd
     };
 }
+function pwdError(errorMessage){
+    document.getElementById("pwdError").innerHTML = errorMessage;
 
+}
 
 function fire(){
     const result = getValues()
@@ -47,5 +66,5 @@ function fire(){
     }
 
     sendEvent('login', {username: 'wert1', password: 'wert2'})
-    console.log("like");
+    console.log("sended LoginData");
 }

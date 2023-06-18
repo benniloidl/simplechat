@@ -1,29 +1,46 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <script src="../script/socketConnection.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimpleChat - Login</title>
+    <script src="../script/socketConnection.js" charset="utf-8"></script>
+    <style>
+        body{
+            font-family: -apple-system, system-ui, sans-serif;
+        }
+        article {
+            width: 90%;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 16px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
     <link rel="stylesheet" href="../style/general.css">
     <link rel="stylesheet" href="../style/login.css">
+    <script src="../script/general.js" charset="utf-8"></script>
 </head>
 <body>
-<div class="wrappeQr">
-    <div class="loginForm">
+<article class="loginForm">
+<!--    <div class="loginForm">-->
         <h1>Login</h1>
         <h2>Let's Chat</h2>
-        <label hidden="hidden" for="usr"></label><input type="text" id="usr" placeholder="Username" value="" tabindex="1"><br>
-        <label hidden="hidden" for="pwd"></label><input type="password" id="pwd" placeholder="Password"  value="" tabindex="2"><br>
+        <label hidden="hidden" for="usr"></label><input type="text" id="usr" placeholder="Username" value="" tabindex="1" maxlength="16" required="required"><br>
+        <label hidden="hidden" for="pwd"></label><input type="password" id="pwd" placeholder="Password"  value="" tabindex="2" required="required"><br>
+        <i class="error" id="pwdError"></i>
         <div>
             <a href="">Forgot Password</a>
             <a href=""><b>Signup</b></a>
         </div>
         <button onclick="fire()" id="submit" tabindex="3">Login</button>
-    </div>
-</div>
+<!--    </div>-->
+</article>
     <footer>
-            <a class="footerLink" href="imprint.html">Imprint</a>
-            <a class="footerLink" href="privacy.html">Privacy</a>
+        <span class="appereanceMode" onclick="changeColorScheme()"></span>
+        <a class="footerLink" href="imprint.html">Imprint</a>
+        <a class="footerLink" href="privacy.html">Privacy</a>
     </footer>
     <script>
         const input = document.querySelectorAll("input");
@@ -34,28 +51,6 @@
                 }
             })
         }
-
-        function detectColorScheme(){
-            let theme="light";    //default to light
-            //local storage is used to override OS theme settings
-            if(localStorage.getItem("theme")){
-                if(localStorage.getItem("theme") === "dark"){
-                    theme = "dark";
-                }
-            } else if(!window.matchMedia) {
-                //matchMedia method not supported
-                return false;
-            } else if(window.matchMedia("(prefers-color-scheme: dark)").matches) {
-                //OS theme setting detected as dark
-                theme = "dark";
-            }
-
-            //dark theme preferred, set document with a `data-theme` attribute
-            if (theme==="dark") {
-                document.documentElement.setAttribute("data-theme", "dark");
-            }
-        }
-        detectColorScheme();
     </script>
 </body>
 </html>
