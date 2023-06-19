@@ -1,6 +1,27 @@
 const ws = require('ws');
-const app = require('express')();
+const express = require('express');
+const app = express();
+const path = require('path');
 const cookieParser = require('cookie-parser');
+const { MongoClient } = require('mongodb');
+const uri = "mongodb://localhost:27017";
+const dbClient = new MongoClient(uri);
+const userCollectionName = "user";
+const chatHistoryCollectionName = "chatHistory";
+
+connectToDB();
+
+async function connectToDB(){
+    await dbClient.connect();
+    const db = dbClient.db("SimpleChat");
+    try{
+    await db.createCollection(userCollectionName);
+    await db.createCollection(chatHistoryCollectionName);
+    }catch{}
+}
+validateUser("test123","123").then((exist)=>{
+    console.log(exist);
+});
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
@@ -28,8 +49,16 @@ app.get('/overview', (req, res) => {
     }
 });
 
-function validateUser(username, password) {
-    return false;
+async function validateUser(username, password) {
+    await dbClient.connect();
+    const db = dbClient.db("SimpleChat");
+    const user = db.collection(userCollectionName);
+    const result = await user.findOne({"username":username, "password":password});
+    if(result){
+        return true;
+    }else{
+        return false;
+    }
 }
 
 wsSrv.on('connection', (socket) => {
@@ -46,6 +75,7 @@ wsSrv.on('connection', (socket) => {
     });
 });
 server.on('close', () => {
+    dbClient.close();
     console.log('Client disconnected');
 });
 
