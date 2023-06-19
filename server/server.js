@@ -4,7 +4,7 @@ const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017";
+const uri = "mongodb://localhost:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
 const userCollectionName = "user";
 const chatHistoryCollectionName = "chatHistory";
@@ -13,13 +13,16 @@ connectToDB();
 
 async function connectToDB(){
     await dbClient.connect();
-    const db = dbClient.db("SimpleChat");
+    const db = dbClient.db();
     try{
     await db.createCollection(userCollectionName);
     await db.createCollection(chatHistoryCollectionName);
     }catch{}
 }
 validateUser("test123","123").then((exist)=>{
+    console.log(exist);
+});
+createUser("test1234","123adas").then((exist)=>{
     console.log(exist);
 });
 
@@ -51,13 +54,26 @@ app.get('/overview', (req, res) => {
 
 async function validateUser(username, password) {
     await dbClient.connect();
-    const db = dbClient.db("SimpleChat");
+    const db = dbClient.db();
     const user = db.collection(userCollectionName);
     const result = await user.findOne({"username":username, "password":password});
     if(result){
         return true;
     }else{
         return false;
+    }
+}
+
+async function createUser(username, password) {
+    await dbClient.connect();
+    const db = dbClient.db();
+    const user = db.collection(userCollectionName);
+    const result = await user.findOne({"username":username});
+    if(result){
+        return false;
+    }else{
+        await user.insertOne({"username":username, "password":password});
+        return true;
     }
 }
 
