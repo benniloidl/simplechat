@@ -1,7 +1,5 @@
 const ws = require('ws');
-const express = require('express');
-const app = express();
-const path = require('path');
+const app = require('express')();
 const cookieParser = require('cookie-parser');
 
 app.use(express.static(path.join(__dirname, '../client')));
@@ -36,10 +34,6 @@ function validateUser(username, password) {
 
 wsSrv.on('connection', (socket) => {
     sockets.push(socket);
-    socket.on('message',(message)=>{
-        const buffer = Buffer.from(message);
-        console.log(buffer.toString('utf-8'));
-    })
     socket.on('login', (data) => {
         console.log(data);
         console.log(`Login attempt with username: ${data.username} and password: ${data.password}`);
@@ -51,12 +45,7 @@ wsSrv.on('connection', (socket) => {
         }
     });
 });
-
-wsSrv.on('close', (socket) => {
-    console.log('Client disconnected');
-});
-
 server.on('close', () => {
-    console.log('Server closed');
+    console.log('Client disconnected');
 });
 
