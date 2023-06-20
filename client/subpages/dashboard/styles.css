@@ -1,20 +1,20 @@
 :root {
-    --width: 100%;
-    --max-width: 1200px;
-    --spacing: 1rem;
-    --sidebar-width: 300px;
+    /*--spacing: 1rem;*/
+    /*--sidebar-width: 300px;*/
 
-    --color-primary: #4e90e1;
-    --color-secondary: #f1f3f4;
-    --color-text: #202124;
+    /*--color-primary: #4e90e1;*/
+    /*--color-secondary: #f1f3f4;*/
+    /*--color-text: #202124;*/
 
-    --border-radius: 16px;
+    /*--color-primary: var(--background-color);*/
+    /*--color-primary: hsl(213deg, 71%, 59%);*/
+    /*--color-primary: var(--color-primary);*/
+    --color-secondary: var(--background-color-accent);
+    --color-text: var(--text-color-normal);
 
-    --font-size: 14px;
-}
+    /*--border-radius: 16px;*/
 
-* {
-    box-sizing: border-box;
+    /*--font-size: 14px;*/
 }
 
 body {
@@ -44,6 +44,11 @@ main #sidebar {
     width: var(--sidebar-width);
     padding: var(--spacing);
     gap: var(--spacing);
+}
+
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
 }
 
 main #sidebar .sidebar-callout {

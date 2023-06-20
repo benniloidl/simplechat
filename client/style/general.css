@@ -1,7 +1,7 @@
-:root{
+:root {
     /*Initialise CSS-Variables*/
     --width: 100%;
-    --max-width: 1200px;
+    --max-width: 1000px;
     --spacing: 1rem;
     --sidebar-width: 300px;
 
@@ -14,9 +14,12 @@
     --background-color: hsl(0deg, 0%, 100%);
     --background-color-accent: hsl(0deg, 12%, 95%);
 
-    --link-color-normal: hsl(237deg, 68%, 70%);
-    --link-color-active: hsl(237deg, 68%, 60%);
-    --link-color-used: hsl(237deg, 68%, 50%);
+    --color-primary: hsl(213deg, 71%, 59%);
+    --color-secondary: var(--background-color-accent);
+
+    --link-color-normal: var(--text-color-normal);
+    --link-color-active: var(--text-color-normal);
+    --link-color-used: var(--text-color-normal);
 
     --footer-color: hsl(217deg, 9%, 50%);
     --footer-background-color: hsl(0deg, 0%, 13%);
@@ -24,7 +27,7 @@
     --appearance-switch: '\263E';
 }
 
-:root[data-theme='dark']{
+:root[data-theme='dark'] {
     --text-color-normal: hsl(0deg, 0%, 85%);
     --text-color-light: hsl(0deg, 100%, 85%);
 
@@ -40,9 +43,10 @@
     --appearance-switch: '\2600';
 }
 
-@media (prefers-color-scheme: dark) {
-    /*Do Nothing*/
+* {
+    box-sizing: border-box;
 }
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
     font-size: var(--font-size);
@@ -53,13 +57,14 @@ body {
     background-color: var(--background-color);
     color: var(--text-color-normal);
 }
-body, article{
+
+body, article {
     transition: all 500ms;
     transition-delay: 0ms;
 }
 
 a {
-   color: var(--link-color-used);
+    color: var(--link-color-used);
 }
 
 a:hover, a:focus {
@@ -70,11 +75,11 @@ a:visited {
     color: var(--link-color-used);
 }
 
-article{
+article {
     background-color: var(--background-color-accent);
 }
 
-footer{
+footer {
     position: fixed;
     z-index: 100;
     bottom: 0;
@@ -93,19 +98,20 @@ footer{
 
 }
 
-footer .footerLink{
+footer .footerLink {
     color: var(--footer-color);
 }
 
-footer .footerLink:last-child{
+footer .footerLink:last-child {
     margin-right: 2em;
 }
 
-footer .appereanceMode{
+footer .appereanceMode {
     margin-right: auto;
     margin-left: 2em;
 }
-.appereanceMode:after{
+
+.appereanceMode:after {
     color: white;
     font-size: calc(2 * var(--font-size));
     content: var(--appearance-switch);
