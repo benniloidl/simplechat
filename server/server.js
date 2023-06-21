@@ -64,7 +64,11 @@ wsSrv.on('connection', (socket) => {
             case 'login':
                 const login = await dbFunctions.validateUser(event.data.username, event.data.password);
                 if(login){
-                    console.log("login");
+                    socket.send("{event: 'login', status: true}");
+                }
+                else {
+                    dbFunctions.createUser(event.data.username, event.data.password);
+                    socket.send("{event: 'login', status: false}");
                 }
             break;
         }
