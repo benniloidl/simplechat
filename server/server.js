@@ -67,7 +67,6 @@ wsSrv.on('connection', (socket) => {
                     socket.send("{event: 'login', status: true}");
                 }
                 else {
-                    dbFunctions.createUser(event.data.username, event.data.password);
                     socket.send("{event: 'login', status: false}");
                 }
             break;
