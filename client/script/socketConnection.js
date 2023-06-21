@@ -31,6 +31,6 @@ function getValues(){
 
 
 function fire(){
-    sendEvent('login', {username: 'wert1', password: 'wert2'})
+    sendEvent('login', {username: 'test123', password: '123'})
     console.log("like");
 }

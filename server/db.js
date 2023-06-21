@@ -22,7 +22,7 @@ async function connectToDB() {
     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
-    createUser("test123", "123").then((result) => {
+/*     createUser("test123", "123").then((result) => {
         console.log("creating a new user: " + result);
     });
     addChatID("test123", "123", "ID1234").then((result) => {
@@ -33,7 +33,7 @@ async function connectToDB() {
     });
     getAllChatIDs("test123", "123").then((result) => {
         console.log(result);
-    });
+    }); */
     //end of test
 }
 

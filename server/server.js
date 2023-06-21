@@ -7,6 +7,7 @@ const { MongoClient } = require('mongodb');
 const uri = "mongodb://localhost:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
 const dbFunctions = require('./db');
+const { log } = require('console');
 let db, user, chatHistory;
 
 let sockets = [];
@@ -35,13 +36,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/overview', (req, res) => {
-    /*     validateUser(req.cookies.username, req.cookies.password).then((result) => {
+        validateUser(req.cookies.username, req.cookies.password).then((result) => {
             if (result) {
                 res.sendFile(path.join(__dirname, '../client', 'overview.html'));
             } else {
                 res.redirect('/');
             }
-        }); */
+        });
 });
 
 app.get("*", (_req, res) => {
@@ -49,20 +50,24 @@ app.get("*", (_req, res) => {
 });
 
 
+
+
+
+
 //receive message
 wsSrv.on('connection', (socket) => {
     sockets.push(socket);
-    socket.on('message', (data) => {
-        console.log(data);
-        console.log(`Login attempt with username: ${data.username} and password: ${data.password}`);
-
-        /* validateUser(username, password).then((result) => {
-            if (result) {
-                socket.send('loginAnswer', true);
-            } else {
-                socket.send('loginAnswer', false);
-            }
-        }); */
+    socket.on('message', async (data) => {
+        const message = Buffer.from(data).toString('utf-8');
+        const event = JSON.parse(message);
+        switch (event.event){
+            case 'login':
+                const login = await dbFunctions.validateUser(event.data.username, event.data.password);
+                if(login){
+                    console.log("login");
+                }
+            break;
+        }
     });
 });
 
