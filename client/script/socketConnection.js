@@ -65,9 +65,9 @@ function pwdError(errorMessage){
 
 function fire(){
     const result = getValues()
-/*     if (result === null){
+    if (result === null){
         console.log("Not in format")
         return;
-    } */
-    sendEvent('login', {username: 'test123', password: '123'})
+    }
+    sendEvent('login', {username: result.username, password: result.password})
 }
