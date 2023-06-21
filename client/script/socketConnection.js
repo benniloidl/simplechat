@@ -69,6 +69,6 @@ function fire(){
         console.log("Not in format")
         return;
     }
-    sendEvent('login', {username: 'wert1', password: 'wert2'})
+    sendEvent('login', {username: 'test123', password: '123'})
     console.log("sended LoginData");
 }

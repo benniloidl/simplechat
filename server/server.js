@@ -3,60 +3,76 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const { MongoClient } = require('mongodb');
+const uri = "mongodb://localhost:27017/SimpleChat";
+const dbClient = new MongoClient(uri);
+const dbFunctions = require('./db');
+const { log } = require('console');
+let db, user, chatHistory;
+
+let sockets = [];
+
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 
 const server = app.listen(3000, () => {
-    console.log(`Server is running on port 3000`);
+    console.log("Server is running on port 3000\n");
+    dbFunctions.connectToDB();
 });
 const wsSrv = new ws.Server({ server });
 
-let sockets = [];
 
+
+//Website
 app.get('/', (req, res) => {
-    if (validateUser(req.cookies.username, req.cookies.password)) {
-        res.redirect('/overview');
-    } else {
-        res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
-    }
-});
-
-app.get('/overview', (req, res) => {
-    if (validateUser(req.cookies.username, req.cookies.password)) {
-        res.sendFile(path.join(__dirname, '../client', 'overview.html'));
-    } else {
-        res.redirect('/overview');
-    }
-});
-
-function validateUser(username, password) {
-    return false;
-}
-
-wsSrv.on('connection', (socket) => {
-    sockets.push(socket);
-    socket.on('message',(message)=>{
-        const buffer = Buffer.from(message);
-        console.log(buffer.toString('utf-8'));
-    })
-    socket.on('login', (data) => {
-        console.log(data);
-        console.log(`Login attempt with username: ${data.username} and password: ${data.password}`);
-
-        if (validateUser(username, password)) {
-            socket.send('loginAnswer', true);
+    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+        if (result) {
+            res.redirect('/overview');
         } else {
-            socket.send('loginAnswer', false);
+            res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
         }
     });
 });
 
-wsSrv.on('close', (socket) => {
-    console.log('Client disconnected');
+app.get('/overview', (req, res) => {
+        validateUser(req.cookies.username, req.cookies.password).then((result) => {
+            if (result) {
+                res.sendFile(path.join(__dirname, '../client', 'overview.html'));
+            } else {
+                res.redirect('/');
+            }
+        });
 });
+
+app.get("*", (_req, res) => {
+    res.redirect('/');
+});
+
+
+
+
+
+
+//receive message
+wsSrv.on('connection', (socket) => {
+    sockets.push(socket);
+    socket.on('message', async (data) => {
+        const message = Buffer.from(data).toString('utf-8');
+        const event = JSON.parse(message);
+        switch (event.event){
+            case 'login':
+                const login = await dbFunctions.validateUser(event.data.username, event.data.password);
+                if(login){
+                    console.log("login");
+                }
+            break;
+        }
+    });
+});
+
 
 server.on('close', () => {
+    dbClient.close();
     console.log('Server closed');
 });
-
