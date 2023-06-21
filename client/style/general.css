@@ -1,25 +1,118 @@
-body{
-    /*display: flex;*/
-    /*justify-content: center;*/
-    /*align-content: center;*/
-    /*flex-direction: column;*/
+:root {
+    /*Initialise CSS-Variables*/
+    --width: 100%;
+    --max-width: 1000px;
+    --spacing: 1rem;
+    --sidebar-width: 300px;
+
+    --border-radius: 16px;
+    --font-size: 14px;
+
+    --text-color-normal: hsl(217deg, 77%, 17%);
+    --text-color-light: hsl(217deg, 9%, 9%);
+
+    --background-color: hsl(0deg, 0%, 100%);
+    --background-color-accent: hsl(0deg, 12%, 95%);
+
+    --color-primary: hsl(213deg, 71%, 59%);
+    --color-secondary: var(--background-color-accent);
+
+    --link-color-normal: var(--text-color-normal);
+    --link-color-active: var(--text-color-normal);
+    --link-color-used: var(--text-color-normal);
+
+    --footer-color: hsl(217deg, 9%, 50%);
+    --footer-background-color: hsl(0deg, 0%, 13%);
+
+    --appearance-switch: '\263E';
 }
 
-footer{
-    background-color: grey;
-    height: 2rem;
-    /*display: flex;*/
+:root[data-theme='dark'] {
+    --text-color-normal: hsl(0deg, 0%, 85%);
+    --text-color-light: hsl(0deg, 100%, 85%);
+
+    --background-color: hsl(0deg, 0%, 5%);
+    --background-color-accent: hsl(0deg, 12%, 15%);
+    /*--background-color-accent: hsl(0deg, 0%, 13%);*/
+
+    --link-color-normal: hsl(237deg, 68%, 70%);
+    --link-color-active: hsl(237deg, 68%, 60%);
+    --link-color-used: hsl(237deg, 68%, 65%);
+
+    /*--appearance-switch: '\263C';*/
+    --appearance-switch: '\2600';
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    font-size: var(--font-size);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    /*overflow: hidden;*/
+    background-color: var(--background-color);
+    color: var(--text-color-normal);
+}
+
+body, article {
+    transition: all 500ms;
+    transition-delay: 0ms;
+}
+
+a {
+    color: var(--link-color-used);
+}
+
+a:hover, a:focus {
+    color: var(--link-color-active);
+}
+
+a:visited {
+    color: var(--link-color-used);
+}
+
+article {
+    background-color: var(--background-color-accent);
+}
+
+footer {
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    width: 100vw;
+    /*height: 100vh;*/
+    background-color: var(--footer-background-color);
+    height: 3rem;
+    display: flex;
     flex-flow: row nowrap;
     /*justify-content: space-evenly;*/
     justify-content: flex-end;
+    align-items: center;
     gap: 1rem;
 
     font-family: Calibri, sans-serif;
+
 }
 
-footer .footerLink{
-    color: black;
-    border: 1pt solid gold;
-    background-color: moccasin;
-    list-style-type: none;
+footer .footerLink {
+    color: var(--footer-color);
+}
+
+footer .footerLink:last-child {
+    margin-right: 2em;
+}
+
+footer .appereanceMode {
+    margin-right: auto;
+    margin-left: 2em;
+}
+
+.appereanceMode:after {
+    color: white;
+    font-size: calc(2 * var(--font-size));
+    content: var(--appearance-switch);
 }

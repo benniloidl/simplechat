@@ -1,14 +1,92 @@
-body{
-    background-color: green;
+:root {
+    --login-hue: calc(155 - 75 + 180);
+    /*--login-hue: calc(0);*/
+
+    --login-color: var(--color-primary);
+    --login-accent-color: var(--color-primary);
+
+    --color-error: hsl(0deg, 100%, 50%);
 }
 
-form{
-    border: green solid 1pt;
-    border-radius: 15px;
+:root[data-theme='dark'] {
+    --login-color: hsl(calc(var(--login-hue) - 180), 100%, 50%);
+    --login-accent-color: hsl(calc(var(--login-hue) - 180), 100%, 40%);
+}
+
+
+.loginForm {
+    box-sizing: border-box;
+    margin: calc(50vh - 200px) auto;
+    max-width: 400px;
+    /*height: 360px;*/
+
+    border: none;
+    border-radius: var(--border-radius) var(--border-radius) var(--border-radius) 0;
     padding: 2em;
 
-    font-family: Calibri, sans-serif;
-    /*display: flex;*/
+    /*font-family: Calibri, sans-serif;*/
+    background-color: var(--color-secondary);
+    display: flex;
+    flex-direction: column;
+    position: relative;
 
+}
 
+.loginForm::before {
+    position: absolute;
+    bottom: 0;
+    left: -50px;
+    width: 0;
+    height: 0;
+    content: '';
+    border-width: 0 0 60px 60px;
+    border-style: solid;
+    border-color: transparent transparent var(--color-secondary) transparent;
+}
+
+.loginForm div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.loginForm div a {
+    /*border: solid black 1pt;*/
+}
+
+.loginForm h1 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.loginForm h2 {
+    margin: auto 0;
+}
+
+.loginForm input::placeholder {
+    color: var(--text-color-light);
+}
+
+.loginForm input {
+    padding: var(--spacing);
+    color: var(--text-color-normal);
+    background-color: var(--background-color);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--background-color-accent);
+    outline: none;
+}
+
+#submit {
+    background-color: var(--login-color);
+    border-radius: var(--border-radius);
+    border: none;
+    height: 3em;
+    margin-bottom: var(--spacing);
+}
+
+#submit:hover, #submit:focus {
+    background-color: var(--login-accent-color);
+}
+
+.error {
+    color: var(--color-error);
 }
