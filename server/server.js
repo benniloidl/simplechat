@@ -8,13 +8,25 @@ const uri = "mongodb://localhost:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
 const dbFunctions = require('./db');
 const { log } = require('console');
-let db, user, chatHistory;
 
 let sockets = [];
 
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
+app.use((req, res, next) => {
+    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+        if (result) {
+            next();
+        } else {
+            if (req.path == '/login') {
+                next();
+            } else {
+                res.redirect("/login");
+            }
+        }
+    });
+});
 
 const server = app.listen(3000, () => {
     console.log("Server is running on port 3000\n");
@@ -25,33 +37,13 @@ const wsSrv = new ws.Server({ server });
 
 
 //Website
-app.get('/', (req, res) => {
-    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
-        if (result) {
-            res.redirect('/overview');
-        } else {
-            res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
-        }
-    });
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
 });
 
-app.get('/overview', (req, res) => {
-    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
-        if (result) {
-        res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
-        } else {
-            res.redirect('/');
-        }
-    });
+app.get('/dashbord', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
 });
-
-app.get("*", (_req, res) => {
-    res.redirect('/');
-});
-
-
-
-
 
 
 //receive message
@@ -83,7 +75,7 @@ async function login(event, socket) {
     }
 }
 
-async function signup(event, socket){
+async function signup(event, socket) {
     const login = await dbFunctions.createUser(event.data.username, event.data.password);
     if (login) {
         socket.send("{event: 'signup', status: true}");
