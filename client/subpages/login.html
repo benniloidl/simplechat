@@ -28,10 +28,16 @@
     <!--    <div class="loginForm">-->
     <h1>Login</h1>
     <h2>Let's Chat</h2>
-    <label for="usr" hidden="hidden"></label><input id="usr" maxlength="16" placeholder="Username" required="required" tabindex="1"
-                                                    type="text" value=""><br>
-    <label for="pwd" hidden="hidden"></label><input id="pwd" placeholder="Password" required="required" tabindex="2"
-                                                    type="password" value=""><br>
+    <div class="input-label" data-label="Username">
+	    <label for="usr" hidden="hidden"></label>
+	    <input id="usr" maxlength="16" placeholder="Username" required="required" tabindex="1"
+	           type="text" value=""><br>
+    </div>
+	<div class="input-label" data-label="Password">
+		<label for="pwd" hidden="hidden"></label>
+		<input id="pwd" placeholder="Password" required="required" tabindex="2"
+		       type="password" value=""><br>
+	</div>
     <i class="error" id="pwdError"></i>
     <button id="submit" onclick="fire()" tabindex="3">Login</button>
     <div>
