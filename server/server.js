@@ -36,12 +36,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/overview', (req, res) => {
-        validateUser(req.cookies.username, req.cookies.password).then((result) => {
-            if (result) {
-                res.sendFile(path.join(__dirname, '../client', 'overview.html'));
-            } else {
+        dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+            //if (result) {
+                res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
+            /*} else {
                 res.redirect('/');
-            }
+            }*/
         });
 });
 
