@@ -36,13 +36,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/overview', (req, res) => {
-        dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
-            //if (result) {
-                res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
-            /*} else {
-                res.redirect('/');
-            }*/
-        });
+    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+        //if (result) {
+        res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
+        //} else {
+        //    res.redirect('/');
+        //}
+    });
 });
 
 app.get("*", (_req, res) => {
@@ -60,20 +60,38 @@ wsSrv.on('connection', (socket) => {
     socket.on('message', async (data) => {
         const message = Buffer.from(data).toString('utf-8');
         const event = JSON.parse(message);
-        switch (event.event){
+        switch (event.event) {
             case 'login':
-                const login = await dbFunctions.validateUser(event.data.username, event.data.password);
-                if(login){
-                    socket.send("{event: 'login', status: true}");
-                }
-                else {
-                    socket.send("{event: 'login', status: false}");
-                }
-            break;
+                login(event, socket);
+                break;
+            case 'signup':
+                signup(event, socket);
+                break;
+            default:
+                socket.send("{event: 'error', message: 'unknown event'}");
         }
     });
 });
 
+async function login(event, socket) {
+    const login = await dbFunctions.validateUser(event.data.username, event.data.password);
+    if (login) {
+        socket.send("{event: 'login', status: true}");
+    }
+    else {
+        socket.send("{event: 'login', status: false}");
+    }
+}
+
+async function signup(event, socket){
+    const login = await dbFunctions.createUser(event.data.username, event.data.password);
+    if (login) {
+        socket.send("{event: 'signup', status: true}");
+    }
+    else {
+        socket.send("{event: 'signup', status: false}");
+    }
+}
 
 server.on('close', () => {
     dbClient.close();
