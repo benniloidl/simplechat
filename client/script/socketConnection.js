@@ -1,7 +1,7 @@
 const socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
 
 socket.onopen = function () {
-    
+
 };
 
 function loginUser(data) {
@@ -38,13 +38,13 @@ function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd-check");
-    
+
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
         pwdError("Please fill in the missing fields!")
         return null;
     }
-    
+
     if (
         !(
             pwd.match(/[a-z]/g) &&
@@ -62,7 +62,7 @@ function getValues() {
         pwdError("Passwords doesn't match");
         return null;
     }
-    
+    pwdError("OK");
     return {
         username: usr,
         password: pwd
@@ -71,7 +71,7 @@ function getValues() {
 
 function pwdError(errorMessage) {
     document.getElementById("pwdError").innerHTML = errorMessage;
-    
+
 }
 
 function fire() {
@@ -80,6 +80,6 @@ function fire() {
         console.log("Not in format")
         return;
     }
-    
-    sendEvent('login', { username: result.username, password: result.password })
+
+    sendEvent('login', {username: result.username, password: result.password})
 }

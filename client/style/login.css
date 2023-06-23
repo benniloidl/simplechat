@@ -63,6 +63,10 @@
 }
 
 .loginForm input::placeholder {
+    opacity: 1;
+}
+
+.loginForm input:focus::placeholder {
     opacity: 0;
 }
 
@@ -89,12 +93,14 @@
     top: calc(var(--spacing) + var(--font-size));
     transition: all 0.2s ease-in-out;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
+    visibility: hidden;
 }
 
 .input-label:has(input:focus)::after {
     background-color: var(--background-color);
     top: 0;
     padding: 0 var(--spacing);
+    visibility: visible;
 }
 
 #submit {
