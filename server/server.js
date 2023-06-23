@@ -14,7 +14,11 @@ app.use(cookieParser());
 app.use((req, res, next) => {
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
-            next();
+            if (req.path == '/dashboard') {
+                next();
+            } else {
+                res.redirect("/dashboard");
+            }
         } else {
             if (req.path == '/login') {
                 next();
@@ -41,6 +45,10 @@ app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
 });
 
+app.get('*', (req, res) => {
+    res.redirect('login');
+});
+
 
 
 
@@ -54,13 +62,7 @@ wsSrv.on('connection', (socket) => {
         const event = JSON.parse(message);
         switch (event.event){
             case 'login':
-                const login = await dbFunctions.validateUser(event.data.username, event.data.password);
-                if(login){
-                    socket.send("{event: 'login', status: true}");
-                }
-                else {
-                    socket.send("{event: 'login', status: false}");
-                }
+                login(event, socket);
             break;
         }
     });

@@ -1,20 +1,20 @@
 const socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
 
 socket.onopen = function () {
-    console.log(document.cookie)
+    
 };
 
 function loginUser(data) {
     if (data.status) {
-        console.log("login successful")
-        console.log(data)
+        const result = getValues()
+        document.cookie = "username= " + result.username + ";";
+        document.cookie = "password= " + result.password + ";secure";
+        window.location.href = "/dashboard";
     }
 }
 
 socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
-    console.log(data); // Neue Nachricht behandeln
-    // document.getElementById("b").innerHTML = event.data;
     switch (data.event) {
         case 'login':
             loginUser(data);
@@ -80,8 +80,6 @@ function fire() {
         console.log("Not in format")
         return;
     }
-    sendEvent('login', { username: result.username, password: result.password })
     
-    document.cookie = "username= " + result.username + ";";
-    document.cookie = "password= " + result.password + ";secure";
+    sendEvent('login', { username: result.username, password: result.password })
 }
