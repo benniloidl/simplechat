@@ -1,41 +1,51 @@
-const socket = new WebSocket("ws://localhost:3000");
+const socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
 
 socket.onopen = function () {
-    // Verbindungsaufbau behandeln
-    // document.getElementById("a").innerHTML = "Socked Started"
-
+    
 };
 
-socket.onmessage = function(event) {
-    console.log(event.data); // Neue Nachricht behandeln
-    // document.getElementById("b").innerHTML = event.data;
+function loginUser(data) {
+    if (data.status) {
+        const result = getValues()
+        document.cookie = "username= " + result.username + ";";
+        document.cookie = "password= " + result.password + ";secure";
+        window.location.href = "/dashboard";
+    }
+}
+
+socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    switch (data.event) {
+        case 'login':
+            loginUser(data);
+    }
 };
-socket.onclose = function(event) {
-    // Verbindungsabbau behandeln
-    document.getElementById("c").innerHTML = "stopped";
+
+socket.onclose = function (event) {
 };
 //
 // socket.send("Hello Server");
 //
-function sendEvent(eventName, eventData){
+function sendEvent(eventName, eventData) {
     const message = {
         event: eventName,
         data: eventData,
     };
     socket.send(JSON.stringify(message));
 }
-function getValues(){
+
+function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd-check");
-
+    
     // further client side checking
-    if (usr === "" || pwd === ""|| (pwdElement && pwdElement.value === "")){
+    if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
         pwdError("Please fill in the missing fields!")
         return null;
     }
-
-    if(
+    
+    if (
         !(
             pwd.match(/[a-z]/g) &&
             pwd.match(/[A-Z]/g) &&
@@ -43,33 +53,33 @@ function getValues(){
             pwd.match(/\W/g) &&
             pwd.length >= 8
         )
-    ){
+    ) {
         pwdError("Password must at least 8 characters and upper- and lowercase character, " +
             "number and a special character");
         return null;
     }
-    if (pwdElement && pwdElement.value !== pwd){
+    if (pwdElement && pwdElement.value !== pwd) {
         pwdError("Passwords doesn't match");
         return null;
     }
-
-    return{
+    
+    return {
         username: usr,
         password: pwd
     };
 }
-function pwdError(errorMessage){
-    document.getElementById("pwdError").innerHTML = errorMessage;
 
+function pwdError(errorMessage) {
+    document.getElementById("pwdError").innerHTML = errorMessage;
+    
 }
 
-function fire(){
+function fire() {
     const result = getValues()
-    if (result === null){
+    if (result === null) {
         console.log("Not in format")
         return;
     }
-
-    sendEvent('login', {username: 'wert1', password: 'wert2'})
-    console.log("sended LoginData");
+    
+    sendEvent('login', { username: result.username, password: result.password })
 }
