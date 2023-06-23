@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017/SimpleChat";
+const uri = "mongodb://127.0.0.1:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
 let db, user, chatHistory;
 
