@@ -11,10 +11,14 @@ const { log } = require('console');
 
 let sockets = [];
 
+let user = 0;
+let password = 0;
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
+    user = req.cookies.username;
+    password = rey.cookies.password;
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
             next();
@@ -59,6 +63,8 @@ wsSrv.on('connection', (socket) => {
             case 'signup':
                 signup(event, socket);
                 break;
+            case 'loadchats':
+                loadChats(event, socket);
             default:
                 socket.send("{event: 'error', message: 'unknown event'}");
         }
@@ -83,6 +89,12 @@ async function signup(event, socket) {
     else {
         socket.send("{event: 'signup', status: false}");
     }
+}
+
+async function loadChats(event, socket){
+    dbFunctions.validateUser(user, password);
+    let chatIDs = dbFunctions.getAllChatIDs(user, password);
+    socket.send(""+chatIDs);
 }
 
 server.on('close', () => {
