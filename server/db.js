@@ -22,20 +22,6 @@ async function connectToDB() {
     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
-<<<<<<< Updated upstream
-/*     createUser("test123", "123").then((result) => {
-        console.log("creating a new user: " + result);
-    });
-    addChatID("test123", "123", "ID1234").then((result) => {
-        console.log("added ID: "+result);
-    });
-    removeChatID("test123", "123", "ID1234").then((result) => {
-        console.log("removed ID: "+result);
-    });
-    getAllChatIDs("test123", "123").then((result) => {
-        console.log(result);
-    }); */
-=======
     createUser("Test12345", "Test123*345u").then((result) => {
         console.log("creating a new user: " + result);
     });
@@ -48,7 +34,6 @@ async function connectToDB() {
     getAllChatIDs("test123", "123").then((result) => {
         console.log(result);
     });
->>>>>>> Stashed changes
     //end of test
 }
 

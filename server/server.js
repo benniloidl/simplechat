@@ -3,23 +3,15 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017/SimpleChat";
-const dbClient = new MongoClient(uri);
 const dbFunctions = require('./db');
 const { log } = require('console');
-let db, user, chatHistory;
 
 let sockets = [];
 
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
-<<<<<<< Updated upstream
-=======
 app.use((req, res, next) => {
-    user = req.cookies.username;
-    password = req.cookies.password;
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
             next();
@@ -32,7 +24,6 @@ app.use((req, res, next) => {
         }
     });
 });
->>>>>>> Stashed changes
 
 const server = app.listen(3000, () => {
     console.log("Server is running on port 3000\n");
@@ -42,33 +33,12 @@ const wsSrv = new ws.Server({ server });
 
 
 //Website
-app.get('/', (req, res) => {
-    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
-        if (result) {
-            res.redirect('/overview');
-        } else {
-            res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
-        }
-    });
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
 });
 
-<<<<<<< Updated upstream
-app.get('/overview', (req, res) => {
-        validateUser(req.cookies.username, req.cookies.password).then((result) => {
-            if (result) {
-                res.sendFile(path.join(__dirname, '../client', 'overview.html'));
-            } else {
-                res.redirect('/');
-            }
-        });
-=======
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
->>>>>>> Stashed changes
-});
-
-app.get("*", (_req, res) => {
-    res.redirect('/');
 });
 
 
@@ -96,8 +66,6 @@ wsSrv.on('connection', (socket) => {
     });
 });
 
-<<<<<<< Updated upstream
-=======
 async function login(event, socket) {
     const login = await dbFunctions.validateUser(event.data.username, event.data.password);
     if (login) {
@@ -115,7 +83,7 @@ async function signup(event, socket) {
         socket.send("{event: 'signup', status: false}");
     }
 }
-
+/*
 async function loadChats(event, socket) {
     dbFunctions.validateUser(user, password);
     let chatIDs = dbFunctions.getAllChatIDs(user, password);
@@ -140,9 +108,8 @@ async function createChat(event, socket) {
 async function addUserToGroup(event, socket, id) {
     dbFunctions.validateUser(user, password);
     dbFunctions.addChatID(user, password, id);
-}
+}*/
 
->>>>>>> Stashed changes
 
 server.on('close', () => {
     dbClient.close();
