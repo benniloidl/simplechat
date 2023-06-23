@@ -50,23 +50,51 @@ app.get('*', (req, res) => {
 });
 
 
-
-
-
-
 //receive message
-wsSrv.on('connection', (socket) => {
+wsSrv.on('connection', (socket, req) => {
     sockets.push(socket);
     socket.on('message', async (data) => {
-        const message = Buffer.from(data).toString('utf-8');
-        const event = JSON.parse(message);
-        switch (event.event){
+        let event;
+        try {
+            const message = Buffer.from(data).toString('utf-8');
+            event = JSON.parse(message);
+        } catch {
+            return -1;
+        }
+
+        const cookie = req.headers.cookie;
+        let JSONCookie = {};
+        if (cookie) {
+            cookie.split(/\s*;\s*/).forEach(function (pair) {
+                pair = pair.split(/\s*=\s*/);
+                JSONCookie[pair[0]] = pair.splice(1).join('=');
+            });
+        }
+
+        switch (event.event) {
             case 'login':
                 login(event, socket);
-            break;
+                break;
+
+            case 'loadChats':
+                if (validate(JSONCookie)) {
+                    loadChats(event, socket);
+                }
+                break;
+
+            default: return -1;
         }
     });
 });
+
+async function validate(cookie) {
+    const valid = await dbFunctions.validateUser(cookie.username, cookie.password);
+    if (valid) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 async function login(event, socket) {
     const login = await dbFunctions.validateUser(event.data.username, event.data.password);
@@ -85,12 +113,13 @@ async function signup(event, socket) {
         socket.send("{event: 'signup', status: false}");
     }
 }
-/*
+
 async function loadChats(event, socket) {
     dbFunctions.validateUser(user, password);
     let chatIDs = dbFunctions.getAllChatIDs(user, password);
     socket.send("" + chatIDs);
 }
+/*
 
 async function loadChatHistory(event, socket) {
     dbFunctions.validateUser(user, password);
