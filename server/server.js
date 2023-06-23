@@ -15,13 +15,30 @@ let sockets = [];
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
+<<<<<<< Updated upstream
+=======
+app.use((req, res, next) => {
+    user = req.cookies.username;
+    password = req.cookies.password;
+    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+        if (result) {
+            next();
+        } else {
+            if (req.path == '/login') {
+                next();
+            } else {
+                res.redirect("/login");
+            }
+        }
+    });
+});
+>>>>>>> Stashed changes
 
 const server = app.listen(3000, () => {
     console.log("Server is running on port 3000\n");
     dbFunctions.connectToDB();
 });
 const wsSrv = new ws.Server({ server });
-
 
 
 //Website
@@ -35,6 +52,7 @@ app.get('/', (req, res) => {
     });
 });
 
+<<<<<<< Updated upstream
 app.get('/overview', (req, res) => {
         validateUser(req.cookies.username, req.cookies.password).then((result) => {
             if (result) {
@@ -43,6 +61,10 @@ app.get('/overview', (req, res) => {
                 res.redirect('/');
             }
         });
+=======
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
+>>>>>>> Stashed changes
 });
 
 app.get("*", (_req, res) => {
@@ -74,6 +96,53 @@ wsSrv.on('connection', (socket) => {
     });
 });
 
+<<<<<<< Updated upstream
+=======
+async function login(event, socket) {
+    const login = await dbFunctions.validateUser(event.data.username, event.data.password);
+    if (login) {
+        socket.send(JSON.stringify({ event: 'login', status: true }));
+    } else {
+        socket.send(JSON.stringify({ event: 'login', status: false }));
+    }
+}
+
+async function signup(event, socket) {
+    const login = await dbFunctions.createUser(event.data.username, event.data.password);
+    if (login) {
+        socket.send("{event: 'signup', status: true}");
+    } else {
+        socket.send("{event: 'signup', status: false}");
+    }
+}
+
+async function loadChats(event, socket) {
+    dbFunctions.validateUser(user, password);
+    let chatIDs = dbFunctions.getAllChatIDs(user, password);
+    socket.send("" + chatIDs);
+}
+
+async function loadChatHistory(event, socket) {
+    dbFunctions.validateUser(user, password);
+    //get Chathistory
+}
+
+async function sendMessage(event, socket, message) {
+    dbFunctions.validateUser(user, password);
+    //insert Message into chat
+}
+
+async function createChat(event, socket) {
+    dbFunctions.validateUser(user, password);
+    //create a new chat
+}
+
+async function addUserToGroup(event, socket, id) {
+    dbFunctions.validateUser(user, password);
+    dbFunctions.addChatID(user, password, id);
+}
+
+>>>>>>> Stashed changes
 
 server.on('close', () => {
     dbClient.close();
