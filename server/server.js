@@ -8,6 +8,7 @@ const uri = "mongodb://localhost:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
 const dbFunctions = require('./db');
 const { log } = require('console');
+const { validateUser } = require('./db');
 
 let sockets = [];
 
@@ -69,6 +70,15 @@ wsSrv.on('connection', (socket) => {
             case 'loadchathistory':
                 loadChatHistory(event, socket);
                 break;
+            case 'sendmessage':
+                sendMessage(event, socket, event.data.message);
+                break;
+            case 'createchat':
+                createChat(event, socket);
+                break;
+            case 'addusertogroup':
+                addUserToGroup(event, socket, event.data.id);
+                break;
             default:
                 socket.send("{event: 'error', message: 'unknown event'}");
         }
@@ -105,6 +115,23 @@ async function loadChatHistory(event, socket){
     dbFunctions.validateUser(user, password);
     //get Chathistory
 }
+
+async function sendMessage(event, socket, message){
+    dbFunctions.validateUser(user, password);
+    //insert Message into chat
+}
+
+async function createChat(event, socket){
+    dbFunctions.validateUser(user, password);
+    //create a new chat
+}
+
+async function addUserToGroup(event, socket, id){
+    dbFunctions.validateUser(user, password);
+    dbFunctions.addChatID(user, password, id);
+}
+
+
 
 server.on('close', () => {
     dbClient.close();
