@@ -22,18 +22,18 @@ async function connectToDB() {
     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
-       createUser("test123", "123").then((result) => {
-            console.log("creating a new user: " + result);
-        });
-        addChatID("test123", "123", "ID1234").then((result) => {
-            console.log("added ID: "+result);
-        });
-        removeChatID("test123", "123", "ID1234").then((result) => {
-            console.log("removed ID: "+result);
-        });
-        getAllChatIDs("test123", "123").then((result) => {
-            console.log(result);
-        }); 
+    createUser("test123", "123").then((result) => {
+        console.log("creating a new user: " + result);
+    });
+    addChatID("test123", "123", "ID1234").then((result) => {
+        console.log("added ID: "+result);
+    });
+    removeChatID("test123", "123", "ID1234").then((result) => {
+        console.log("removed ID: "+result);
+    });
+    getAllChatIDs("test123", "123").then((result) => {
+        console.log(result);
+    }); 
     //end of test
 }
 
