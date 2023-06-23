@@ -3,9 +3,6 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017/SimpleChat";
-const dbClient = new MongoClient(uri);
 const dbFunctions = require('./db');
 const { log } = require('console');
 const { validateUser } = require('./db');
@@ -19,7 +16,7 @@ app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
     user = req.cookies.username;
-    password = rey.cookies.password;
+    password = req.cookies.password;
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
             next();
