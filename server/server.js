@@ -65,6 +65,10 @@ wsSrv.on('connection', (socket) => {
                 break;
             case 'loadchats':
                 loadChats(event, socket);
+                break;
+            case 'loadchathistory':
+                loadChatHistory(event, socket);
+                break;
             default:
                 socket.send("{event: 'error', message: 'unknown event'}");
         }
@@ -95,6 +99,11 @@ async function loadChats(event, socket){
     dbFunctions.validateUser(user, password);
     let chatIDs = dbFunctions.getAllChatIDs(user, password);
     socket.send(""+chatIDs);
+}
+
+async function loadChatHistory(event, socket){
+    dbFunctions.validateUser(user, password);
+    //get Chathistory
 }
 
 server.on('close', () => {
