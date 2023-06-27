@@ -1,82 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	
+	<title>SimpleChat</title>
+	
+	<link href="../subpages/dashboard/styles.css" rel="stylesheet">
+	<link rel="stylesheet" href="../style/general.css">
+	<script src="../script/general.js"></script>
+	<script charset="utf-8" src="../script/socketConnection.js"></script>
 
-    <title>SimpleChat</title>
-
-    <link href="../subpages/dashboard/styles.css" rel="stylesheet">
-    <link href="../style/general.css" rel="stylesheet">
-    <script src="../script/general.js"></script>
-
-    <script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
-    <script src="../script/injectPage.js" type="text/javascript"></script>
+	<script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
 </head>
 <body>
 <main>
-    <div id="sidebar">
-        <h1>SimpleChat</h1>
-
-        <div class="accent-bar"></div>
-
-        <span class="sidebar-callout">Your Profile</span>
-
-        <div class="chat-contact" onclick='injectPage("profile.html", "chat", "chat")'>
-            <i class="fas fa-user"></i>
-            <p>Your Username</p>
-        </div>
-
-        <div class="chat-contact logout">
-            <i class="fas fa-sign-out-alt"></i>
-            <p>Logout</p>
-        </div>
-
-        <div class="accent-bar"></div>
-
-        <span class="sidebar-callout">Get in touch</span>
-
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/create-chat.html", "chat")'>
-            <i class="fas fa-user-plus"></i>
-            <p>New Chat</p>
-        </div>
-
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/create-group.html", "chat")'>
-            <i class="fas fa-pen"></i>
-            <p>New Group</p>
-        </div>
-
-        <div class="accent-bar"></div>
-
-        <span class="sidebar-callout">Your Chats</span>
-
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html", "chat")'>
-            <i class="fas fa-user"></i>
-            <p>Some user</p>
-        </div>
-
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/group.html", "chat")'>
-            <i class="fas fa-users"></i>
-            <p>Some usqwdqwder</p>
-        </div>
-
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html", "chat")'>
-            <i class="fas fa-user"></i>
-            <p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-        </div>
-
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html", "chat")'>
-            <i class="fas fa-user"></i>
-            <p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-        </div>
-
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html", "chat")'>
-            <i class="fas fa-user"></i>
-            <p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-        </div>
-    </div>
-
-    <div id="chat"></div>
+	<div id="sidebar">
+		<h1>SimpleChat</h1>
+		
+		<div class="accent-bar"></div>
+		
+		<span class="sidebar-callout">Your Profile</span>
+		
+		<div class="chat-contact" onclick='injectPage("profile.html")'>
+			<i class="fas fa-user"></i>
+			<p>Your Username</p>
+		</div>
+		
+		<div class="chat-contact logout">
+			<i class="fas fa-sign-out-alt"></i>
+			<p>Logout</p>
+		</div>
+		
+		<div class="accent-bar"></div>
+		
+		<span class="sidebar-callout">Get in touch</span>
+		
+		<div class="chat-contact" onclick='injectPage("create-chat.html")'>
+			<i class="fas fa-user-plus"></i>
+			<p>New Chat</p>
+		</div>
+		
+		<div class="chat-contact" onclick='injectPage("create-group.html")'>
+			<i class="fas fa-pen"></i>
+			<p>New Group</p>
+		</div>
+		
+		<div class="accent-bar"></div>
+		
+		<span class="sidebar-callout">Your Chats</span>
+		
+		<div class="chat-contact" onclick='injectPage("chat.html")'>
+			<i class="fas fa-user"></i>
+			<p>Some user</p>
+		</div>
+		
+		<div class="chat-contact" onclick='injectPage("group.html")'>
+			<i class="fas fa-users"></i>
+			<p>Some usqwdqwder</p>
+		</div>
+		
+		<div class="chat-contact" onclick='injectPage("chat.html")'>
+			<i class="fas fa-user"></i>
+			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
+		</div>
+		
+		<div class="chat-contact" onclick='injectPage("chat.html")'>
+			<i class="fas fa-user"></i>
+			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
+		</div>
+		
+		<div class="chat-contact" onclick='injectPage("chat.html")'>
+			<i class="fas fa-user"></i>
+			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
+		</div>
+	</div>
+	
+	<div id="chat"></div>
 </main>
+
+<script>
+	function injectPage(url) {
+		const chatDiv = document.getElementById("chat");
+		const xhr = new XMLHttpRequest();
+		
+		xhr.open("GET", "dashboard/" + url, true);
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				chatDiv.innerHTML = xhr.responseText;
+			}
+		};
+		xhr.send();
+	}
+	
+	injectPage("create-group.html")
+</script>
 </body>
 </html>
