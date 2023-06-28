@@ -38,12 +38,7 @@ async function connectToDB() {
 }
 
 async function validateUser(username, password) {
-    const result = await user.findOne({ "username": username, "password": password }, { projection: { _id: 1 } });
-    if (result) {
-        return true;
-    } else {
-        return false;
-    }
+    return await user.findOne({ "username": username, "password": password }, { projection: { _id: 1 } });
 }
 
 async function createUser(username, password) {
