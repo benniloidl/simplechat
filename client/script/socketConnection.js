@@ -8,6 +8,7 @@ socket.sendEvent = (eventName, eventData) => {
         event: eventName,
         data: eventData,
     };
+    console.log("event: " + eventName, eventData);
     socket.send(JSON.stringify(message));
 }
 
@@ -37,7 +38,7 @@ function buildChatOverview(chats) {
             if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
             else injectPage("../subpages/dashboard/group.html");
             TESTBUILDCHATMESSAGES();
-            // chat_clicked(data.chatID);
+            // chat_selected(data.chatID);
         }
 
         const icon = document.createElement("i");
@@ -56,6 +57,7 @@ function TESTBUILDCHATMESSAGES() {
     let testdata = {
         name: "the magnificant 3",
         group: true,
+        chatID: 1337,
         messages: [
             {
                 message: "message",
@@ -86,6 +88,7 @@ function TESTBUILDCHATMESSAGES() {
     let testdata2 = {
         name: "Theresa König",
         group: false,
+        chatID: 4242,
         messages: [
             {
                 message: "message",
@@ -127,7 +130,6 @@ function buildChatMessages(chatData) {
     chatBox.id = "chat-box";
     let lastAuthor;
     chatData.messages.forEach(data => {
-        console.log(data);
         const chatElement = document.createElement("div");
         chatElement.classList.add("chat-element");
         chatElement.classList.add(data.author === "self" ? "chat-element-right" : "chat-element-left");
@@ -171,6 +173,11 @@ function buildChatMessages(chatData) {
     let a = document.getElementById("chat-box");
     document.getElementById("chat-box").replaceWith(chatBox);
     document.getElementById("chat-name").innerHTML = chatData.name;
+
+    document.getElementById("submit-message").onclick = () => {
+        let message = document.querySelector("#chat-actions div textarea").value.trim();
+        chat_send_message(socket, chatData.chatID, message);
+    }
 }
 
 socket.onmessage = function (event) {
@@ -248,9 +255,8 @@ function loginRequest() {
     socket.sendEvent('login', {username: result.username, password: result.password})
 }
 
-function chat_clicked(socket, chatId) {
-    console.log("selected chat: ", chatId)
-    socket.sendEvent('fetch-chat-message', {
+function chat_selected(socket, chatId) {
+    socket.sendEvent('loadChatMessages', {
         chatID: chatId,
         start: 0,
         amount: chatMessageAmount
@@ -259,10 +265,22 @@ function chat_clicked(socket, chatId) {
 
 function chat_scrolled(socket, chatId) {
     let times = 2;
-    socket.sendEvent('fetch-chat-message', {
+    socket.sendEvent('loadChatMessages', {
         chatID: chatId,
         start: (chatMessageAmount * times),
         amount: (chatMessageAmount * (times + 1))
+    });
+}
+
+function chat_send_message(socket, chatId, message) {
+    socket.sendEvent('sendMessage', {
+        message: message,
+        chatId: chatId,
+
+        // Data injected by server!
+        timestamp: undefined,
+        author: undefined,
+        read: undefined
     });
 }
 
