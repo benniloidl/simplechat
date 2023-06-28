@@ -53,52 +53,86 @@ function buildChatOverview(chats) {
 }
 
 function TESTBUILDCHATMESSAGES() {
-    let testdata = [
-        {
-            message: "message",
-            timestamp: "12 nov 2003 17:01",
-            readConfirmation: true,
-            author: "Honulullu"
-        },
-        {
-            message: "answer",
-            timestamp: "13 nov 2003 17:01",
-            readConfirmation: true,
-            author: "self"
-        },
-        {
-            message: "some other message",
-            timestamp: "28 jun 2023 18:00",
-            readConfirmation: true,
-            author: "Honulullu"
-        },
-        {
-            message: "some other message",
-            timestamp: "28 jun 2023 19:00",
-            readConfirmation: true,
-            author: "Honulullu"
-        },
-    ]
+    let testdata = {
+        name: "the magnificant 3",
+        group: true,
+        messages: [
+            {
+                message: "message",
+                timestamp: "12 nov 2003 17:01",
+                readConfirmation: true,
+                author: "Honulullu"
+            },
+            {
+                message: "answer",
+                timestamp: "13 nov 2003 17:01",
+                readConfirmation: true,
+                author: "self"
+            },
+            {
+                message: "some other message",
+                timestamp: "28 jun 2023 18:00",
+                readConfirmation: true,
+                author: "Honulullu"
+            },
+            {
+                message: "some other message",
+                timestamp: "28 jun 2023 19:00",
+                readConfirmation: true,
+                author: "Honulullu"
+            },
+        ]
+    }
+    let testdata2 = {
+        name: "Theresa König",
+        group: false,
+        messages: [
+            {
+                message: "message",
+                timestamp: "12 nov 2003 17:01",
+                readConfirmation: true,
+                author: "Honulullu"
+            },
+            {
+                message: "answer",
+                timestamp: "13 nov 2003 17:01",
+                readConfirmation: true,
+                author: "self"
+            },
+            {
+                message: "some other message",
+                timestamp: "28 jun 2023 18:00",
+                readConfirmation: true,
+                author: "Honulullu"
+            },
+            {
+                message: "some other message",
+                timestamp: "28 jun 2023 19:00",
+                readConfirmation: true,
+                author: "Honulullu"
+            },
+        ]
+    }
     // try {
     //     buildChatMessages(testdata, true);
     // } catch (e) {
     //     setTimeout(() => buildChatMessages(testdata, true), 1000);
     // }
-    setTimeout(() => buildChatMessages(testdata, true), 10);
+    setTimeout(() => buildChatMessages(testdata2), 10);
 
 }
 
-function buildChatMessages(chatMessages, group) {
+function buildChatMessages(chatData) {
     const chatBox = document.createElement("div");
     chatBox.id = "chat-box";
     let lastAuthor;
-    chatMessages.forEach(data => {
+    chatData.messages.forEach(data => {
         console.log(data);
         const chatElement = document.createElement("div");
         chatElement.classList.add("chat-element");
         chatElement.classList.add(data.author === "self" ? "chat-element-right" : "chat-element-left");
 
-        if (group === true && lastAuthor !== data.author) {
+        if (chatData.group === true && lastAuthor !== data.author) {
             if (data.author !== "self") {
                 const senderElement = document.createElement("span");
                 senderElement.classList.add("sender");
@@ -134,9 +168,9 @@ function buildChatMessages(chatMessages, group) {
 
         chatBox.appendChild(chatElement);
     });
-    // document.getElementById("chat")
     let a = document.getElementById("chat-box");
     document.getElementById("chat-box").replaceWith(chatBox);
+    document.getElementById("chat-name").innerHTML = chatData.name;
 }
 
 socket.onmessage = function (event) {
@@ -154,9 +188,9 @@ socket.onmessage = function (event) {
             break;
         case 'chatMessages':
             try {
-                buildChatMessages(data.content, data.isgroup)
+                buildChatMessages(data.content)
             } catch (e) {
-                setTimeout(() => buildChatMessages(data.chats, data.isgroup), 1000);
+                setTimeout(() => buildChatMessages(data.content), 1000);
             }
     }
 };
