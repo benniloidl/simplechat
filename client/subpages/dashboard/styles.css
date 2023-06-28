@@ -280,3 +280,8 @@ main #chat form input[type="submit"]:hover {
     background: var(--color-primary);
     filter: drop-shadow(0 0 0.5rem var(--color-primary));
 }
+
+.notification {
+    /*TODO CHANGE NOTIFICATION*/
+    color: red;
+}

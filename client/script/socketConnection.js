@@ -34,11 +34,18 @@ function buildChatOverview(chats) {
 
         const navigator = document.createElement("div");
         navigator.classList.add("chat-contact");
+        navigator.setAttribute("chatID", data.chatID);
         navigator.onclick = () => {
             if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
             else injectPage("../subpages/dashboard/group.html");
             TESTBUILDCHATMESSAGES();
             // chat_selected(data.chatID);
+            // if()
+            if (elementHasNotification(navigator)) {
+                chat_read_event(socket, data.chatID);
+                navigator.classList.remove("notification");
+                console.log("remove notification")
+            }
         }
 
         const icon = document.createElement("i");
@@ -180,6 +187,43 @@ function buildChatMessages(chatData) {
     }
 }
 
+function TESTNOTIFICATIONHANDLER() {
+    let testNotification = {
+        chatID: "649c3b837074414f95088ce2",
+        message: "Benni hat immer Recht!"
+    }
+
+    notificationHandler(testNotification);
+}
+
+function notificationHandler(notification) {
+    function get() {
+        let childs = document.getElementById("chats").childNodes;
+        for (const child of childs) {
+            let nodeId = child.attributes.chatId.nodeValue;
+            if (nodeId == notification.chatID) {
+                return child;
+            }
+            console.log(nodeId);
+        }
+    }
+
+    let node = get();
+    if (node) {
+        node.classList.add("notification");
+        console.log(node)
+    }
+
+}
+
+function elementHasNotification(element) {
+    let e = element.classList
+    for (const value of e.values()) {
+        if (value == "notification") return true;
+    }
+    return false;
+}
+
 socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     switch (data.event) {
@@ -199,6 +243,10 @@ socket.onmessage = function (event) {
             } catch (e) {
                 setTimeout(() => buildChatMessages(data.content), 1000);
             }
+            break;
+        case 'messageNotification': {
+
+        }
     }
 };
 
@@ -282,6 +330,10 @@ function chat_send_message(socket, chatId, message) {
         author: undefined,
         read: undefined
     });
+}
+
+function chat_read_event(socket, chatId) {
+
 }
 
 function chat_overview(socket) {
