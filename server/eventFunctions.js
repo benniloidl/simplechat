@@ -10,8 +10,8 @@ async function validate(username, password) {
 }
 
 async function fetchchats(event, socket, username){
-    const chats = dbFunctions.fetchChats(username);
-    socket.send({event: 'fetchchats', chats: chats});
+    const chats = await dbFunctions.fetchChats(username);
+    socket.send(JSON.stringify({event: 'fetchChats', "chats": chats}));
 }
 
 async function login(event, socket) {

@@ -1,7 +1,10 @@
 const socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
+const fileName = location.href.split("/").slice(-1)
 
 socket.onopen = function () {
-
+    if(fileName == "dashboard"){
+        sendEvent("fetchChats","");
+    }
 };
 
 function loginUser(data) {
@@ -13,9 +16,8 @@ function loginUser(data) {
     }
 }
 
-function fetchChat(data) {
-    if (!data.status) return;
-    
+function fetchChat(chats) {
+    chats.forEach(data => {
     const navigator = document.createElement("div");
     navigator.classList.add("chat-contact");
     navigator.onclick = () => {
@@ -32,6 +34,7 @@ function fetchChat(data) {
     navigator.appendChild(name);
     
     document.getElementById("chats").appendChild(navigator);
+});
 }
 
 socket.onmessage = function (event) {
@@ -40,9 +43,9 @@ socket.onmessage = function (event) {
         case 'login':
             loginUser(data);
             break;
-        case 'fetchChat':
+        case 'fetchChats':
             try {
-                fetchChat(data.data);
+                fetchChat(data.chats);
             } catch (e) { // if the element is not yet loaded
                 setTimeout(() => fetchChat(data.data), 1000);
             }

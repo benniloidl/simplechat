@@ -18,7 +18,7 @@ async function connectToDB() {
         process.exit(42);
     }
     console.log("connected successfully\n");
-    createChat("Chat123", "user").then((result) => {
+    /*createChat("Chat123", "user").then((result) => {
         console.log("createChat: " + result);
         addChat("Test12345", result).then((result) => {
             console.log("added ID: " + result);
@@ -28,7 +28,7 @@ async function connectToDB() {
         console.log(result);
     });
     //test the functions
-/*     validateUser("test123", "123").then((result) => {
+     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
     createUser("Test12345", "Test123*345u").then((result) => {
@@ -79,7 +79,7 @@ async function addChat(username, chatID) {
     if (result) {
         return false;
     }
-    await user.updateOne({ "username": username }, { $push: { chats: { "chatID": chatID } } });
+    await user.updateOne({ "username": username }, { $push: { chats: { "chatID": chatID, "unreadMessages": 0 } } });
     return true;
 }
 
@@ -103,11 +103,11 @@ async function getChatDetails(chatID) {
 async function fetchChats(username) {
     const chatIDs = await getAllChatIDs(username);
     let chats = [];
-    if (chatIDs.chats.length>0) {
+    if (chatIDs.chats.length > 0) {
         for (let i = 0; i < chatIDs.chats.length; i++) {
             const id = chatIDs.chats[i];
             const detail = await getChatDetails(id.chatID);
-            chats.push({"chatID":id.chatID,"name":detail.name,"type":detail.type});
+            chats.push({ "chatID": id.chatID, "name": detail.name, "type": detail.type });
         }
     } else {
         return false;
