@@ -5,7 +5,6 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
 const eventFunctions = require('./eventFunctions');
-const e = require('express');
 
 let sockets = [];
 
@@ -14,7 +13,11 @@ app.use(cookieParser());
 app.use((req, res, next) => {
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
-            next();
+            if (req.path == '/login') {
+                res.redirect("/dashboard");
+            } else {
+                next();
+            }
         } else {
             if (req.path == '/login') {
                 next();
@@ -41,7 +44,7 @@ app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
 });
 
-app.get('*.html', (req, res) => {
+app.get('*', (req, res) => {
     res.redirect('login');
 });
 
@@ -74,12 +77,12 @@ wsSrv.on('connection', (socket, req) => {
             case 'login':
                 eventFunctions.login(event, socket);
                 break;
-            case 'fetchchats':
+            case 'fetchChats':
                 if (eventFunctions.validate(username, password)) {
                     eventFunctions.fetchchats(event, socket, username);
                 }
                 break;
-            case 'fetchchatmessage':
+            case 'fetchChatMessage':
                 if(eventFunctions.validate(username, password)){
                     eventFunctions.fetchchats(event, socket);
                 }

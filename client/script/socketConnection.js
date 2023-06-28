@@ -11,9 +11,12 @@ socket.sendEvent = (eventName, eventData) => {
 //const {chat_clicked} = require("./chatConnection");
 
 //chatFunctions.chat_clicked(socket);
+const fileName = location.href.split("/").slice(-1)
 
 socket.onopen = function () {
-
+    if(fileName == "dashboard"){
+        sendEvent("fetchChats","");
+    }
 };
 
 function loginUser(data) {
@@ -45,6 +48,7 @@ function buildChatOverview(data) {
     navigator.appendChild(name);
 
     document.getElementById("chats").appendChild(navigator);
+});
 }
 
 socket.onmessage = function (event) {
@@ -53,7 +57,7 @@ socket.onmessage = function (event) {
         case 'login':
             loginUser(data);
             break;
-        case 'fetchChat':
+        case 'fetchChats':
             try {
                 buildChatOverview(data.data);
             } catch (e) { // if the element is not yet loaded
