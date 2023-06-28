@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>SimpleChat - Register</title>
-    <script src="../script/socketConnection.js" charset="utf-8"></script>
+    <script charset="utf-8" src="../script/socketConnection.js"></script>
     <style>
         body {
             font-family: -apple-system, system-ui, sans-serif;
@@ -19,27 +19,27 @@
             box-sizing: border-box;
         }
     </style>
-    <link rel="stylesheet" href="../style/general.css">
-    <link rel="stylesheet" href="../style/login.css">
-    <script src="../script/general.js" charset="utf-8"></script>
+    <link href="../style/general.css" rel="stylesheet">
+    <link href="../style/login.css" rel="stylesheet">
+    <script charset="utf-8" src="../script/general.js"></script>
 </head>
 <body>
 <article class="loginForm">
     <!--    <div class="loginForm">-->
     <h1>Register</h1>
     <h2>Let's Chat</h2>
-    <label hidden="hidden" for="usr"></label><input type="text" id="usr" placeholder="Username" value="" tabindex="1"
-                                                    maxlength="16" required="required"><br>
-    <label hidden="hidden" for="pwd"></label><input type="password" id="pwd" placeholder="Password" value=""
-                                                    tabindex="2" required="required"><br>
-    <label hidden="hidden" for="pwd"></label><input type="password" id="pwd-check" placeholder="Check password" value=""
-                                                    tabindex="3" required="required"><br>
+    <label for="usr" hidden="hidden"></label><input id="usr" maxlength="16" placeholder="Username" required="required" tabindex="1"
+                                                    type="text" value=""><br>
+    <label for="pwd" hidden="hidden"></label><input id="pwd" placeholder="Password" required="required" tabindex="2"
+                                                    type="password" value=""><br>
+    <label for="pwd" hidden="hidden"></label><input id="pwd-check" placeholder="Check password" required="required" tabindex="3"
+                                                    type="password" value=""><br>
     <i class="error" id="pwdError"></i>
     <div>
         <a href="">Forgot Password</a>
         <a href="login.html"><b>Login</b></a>
     </div>
-    <button onclick="fire()" id="submit" tabindex="3">Login</button>
+    <button id="submit" onclick="loginRequest()" tabindex="3">Login</button>
     <!--    </div>-->
 </article>
 <footer>
@@ -52,7 +52,7 @@
     for (let inputElement of input) {
         inputElement.addEventListener("keyup", (event) => {
             if (event.key === "Enter") {
-                fire()
+                loginRequest()
             }
         })
     }

@@ -1,4 +1,8 @@
 const socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
+const chatFunctions = require('./chatConnection')
+const {chat_clicked} = require("./chatConnection");
+
+chatFunctions.chat_clicked(socket);
 
 socket.onopen = function () {
 
@@ -13,24 +17,25 @@ function loginUser(data) {
     }
 }
 
-function fetchChat(data) {
+function buildChatOverview(data) {
     if (!data.status) return;
-    
+
     const navigator = document.createElement("div");
     navigator.classList.add("chat-contact");
     navigator.onclick = () => {
+        chat_clicked(data.chatId);
         if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
         else injectPage("../subpages/dashboard/group.html");
     }
-    
+
     const icon = document.createElement("i");
     icon.classList.add("fas", data.type === "user" ? "fa-user" : "fa-users");
     navigator.appendChild(icon);
-    
+
     const name = document.createElement("p");
     name.innerHTML = data.name;
     navigator.appendChild(name);
-    
+
     document.getElementById("chats").appendChild(navigator);
 }
 
@@ -42,9 +47,9 @@ socket.onmessage = function (event) {
             break;
         case 'fetchChat':
             try {
-                fetchChat(data.data);
+                buildChatOverview(data.data);
             } catch (e) { // if the element is not yet loaded
-                setTimeout(() => fetchChat(data.data), 1000);
+                setTimeout(() => buildChatOverview(data.data), 1000);
             }
             break;
     }
@@ -65,13 +70,13 @@ function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd-check");
-    
+
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
         pwdError("Please fill in the missing fields!")
         return null;
     }
-    
+
     if (
         !(
             pwd.match(/[a-z]/g) &&
@@ -98,15 +103,15 @@ function getValues() {
 
 function pwdError(errorMessage) {
     document.getElementById("pwdError").innerHTML = errorMessage;
-    
+
 }
 
-function fire() {
+function loginRequest() {
     const result = getValues()
     if (result === null) {
         console.log("Not in format")
         return;
     }
-    
-    sendEvent('login', { username: result.username, password: result.password })
+
+    sendEvent('login', {username: result.username, password: result.password})
 }
