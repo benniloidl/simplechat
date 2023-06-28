@@ -7,10 +7,10 @@
 	<title>SimpleChat</title>
 	
 	<link href="../subpages/dashboard/styles.css" rel="stylesheet">
-	<link rel="stylesheet" href="../style/general.css">
+	<link href="../style/general.css" rel="stylesheet">
 	<script src="../script/general.js"></script>
 	<script charset="utf-8" src="../script/socketConnection.js"></script>
-
+	
 	<script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
 </head>
 <body>
@@ -24,7 +24,12 @@
 		
 		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/profile.html")'>
 			<i class="fas fa-user"></i>
-			<p>Your Username</p>
+			<p class="username">Your Username</p>
+		</div>
+		
+		<div class="chat-contact appearance" onclick="changeColorScheme()">
+			<i class="fas fa-moon"></i>
+			<p>Appearance</p>
 		</div>
 		
 		<div class="chat-contact logout">
@@ -50,30 +55,7 @@
 		
 		<span class="sidebar-callout">Your Chats</span>
 		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Some user</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/group.html")'>
-			<i class="fas fa-users"></i>
-			<p>Some usqwdqwder</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/	chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-		</div>
+		<div id="chats" style="display: flex; flex-direction: column; gap: var(--spacing);"></div>
 	</div>
 	
 	<div id="chat"></div>
@@ -88,12 +70,16 @@
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				chatDiv.innerHTML = xhr.responseText;
+		
+				document.querySelectorAll(".username").forEach(function (element) {
+					element.innerHTML = getCookie("username");
+				});	
 			}
 		};
 		xhr.send();
 	}
 	
-	injectPage("create-group.html")
+	injectPage("../subpages/dashboard/profile.html")
 </script>
 </body>
 </html>

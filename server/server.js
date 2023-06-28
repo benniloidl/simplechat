@@ -51,6 +51,10 @@ app.get('*.html', (req, res) => {
 //receive message
 wsSrv.on('connection', (socket, req) => {
     sockets.push(socket);
+    
+    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Chat", type: "user", status: true } }));
+    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Group", type: "group", status: true } }));
+    
     socket.on('message', async (data) => {
         let event;
         try {
@@ -59,7 +63,7 @@ wsSrv.on('connection', (socket, req) => {
         } catch {
             return -1;
         }
-
+        
         const cookie = req.headers.cookie;
         let JSONCookie = {};
         if (cookie) {
