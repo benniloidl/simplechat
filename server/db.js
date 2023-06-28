@@ -18,15 +18,23 @@ async function connectToDB() {
         process.exit(42);
     }
     console.log("connected successfully\n");
-
+    createChat("Chat123", "user").then((result) => {
+        console.log("createChat: " + result);
+        addChat("Test12345", result).then((result) => {
+            console.log("added ID: " + result);
+        });
+    });
+    fetchChats("Test12345").then((result) => {
+        console.log(result);
+    });
     //test the functions
-    validateUser("test123", "123").then((result) => {
+/*     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
     createUser("Test12345", "Test123*345u").then((result) => {
         console.log("creating a new user: " + result);
-    });
-    /*createChat("Chat123", "user").then((result) => {
+    }); 
+    createChat("Chat123", "user").then((result) => {
         console.log("createChat: " + result);
         addChat("test123", result).then((result) => {
             console.log("added ID: " + result);
@@ -37,13 +45,13 @@ async function connectToDB() {
     });
     addMessage("649be7f00dee1cb81769fae2", { author: "abc123", message: "Hello World", timeStamp: "12:34", readConfirmation: false }).then((result) => {
         console.log("addMessage: " + result);
-    });*/
+    });
     loadMessages("649be7f00dee1cb81769fae2", 0, 5).then((result) => {
         console.log(result);
     });
     fetchChats("test123").then((result) => {
         console.log(result);
-    });
+    });*/
     //end of test
 }
 

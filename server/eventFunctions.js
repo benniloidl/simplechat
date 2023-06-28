@@ -10,8 +10,8 @@ async function validate(username, password) {
 }
 
 async function fetchchats(event, socket, username){
-
-    //socket.send({event: 'fetchchats', chats: });
+    const chats = dbFunctions.fetchChats(username);
+    socket.send({event: 'fetchchats', chats: chats});
 }
 
 async function login(event, socket) {
