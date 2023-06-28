@@ -95,11 +95,11 @@ async function getChatDetails(chatID) {
 async function fetchChats(username) {
     const chatIDs = await getAllChatIDs(username);
     let chats = [];
-    if (chatIDs) {
+    if (chatIDs.chats.length>0) {
         for (let i = 0; i < chatIDs.chats.length; i++) {
             const id = chatIDs.chats[i];
             const detail = await getChatDetails(id.chatID);
-            chats.push({"chatID":id,"name":detail.name,"type":detail.type});
+            chats.push({"chatID":id.chatID,"name":detail.name,"type":detail.type});
         }
     } else {
         return false;
