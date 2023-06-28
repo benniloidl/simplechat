@@ -15,7 +15,7 @@ const fileName = location.href.split("/").slice(-1)
 
 socket.onopen = function () {
     if(fileName == "dashboard"){
-        sendEvent("fetchChats","");
+        socket.sendEvent("fetchChats","");
     }
 };
 
@@ -28,8 +28,8 @@ function loginUser(data) {
     }
 }
 
-function buildChatOverview(data) {
-    if (!data.status) return;
+function buildChatOverview(chats) {
+    chats.forEach(data => {
 
     const navigator = document.createElement("div");
     navigator.classList.add("chat-contact");
@@ -59,9 +59,9 @@ socket.onmessage = function (event) {
             break;
         case 'fetchChats':
             try {
-                buildChatOverview(data.data);
+                buildChatOverview(data.chats);
             } catch (e) { // if the element is not yet loaded
-                setTimeout(() => buildChatOverview(data.data), 1000);
+                setTimeout(() => buildChatOverview(data.chats), 1000);
             }
             break;
     }
