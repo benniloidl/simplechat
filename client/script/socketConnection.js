@@ -63,7 +63,8 @@ function buildChatOverview(chats) {
 function TESTBUILDCHATMESSAGES() {
     let testdata = {
         name: "the magnificant 3",
-        group: true,
+        type: "group",
+        username: 'self',
         chatID: 1337,
         messages: [
             {
@@ -94,7 +95,8 @@ function TESTBUILDCHATMESSAGES() {
     }
     let testdata2 = {
         name: "Theresa König",
-        group: false,
+        type: 'user',
+        username: 'self',
         chatID: 4242,
         messages: [
             {
@@ -139,10 +141,10 @@ function buildChatMessages(chatData) {
     chatData.messages.forEach(data => {
         const chatElement = document.createElement("div");
         chatElement.classList.add("chat-element");
-        chatElement.classList.add(data.author === "self" ? "chat-element-right" : "chat-element-left");
+        chatElement.classList.add(data.author === chatData.username ? "chat-element-right" : "chat-element-left");
 
-        if (chatData.group === true && lastAuthor !== data.author) {
-            if (data.author !== "self") {
+        if (chatData.type === 'group' && lastAuthor !== data.author) {
+            if (data.author !== chatData.username) {
                 const senderElement = document.createElement("span");
                 senderElement.classList.add("sender");
                 senderElement.innerHTML = data.author;
@@ -329,6 +331,14 @@ function chat_send_message(socket, chatId, message) {
         timestamp: undefined,
         author: undefined,
         read: undefined
+    });
+}
+
+function chat_create_new_chat(socket, name, isGroup, users) {
+    socket.sendEvent('createChat', {
+        name: name,
+        type: isGroup ? 'group' : 'user',
+        users: users
     });
 }
 
