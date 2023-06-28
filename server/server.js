@@ -4,20 +4,17 @@ const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
+const eventFunctions = require('./eventFunctions');
+const e = require('express');
 
 let sockets = [];
-
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
-            if (req.path == '/dashboard') {
-                next();
-            } else {
-                res.redirect("/dashboard");
-            }
+            next();
         } else {
             if (req.path == '/login') {
                 next();
@@ -53,9 +50,6 @@ app.get('*.html', (req, res) => {
 wsSrv.on('connection', (socket, req) => {
     sockets.push(socket);
     
-    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Chat", type: "user", status: true } }));
-    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Group", type: "group", status: true } }));
-    
     socket.on('message', async (data) => {
         let event;
         try {
@@ -64,7 +58,7 @@ wsSrv.on('connection', (socket, req) => {
         } catch {
             return -1;
         }
-        
+
         const cookie = req.headers.cookie;
         let JSONCookie = {};
         if (cookie) {
@@ -73,81 +67,27 @@ wsSrv.on('connection', (socket, req) => {
                 JSONCookie[pair[0]] = pair.splice(1).join('=');
             });
         }
-        
+        const username = JSONCookie.username;
+        const password = JSONCookie.password;
+
         switch (event.event) {
             case 'login':
-                login(event, socket);
+                eventFunctions.login(event, socket);
                 break;
-            
-            case 'loadChats':
-                if (validate(JSONCookie)) {
-                    loadChats(event, socket);
+            case 'fetchchats':
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.fetchchats(event, socket, username);
                 }
                 break;
-            
-            default:
-                return -1;
+            case 'fetchchatmessage':
+                if(eventFunctions.validate(username, password)){
+                    eventFunctions.fetchchats(event, socket);
+                }
+            default: return -1;
         }
     });
 });
 
-async function validate(cookie) {
-    const valid = await dbFunctions.validateUser(cookie.username, cookie.password);
-    if (valid) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-async function login(event, socket) {
-    const login = await dbFunctions.validateUser(event.data.username, event.data.password);
-    if (login) {
-        socket.send(JSON.stringify({ event: 'login', status: true }));
-    } else {
-        socket.send(JSON.stringify({ event: 'login', status: false }));
-    }
-}
-
-async function signup(event, socket) {
-    const login = await dbFunctions.createUser(event.data.username, event.data.password);
-    if (login) {
-        socket.send("{event: 'signup', status: true}");
-    } else {
-        socket.send("{event: 'signup', status: false}");
-    }
-}
-
-async function loadChats(event, socket) {
-    dbFunctions.validateUser(user, password);
-    let chatIDs = dbFunctions.getAllChatIDs(user, password);
-    socket.send("" + chatIDs);
-}
-
-/*
-
-async function loadChatHistory(event, socket) {
-    dbFunctions.validateUser(user, password);
-    //get Chathistory
-}
-
-async function sendMessage(event, socket, message) {
-    dbFunctions.validateUser(user, password);
-    //insert Message into chat
-}
-
-async function createChat(event, socket) {
-    dbFunctions.validateUser(user, password);
-    //create a new chat
-}
-
-async function addUserToGroup(event, socket, id) {
-    dbFunctions.validateUser(user, password);
-    dbFunctions.addChatID(user, password, id);
-}*/
-
-
 server.on('close', () => {
-    dbClient.close();
     console.log('Server closed');
 });
