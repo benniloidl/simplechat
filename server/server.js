@@ -3,26 +3,21 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017/SimpleChat";
-const dbClient = new MongoClient(uri);
 const dbFunctions = require('./db');
-const { log } = require('console');
-const { validateUser } = require('./db');
 
 let sockets = [];
 
-let user = 0;
-let password = 0;
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
-    user = req.cookies.username;
-    password = rey.cookies.password;
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
-            next();
+            if (req.path == '/dashboard') {
+                next();
+            } else {
+                res.redirect("/dashboard");
+            }
         } else {
             if (req.path == '/login') {
                 next();
@@ -40,58 +35,72 @@ const server = app.listen(3000, () => {
 const wsSrv = new ws.Server({ server });
 
 
-
 //Website
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
 });
 
-app.get('/dashbord', (req, res) => {
+app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
+});
+
+app.get('*.html', (req, res) => {
+    res.redirect('login');
 });
 
 
 //receive message
-wsSrv.on('connection', (socket) => {
+wsSrv.on('connection', (socket, req) => {
     sockets.push(socket);
     socket.on('message', async (data) => {
-        const message = Buffer.from(data).toString('utf-8');
-        const event = JSON.parse(message);
+        let event;
+        try {
+            const message = Buffer.from(data).toString('utf-8');
+            event = JSON.parse(message);
+        } catch {
+            return -1;
+        }
+
+        const cookie = req.headers.cookie;
+        let JSONCookie = {};
+        if (cookie) {
+            cookie.split(/\s*;\s*/).forEach(function (pair) {
+                pair = pair.split(/\s*=\s*/);
+                JSONCookie[pair[0]] = pair.splice(1).join('=');
+            });
+        }
+
         switch (event.event) {
             case 'login':
                 login(event, socket);
                 break;
-            case 'signup':
-                signup(event, socket);
+
+            case 'loadChats':
+                if (validate(JSONCookie)) {
+                    loadChats(event, socket);
+                }
                 break;
-            case 'loadchats':
-                loadChats(event, socket);
-                break;
-            case 'loadchathistory':
-                loadChatHistory(event, socket);
-                break;
-            case 'sendmessage':
-                sendMessage(event, socket, event.data.message);
-                break;
-            case 'createchat':
-                createChat(event, socket);
-                break;
-            case 'addusertogroup':
-                addUserToGroup(event, socket, event.data.id);
-                break;
-            default:
-                socket.send("{event: 'error', message: 'unknown event'}");
+
+            default: return -1;
         }
     });
 });
 
+async function validate(cookie) {
+    const valid = await dbFunctions.validateUser(cookie.username, cookie.password);
+    if (valid) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 async function login(event, socket) {
     const login = await dbFunctions.validateUser(event.data.username, event.data.password);
     if (login) {
-        socket.send("{event: 'login', status: true}");
-    }
-    else {
-        socket.send("{event: 'login', status: false}");
+        socket.send(JSON.stringify({ event: 'login', status: true }));
+    } else {
+        socket.send(JSON.stringify({ event: 'login', status: false }));
     }
 }
 
@@ -99,38 +108,37 @@ async function signup(event, socket) {
     const login = await dbFunctions.createUser(event.data.username, event.data.password);
     if (login) {
         socket.send("{event: 'signup', status: true}");
-    }
-    else {
+    } else {
         socket.send("{event: 'signup', status: false}");
     }
 }
 
-async function loadChats(event, socket){
+async function loadChats(event, socket) {
     dbFunctions.validateUser(user, password);
     let chatIDs = dbFunctions.getAllChatIDs(user, password);
-    socket.send(""+chatIDs);
+    socket.send("" + chatIDs);
 }
+/*
 
-async function loadChatHistory(event, socket){
+async function loadChatHistory(event, socket) {
     dbFunctions.validateUser(user, password);
     //get Chathistory
 }
 
-async function sendMessage(event, socket, message){
+async function sendMessage(event, socket, message) {
     dbFunctions.validateUser(user, password);
     //insert Message into chat
 }
 
-async function createChat(event, socket){
+async function createChat(event, socket) {
     dbFunctions.validateUser(user, password);
     //create a new chat
 }
 
-async function addUserToGroup(event, socket, id){
+async function addUserToGroup(event, socket, id) {
     dbFunctions.validateUser(user, password);
     dbFunctions.addChatID(user, password, id);
-}
-
+}*/
 
 
 server.on('close', () => {

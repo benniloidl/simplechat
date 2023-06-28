@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const uri = "mongodb://localhost:27017/SimpleChat";
+const uri = "mongodb://127.0.0.1:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
 let db, user, chatHistory;
 
@@ -17,23 +17,23 @@ async function connectToDB() {
         process.exit(42);
     }
     console.log("connected successfully\n");
-
+    
     //test the functions
     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
-       createUser("test123", "123").then((result) => {
-            console.log("creating a new user: " + result);
-        });
-        addChatID("test123", "123", "ID1234").then((result) => {
-            console.log("added ID: "+result);
-        });
-        removeChatID("test123", "123", "ID1234").then((result) => {
-            console.log("removed ID: "+result);
-        });
-        getAllChatIDs("test123", "123").then((result) => {
-            console.log(result);
-        }); 
+    createUser("Test12345", "Test123*345u").then((result) => {
+        console.log("creating a new user: " + result);
+    });
+    addChatID("test123", "123", "ID1234").then((result) => {
+        console.log("added ID: " + result);
+    });
+    removeChatID("test123", "123", "ID1234").then((result) => {
+        console.log("removed ID: " + result);
+    });
+    getAllChatIDs("test123", "123").then((result) => {
+        console.log(result);
+    });
     //end of test
 }
 
@@ -57,25 +57,40 @@ async function createUser(username, password) {
 }
 
 async function addChatID(username, password, id) {
-    const result = await user.findOne({ "username": username, "chats.id": id }, { projection: { _id: 1 } });
-    if (result) {
-        return "ID already added";
+    const valid = await validateUser(username, password);
+    if (valid) {
+        const result = await user.findOne({ "username": username, "chats.id": id }, { projection: { _id: 1 } });
+        if (result) {
+            return "ID already added";
+        }
+        await user.updateOne({ "username": username }, { $push: { chats: { "id": id } } });
+        return true;
+    } else {
+        return "wrong username/password"
     }
-    await user.updateOne({ "username": username }, { $push: { chats: { "id": id } } });
-    return true;
 }
 
 async function removeChatID(username, password, id) {
-    const result = await user.findOne({ "username": username, "chats.id": id }, { projection: { _id: 1 } });
-    if (!result) {
-        return "ID not found";
+    const valid = await validateUser(username, password);
+    if (valid) {
+        const result = await user.findOne({ "username": username, "chats.id": id }, { projection: { _id: 1 } });
+        if (!result) {
+            return "ID not found";
+        }
+        await user.updateOne({ "username": username }, { $pull: { chats: { "id": id } } });
+        return true;
+    } else {
+        return "wrong username/password"
     }
-    await user.updateOne({ "username": username }, { $pull: { chats: { "id": id } } });
-    return true;
 }
 
 async function getAllChatIDs(username, password) {
-    return await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
+    const valid = await validateUser(username, password);
+    if (valid) {
+        return await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
+    } else {
+        return "wrong username/password"
+    }
 }
 
 module.exports = {
