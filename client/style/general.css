@@ -25,6 +25,8 @@
     --footer-background-color: hsl(0deg, 0%, 13%);
 
     --appearance-switch: '\263E';
+
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
 }
 
 :root[data-theme='dark'] {
@@ -48,7 +50,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    font-family: var(--font-family);
     font-size: var(--font-size);
     line-height: 1.6;
     margin: 0;
