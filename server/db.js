@@ -17,23 +17,23 @@ async function connectToDB() {
         process.exit(42);
     }
     console.log("connected successfully\n");
-
+    
     //test the functions
     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
-    createUser("test123", "123").then((result) => {
+    createUser("Test12345", "Test123*345u").then((result) => {
         console.log("creating a new user: " + result);
     });
     addChatID("test123", "123", "ID1234").then((result) => {
-        console.log("added ID: "+result);
+        console.log("added ID: " + result);
     });
     removeChatID("test123", "123", "ID1234").then((result) => {
-        console.log("removed ID: "+result);
+        console.log("removed ID: " + result);
     });
     getAllChatIDs("test123", "123").then((result) => {
         console.log(result);
-    }); 
+    });
     //end of test
 }
 
