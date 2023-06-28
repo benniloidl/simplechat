@@ -23,9 +23,7 @@ socket.onmessage = function (event) {
 
 socket.onclose = function (event) {
 };
-//
-// socket.send("Hello Server");
-//
+
 function sendEvent(eventName, eventData) {
     const message = {
         event: eventName,
@@ -38,13 +36,13 @@ function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd-check");
-
+    
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
         pwdError("Please fill in the missing fields!")
         return null;
     }
-
+    
     if (
         !(
             pwd.match(/[a-z]/g) &&
@@ -71,7 +69,7 @@ function getValues() {
 
 function pwdError(errorMessage) {
     document.getElementById("pwdError").innerHTML = errorMessage;
-
+    
 }
 
 function fire() {
@@ -80,6 +78,6 @@ function fire() {
         console.log("Not in format")
         return;
     }
-
-    sendEvent('login', {username: result.username, password: result.password})
+    
+    sendEvent('login', { username: result.username, password: result.password })
 }
