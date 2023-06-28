@@ -7,9 +7,6 @@ const dbFunctions = require('./db');
 
 let sockets = [];
 
-let user = 0;
-let password = 0;
-
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
@@ -71,6 +68,8 @@ wsSrv.on('connection', (socket, req) => {
                 JSONCookie[pair[0]] = pair.splice(1).join('=');
             });
         }
+        const username = JSONCookie.username;
+        const password = JSONCookie.password;
 
         switch (event.event) {
             case 'login':
@@ -78,8 +77,8 @@ wsSrv.on('connection', (socket, req) => {
                 break;
 
             case 'loadChats':
-                if (validate(JSONCookie)) {
-                    loadChats(event, socket);
+                if (validate(username, password)) {
+                    loadChats(event, socket, username);
                 }
                 break;
 
@@ -88,8 +87,8 @@ wsSrv.on('connection', (socket, req) => {
     });
 });
 
-async function validate(cookie) {
-    const valid = await dbFunctions.validateUser(cookie.username, cookie.password);
+async function validate(username, password) {
+    const valid = await dbFunctions.validateUser(username, password);
     if (valid) {
         return true;
     } else {
@@ -116,34 +115,27 @@ async function signup(event, socket) {
 }
 
 async function loadChats(event, socket) {
-    dbFunctions.validateUser(user, password);
-    let chatIDs = dbFunctions.getAllChatIDs(user, password);
+    let chatIDs = dbFunctions.getAllChatIDs(username);
     socket.send("" + chatIDs);
 }
-/*
 
-async function loadChatHistory(event, socket) {
-    dbFunctions.validateUser(user, password);
+async function loadChatHistory(event, socket, username) {
     //get Chathistory
 }
 
 async function sendMessage(event, socket, message) {
-    dbFunctions.validateUser(user, password);
     //insert Message into chat
 }
 
 async function createChat(event, socket) {
-    dbFunctions.validateUser(user, password);
     //create a new chat
 }
 
-async function addUserToGroup(event, socket, id) {
-    dbFunctions.validateUser(user, password);
-    dbFunctions.addChatID(user, password, id);
-}*/
+async function addUserToGroup(event, socket, username, id) {
+    dbFunctions.addChatID(username, id);
+}
 
 
 server.on('close', () => {
-    dbClient.close();
     console.log('Server closed');
 });
