@@ -334,6 +334,23 @@ function chat_send_message(socket, chatId, message) {
     });
 }
 
+function newChat(isGroup) {
+    console.log("newChat")
+    let inform = document.querySelector("input[type=text]").value.trim();
+    if (inform === "") return;
+    let users = [];
+
+    let name = inform.trim();
+    if (!isGroup) {
+        users = [inform];
+    } else {
+        //TODO add users
+
+    }
+    console.log(inform, users)
+    chat_create_new_chat(socket, name, isGroup, users);
+}
+
 function chat_create_new_chat(socket, name, isGroup, users) {
     socket.sendEvent('createChat', {
         name: name,

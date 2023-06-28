@@ -12,6 +12,20 @@
     <script charset="utf-8" src="../script/socketConnection.js"></script>
 
     <script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
+
+    <script>
+        function disableForm(path, event_function, parameter) {
+            injectPage(path);
+            setTimeout(() => {
+                let form = document.forms[0];
+                form.addEventListener("submit", (event) => {
+                    event.preventDefault();
+                    event_function(parameter)
+                })
+            }, 1000);
+
+        }
+    </script>
 </head>
 <body>
 <main>
@@ -41,7 +55,7 @@
 
         <span class="sidebar-callout">Get in touch</span>
 
-        <div class="chat-contact" onclick='injectPage("../subpages/dashboard/create-chat.html")'>
+        <div class="chat-contact" onclick='disableForm("../subpages/dashboard/create-chat.html", newChat, false)'>
             <i class="fas fa-user-plus"></i>
             <p>New Chat</p>
         </div>
