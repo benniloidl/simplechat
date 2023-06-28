@@ -41,7 +41,11 @@ socket.onmessage = function (event) {
             loginUser(data);
             break;
         case 'fetchChat':
-            fetchChat(data.data);
+            try {
+                fetchChat(data.data);
+            } catch (e) { // if the element is not yet loaded
+                setTimeout(() => fetchChat(data.data), 1000);
+            }
             break;
     }
 };
