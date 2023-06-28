@@ -4,7 +4,6 @@ const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
-const { log } = require('console');
 
 let sockets = [];
 
@@ -45,7 +44,7 @@ app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'dashboard.html'));
 });
 
-app.get('*', (req, res) => {
+app.get('*.html', (req, res) => {
     res.redirect('login');
 });
 
