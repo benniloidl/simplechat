@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-    <title>SimpleChat</title>
-
-    <link href="../subpages/dashboard/styles.css" rel="stylesheet">
-    <link href="../style/general.css" rel="stylesheet">
-    <script src="../script/general.js"></script>
-    <script charset="utf-8" src="../script/socketConnection.js"></script>
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 	
-    <script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
+	<title>SimpleChat</title>
+	
+	<link href="../subpages/dashboard/styles.css" rel="stylesheet">
+	<link href="../style/general.css" rel="stylesheet">
+	<script src="../script/general.js"></script>
+	<script charset="utf-8" src="../script/socketConnection.js"></script>
+	
+	<script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
 </head>
 <body>
 <main>
@@ -55,30 +55,7 @@
 		
 		<span class="sidebar-callout">Your Chats</span>
 		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Some user</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/group.html")'>
-			<i class="fas fa-users"></i>
-			<p>Some usqwdqwder</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-		</div>
-		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/chat.html")'>
-			<i class="fas fa-user"></i>
-			<p>Soqwdqwdme userq njwhuidq owhduiqhiuqiuoqwuiowhiuhd</p>
-		</div>
+		<div id="chats" style="display: flex; flex-direction: column; gap: var(--spacing);"></div>
 	</div>
 	
 	<div id="chat"></div>
