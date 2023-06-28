@@ -12,11 +12,7 @@ app.use(cookieParser());
 app.use((req, res, next) => {
     dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
         if (result) {
-            if (req.path == '/dashboard') {
-                next();
-            } else {
-                res.redirect("/dashboard");
-            }
+            next();
         } else {
             if (req.path == '/login') {
                 next();
@@ -51,9 +47,6 @@ app.get('*.html', (req, res) => {
 //receive message
 wsSrv.on('connection', (socket, req) => {
     sockets.push(socket);
-    
-    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Chat", type: "user", status: true } }));
-    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Group", type: "group", status: true } }));
     
     socket.on('message', async (data) => {
         let event;

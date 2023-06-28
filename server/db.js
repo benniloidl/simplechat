@@ -26,29 +26,34 @@ async function connectToDB() {
     createUser("Test12345", "Test123*345u").then((result) => {
         console.log("creating a new user: " + result);
     });
-    addChatID("test123", "ID1234").then((result) => {
-        console.log("added ID: " + result);
+    /*createChat("Chat123", "user").then((result) => {
+        console.log("createChat: " + result);
+        addChat("test123", result).then((result) => {
+            console.log("added ID: " + result);
+        });
     });
-    /*removeChatID("test123", "ID1234").then((result) => {
+    removeChat("test123", "ID1234").then((result) => {
         console.log("removed ID: " + result);
-    });*/
-    getAllChatIDs("test123").then((result) => {
-        console.log(result);
     });
-    /*createChatHistory("Chat123").then((result) => {
-        console.log("createChatHistory: " + result);
-    });
-    addMessage("649be7f00dee1cb81769fae2", { message: "Hello World", time: "12:34", readConfirmation: false }).then((result) => {
+    addMessage("649be7f00dee1cb81769fae2", { author: "abc123", message: "Hello World", timeStamp: "12:34", readConfirmation: false }).then((result) => {
         console.log("addMessage: " + result);
     });*/
     loadMessages("649be7f00dee1cb81769fae2", 0, 5).then((result) => {
+        console.log(result);
+    });
+    fetchChats("test123").then((result) => {
         console.log(result);
     });
     //end of test
 }
 
 async function validateUser(username, password) {
-    return await user.findOne({ "username": username, "password": password }, { projection: { _id: 1 } });
+    const result = await user.findOne({ "username": username, "password": password }, { projection: { _id: 1 } });
+    if (result) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 async function createUser(username, password) {
@@ -61,7 +66,7 @@ async function createUser(username, password) {
     }
 }
 
-async function addChatID(username, chatID) {
+async function addChat(username, chatID) {
     const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
     if (result) {
         return false;
@@ -70,7 +75,7 @@ async function addChatID(username, chatID) {
     return true;
 }
 
-async function removeChatID(username, chatID) {
+async function removeChat(username, chatID) {
     const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
     if (!result) {
         return false;
@@ -83,8 +88,27 @@ async function getAllChatIDs(username) {
     return await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
 }
 
-async function createChatHistory(name) {
-    const result = await chatHistory.insertOne({ "name": name, "messages": [] });
+async function getChatDetails(chatID) {
+    return await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, name: 1, type: 1 } });
+}
+
+async function fetchChats(username) {
+    const chatIDs = await getAllChatIDs(username);
+    let chats = [];
+    if (chatIDs) {
+        for (let i = 0; i < chatIDs.chats.length; i++) {
+            const id = chatIDs.chats[i];
+            const detail = await getChatDetails(id.chatID);
+            chats.push({"chatID":id,"name":detail.name,"type":detail.type});
+        }
+    } else {
+        return false;
+    }
+    return chats;
+}
+
+async function createChat(name, type) {
+    const result = await chatHistory.insertOne({ "name": name, "type": type, "messages": [] });
     return result.insertedId.toString();
 }
 
@@ -121,10 +145,10 @@ module.exports = {
     connectToDB,
     validateUser,
     createUser,
-    addChatID,
-    removeChatID,
-    getAllChatIDs,
-    createChatHistory,
+    addChat,
+    removeChat,
+    fetchChats,
+    createChat,
     loadMessages,
     addMessage
 };
