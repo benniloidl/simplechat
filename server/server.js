@@ -52,6 +52,10 @@ app.get('*.html', (req, res) => {
 //receive message
 wsSrv.on('connection', (socket, req) => {
     sockets.push(socket);
+    
+    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Chat", type: "user", status: true } }));
+    socket.send(JSON.stringify({ event: 'fetchChat', data: { name: "Test Group", type: "group", status: true } }));
+    
     socket.on('message', async (data) => {
         let event;
         try {
@@ -60,7 +64,7 @@ wsSrv.on('connection', (socket, req) => {
         } catch {
             return -1;
         }
-
+        
         const cookie = req.headers.cookie;
         let JSONCookie = {};
         if (cookie) {
@@ -69,19 +73,20 @@ wsSrv.on('connection', (socket, req) => {
                 JSONCookie[pair[0]] = pair.splice(1).join('=');
             });
         }
-
+        
         switch (event.event) {
             case 'login':
                 login(event, socket);
                 break;
-
+            
             case 'loadChats':
                 if (validate(JSONCookie)) {
                     loadChats(event, socket);
                 }
                 break;
-
-            default: return -1;
+            
+            default:
+                return -1;
         }
     });
 });
@@ -118,6 +123,7 @@ async function loadChats(event, socket) {
     let chatIDs = dbFunctions.getAllChatIDs(user, password);
     socket.send("" + chatIDs);
 }
+
 /*
 
 async function loadChatHistory(event, socket) {

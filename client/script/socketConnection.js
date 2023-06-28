@@ -13,11 +13,36 @@ function loginUser(data) {
     }
 }
 
+function fetchChat(data) {
+    if (!data.status) return;
+    
+    const navigator = document.createElement("div");
+    navigator.classList.add("chat-contact");
+    navigator.onclick = () => {
+        if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
+        else injectPage("../subpages/dashboard/group.html");
+    }
+    
+    const icon = document.createElement("i");
+    icon.classList.add("fas", data.type === "user" ? "fa-user" : "fa-users");
+    navigator.appendChild(icon);
+    
+    const name = document.createElement("p");
+    name.innerHTML = data.name;
+    navigator.appendChild(name);
+    
+    document.getElementById("chats").appendChild(navigator);
+}
+
 socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     switch (data.event) {
         case 'login':
             loginUser(data);
+            break;
+        case 'fetchChat':
+            fetchChat(data.data);
+            break;
     }
 };
 
