@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>SimpleChat</title>
+
+    <link href="../subpages/dashboard/styles.css" rel="stylesheet">
+    <link href="../style/general.css" rel="stylesheet">
+    <script src="../script/general.js"></script>
+    <script charset="utf-8" src="../script/socketConnection.js"></script>
 	
-	<title>SimpleChat</title>
-	
-	<link href="../subpages/dashboard/styles.css" rel="stylesheet">
-	<link href="../style/general.css" rel="stylesheet">
-	<script src="../script/general.js"></script>
-	<script charset="utf-8" src="../script/socketConnection.js"></script>
-	
-	<script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
+    <script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
 </head>
 <body>
 <main>
@@ -25,6 +25,11 @@
 		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/profile.html")'>
 			<i class="fas fa-user"></i>
 			<p class="username">Your Username</p>
+		</div>
+		
+		<div class="chat-contact appearance" onclick="changeColorScheme()">
+			<i class="fas fa-moon"></i>
+			<p>Appearance</p>
 		</div>
 		
 		<div class="chat-contact logout">
