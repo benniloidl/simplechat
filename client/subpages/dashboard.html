@@ -62,12 +62,6 @@
 </main>
 
 <script>
-	setInterval(() => {
-		document.querySelectorAll(".username").forEach(function (element) {
-			element.innerHTML = getCookie("username");
-		});
-	}, 1000);
-	
 	function injectPage(url) {
 		const chatDiv = document.getElementById("chat");
 		const xhr = new XMLHttpRequest();
@@ -76,6 +70,10 @@
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				chatDiv.innerHTML = xhr.responseText;
+		
+				document.querySelectorAll(".username").forEach(function (element) {
+					element.innerHTML = getCookie("username");
+				});	
 			}
 		};
 		xhr.send();
