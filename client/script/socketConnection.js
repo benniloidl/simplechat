@@ -1,4 +1,12 @@
 const socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
+socket.sendEvent = (eventName, eventData) => {
+    const message = {
+        event: eventName,
+        data: eventData,
+    };
+    socket.send(JSON.stringify(message));
+}
+
 const chatFunctions = require('./chatConnection')
 const {chat_clicked} = require("./chatConnection");
 
@@ -43,7 +51,7 @@ socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     switch (data.event) {
         case 'login':
-            loginUser(data);
+            loginUser(socket, data);
             break;
         case 'fetchChat':
             try {
@@ -57,14 +65,6 @@ socket.onmessage = function (event) {
 
 socket.onclose = function (event) {
 };
-
-function sendEvent(eventName, eventData) {
-    const message = {
-        event: eventName,
-        data: eventData,
-    };
-    socket.send(JSON.stringify(message));
-}
 
 function getValues() {
     let usr = document.getElementById("usr").value;
@@ -113,5 +113,5 @@ function loginRequest() {
         return;
     }
 
-    sendEvent('login', {username: result.username, password: result.password})
+    socket.sendEvent('login', {username: result.username, password: result.password})
 }
