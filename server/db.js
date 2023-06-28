@@ -1,4 +1,5 @@
-const { MongoClient } = require('mongodb');
+const mongo = require('mongodb');
+const { MongoClient } = mongo;
 const uri = "mongodb://127.0.0.1:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
 let db, user, chatHistory;
@@ -34,13 +35,13 @@ async function connectToDB() {
     getAllChatIDs("test123").then((result) => {
         console.log(result);
     });
-    createChatHistory("ID1234", "Chat123").then((result) => {
-        console.log("createChatHistory: "+result);
+    /*createChatHistory("Chat123").then((result) => {
+        console.log("createChatHistory: " + result);
     });
-    addMessage("ID1234", {message:"Hello World", time:"12:34", readConfirmation:false}).then((result) => {
-        console.log("addMessage: "+result);
-    });
-    loadMessages("ID1234", 0,5).then((result) => {
+    addMessage("649be7f00dee1cb81769fae2", { message: "Hello World", time: "12:34", readConfirmation: false }).then((result) => {
+        console.log("addMessage: " + result);
+    });*/
+    loadMessages("649be7f00dee1cb81769fae2", 0, 5).then((result) => {
         console.log(result);
     });
     //end of test
@@ -87,25 +88,20 @@ async function getAllChatIDs(username) {
     return await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
 }
 
-async function createChatHistory(chatID, name) {
-    const result = await chatHistory.findOne({ "chatID": chatID }, { projection: { _id: 1 } });
-    if (result) {
-        return false;
-    } else {
-        await chatHistory.insertOne({ "chatID": chatID, "name": name, "messages": [] });
-        return true;
-    }
+async function createChatHistory(name) {
+    const result = await chatHistory.insertOne({ "name": name, "messages": [] });
+    return result.insertedId.toString();
 }
 
 async function loadMessages(chatID, start, amount) {
-    const result = await chatHistory.findOne({ "chatID": chatID }, { projection: { _id: 0, messages: 1 } });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, messages: 1 } });
     if (result) {
         let ret;
         try {
-            ret = result.messages.subarray(start, start + amount + 1);
+            ret = result.messages.slice(start, start + amount);
         } catch {
             try {
-                ret = result.messages.subarray(start, result.messages.length);
+                ret = result.messages.slice(start, result.messages.length);
             } catch {
                 return false;
             }
@@ -117,9 +113,9 @@ async function loadMessages(chatID, start, amount) {
 }
 
 async function addMessage(chatID, message) {
-    const result = await chatHistory.findOne({ "chatID": chatID }, { projection: { _id: 1 } });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 1 } });
     if (result) {
-        await chatHistory.updateOne({ "chatID": chatID }, { $push: { messages: message } });
+        await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $push: { messages: message } });
         return true;
     } else {
         return false;
