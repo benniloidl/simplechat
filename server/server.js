@@ -4,6 +4,8 @@ const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
+const eventFunctions = require('./eventFunctions');
+const e = require('express');
 
 let sockets = [];
 
@@ -56,7 +58,7 @@ wsSrv.on('connection', (socket, req) => {
         } catch {
             return -1;
         }
-        
+
         const cookie = req.headers.cookie;
         let JSONCookie = {};
         if (cookie) {
@@ -70,68 +72,21 @@ wsSrv.on('connection', (socket, req) => {
 
         switch (event.event) {
             case 'login':
-                login(event, socket);
+                eventFunctions.login(event, socket);
                 break;
-
-            case 'loadChats':
-                if (validate(username, password)) {
-                    loadChats(event, socket, username);
+            case 'fetchchats':
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.fetchchats(event, socket, username);
                 }
                 break;
-
+            case 'fetchchatmessage':
+                if(eventFunctions.validate(username, password)){
+                    eventFunctions.fetchchats(event, socket);
+                }
             default: return -1;
         }
     });
 });
-
-async function validate(username, password) {
-    const valid = await dbFunctions.validateUser(username, password);
-    if (valid) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-async function login(event, socket) {
-    const login = await dbFunctions.validateUser(event.data.username, event.data.password);
-    if (login) {
-        socket.send(JSON.stringify({ event: 'login', status: true }));
-    } else {
-        socket.send(JSON.stringify({ event: 'login', status: false }));
-    }
-}
-
-async function signup(event, socket) {
-    const login = await dbFunctions.createUser(event.data.username, event.data.password);
-    if (login) {
-        socket.send("{event: 'signup', status: true}");
-    } else {
-        socket.send("{event: 'signup', status: false}");
-    }
-}
-
-async function loadChats(event, socket) {
-    let chatIDs = dbFunctions.getAllChatIDs(username);
-    socket.send("" + chatIDs);
-}
-
-async function loadChatHistory(event, socket, username) {
-    //get Chathistory
-}
-
-async function sendMessage(event, socket, message) {
-    //insert Message into chat
-}
-
-async function createChat(event, socket) {
-    //create a new chat
-}
-
-async function addUserToGroup(event, socket, username, id) {
-    dbFunctions.addChatID(username, id);
-}
-
 
 server.on('close', () => {
     console.log('Server closed');
