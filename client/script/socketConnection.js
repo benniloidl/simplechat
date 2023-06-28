@@ -7,10 +7,10 @@ socket.sendEvent = (eventName, eventData) => {
     socket.send(JSON.stringify(message));
 }
 
-const chatFunctions = require('./chatConnection')
-const {chat_clicked} = require("./chatConnection");
+//const chatFunctions = require('./chatConnection')
+//const {chat_clicked} = require("./chatConnection");
 
-chatFunctions.chat_clicked(socket);
+//chatFunctions.chat_clicked(socket);
 
 socket.onopen = function () {
 
@@ -51,7 +51,7 @@ socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     switch (data.event) {
         case 'login':
-            loginUser(socket, data);
+            loginUser(data);
             break;
         case 'fetchChat':
             try {

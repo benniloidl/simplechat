@@ -18,7 +18,7 @@ async function connectToDB() {
         process.exit(42);
     }
     console.log("connected successfully\n");
-    createChat("Chat123", "user").then((result) => {
+    /*createChat("Chat123", "user").then((result) => {
         console.log("createChat: " + result);
         addChat("Test12345", result).then((result) => {
             console.log("added ID: " + result);
@@ -28,7 +28,7 @@ async function connectToDB() {
         console.log(result);
     });
     //test the functions
-/*     validateUser("test123", "123").then((result) => {
+     validateUser("test123", "123").then((result) => {
         console.log("validation: " + result);
     });
     createUser("Test12345", "Test123*345u").then((result) => {
