@@ -33,7 +33,6 @@ async function signup(event, socket) {
 }
 
 async function createChat(data, socket, username) {
-    console.log(data);
     if (data.type == "user" && data.users.length != 1) {
         socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
         return false;
@@ -44,8 +43,8 @@ async function createChat(data, socket, username) {
             for (const user of data.users) {
                 await dbFunctions.addChat(user, chatID);
             }
-            socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
-        }
+         }   
+         socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
     });
 }
 
