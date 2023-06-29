@@ -67,11 +67,21 @@ async function sendMessage(socket, sockets, data, username) {
     }
 }
 
+async function readChat(data, socket,sockets, username) {
+    await dbFunctions.resetUnreadMessages(username, data.chatID);
+    for (const s of sockets) {
+        if(s.socket != socket&&s.hasChat(s.username, data.chatID)){
+            s.socket.send(JSON.stringify({event:"messagesRead",chatID:data.chatID}));
+        }
+    }
+}
+
 module.exports = {
     validate,
     login,
     signup,
     fetchchats,
     createChat,
-    sendMessage
+    sendMessage,
+    readChat
 }
