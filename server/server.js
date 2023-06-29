@@ -19,7 +19,7 @@ app.use((req, res, next) => {
                 next();
             }
         } else {
-            if (req.path == '/login' ||req.path == '/register') {
+            if (req.path == '/login' || req.path == '/register') {
                 next();
             } else {
                 res.redirect("/login");
@@ -81,6 +81,9 @@ wsSrv.on('connection', (socket, req) => {
             case 'login':
                 eventFunctions.login(event.data, socket, sockets);
                 break;
+            case 'register':
+                eventFunctions.register(event.data, socket, sockets);
+                break;
             case 'fetchChats':
                 if (eventFunctions.validate(username, password)) {
                     eventFunctions.fetchchats(socket, username);
@@ -103,7 +106,7 @@ wsSrv.on('connection', (socket, req) => {
                 break;
             case 'readChat':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.readChat(event.data, socket,sockets, username);
+                    eventFunctions.readChat(event.data, socket, sockets, username);
                 }
                 break;
             default: return -1;

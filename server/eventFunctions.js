@@ -14,11 +14,11 @@ async function fetchchats(socket, username) {
     socket.send(JSON.stringify({ event: 'fetchChats', "chats": chats }));
 }
 
-async function login(data, socket,sockets) {
+async function login(data, socket, sockets) {
     const login = await dbFunctions.validateUser(data.username, data.password);
     if (login) {
         for (const s of sockets) {
-            if(s.socket == socket){
+            if (s.socket == socket) {
                 s.username = data.username;
                 break;
             }
@@ -29,12 +29,18 @@ async function login(data, socket,sockets) {
     }
 }
 
-async function signup(event, socket) {
-    const login = await dbFunctions.createUser(event.data.username, event.data.password);
+async function register(data, socket, sockets) {
+    const login = await dbFunctions.createUser(data.username, data.password);
     if (login) {
-        socket.send("{event: 'signup', status: true}");
+        for (const s of sockets) {
+            if (s.socket == socket) {
+                s.username = data.username;
+                break;
+            }
+        }
+        socket.send("{event: 'register', status: true}");
     } else {
-        socket.send("{event: 'signup', status: false}");
+        socket.send("{event: 'register', status: false}");
     }
 }
 
@@ -55,7 +61,7 @@ async function createChat(data, socket, username) {
 }
 
 async function sendMessage(socket, sockets, data, username) {
-    if (await dbFunctions.addMessage(data.chatID, {message:data.message.message, author: username, readConfirmation: false, timeStamp:Date.now()})) {
+    if (await dbFunctions.addMessage(data.chatID, { message: data.message.message, author: username, readConfirmation: false, timeStamp: Date.now() })) {
         for (const s of sockets) {
             if (await dbFunctions.hasChat(s.username, data.chatID)) {
                 dbFunctions.incrementUnreadMessages(s.username, data.chatID);
@@ -67,11 +73,11 @@ async function sendMessage(socket, sockets, data, username) {
     }
 }
 
-async function readChat(data, socket,sockets, username) {
+async function readChat(data, socket, sockets, username) {
     await dbFunctions.resetUnreadMessages(username, data.chatID);
     for (const s of sockets) {
-        if(s.socket != socket&&s.hasChat(s.username, data.chatID)){
-            s.socket.send(JSON.stringify({event:"messagesRead",chatID:data.chatID}));
+        if (s.socket != socket && s.hasChat(s.username, data.chatID)) {
+            s.socket.send(JSON.stringify({ event: "messagesRead", chatID: data.chatID }));
         }
     }
 }
@@ -79,7 +85,7 @@ async function readChat(data, socket,sockets, username) {
 module.exports = {
     validate,
     login,
-    signup,
+    register,
     fetchchats,
     createChat,
     sendMessage,
