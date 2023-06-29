@@ -19,7 +19,7 @@ app.use((req, res, next) => {
                 next();
             }
         } else {
-            if (req.path == '/login') {
+            if (req.path == '/login' ||req.path == '/register') {
                 next();
             } else {
                 res.redirect("/login");
@@ -38,6 +38,10 @@ const wsSrv = new ws.Server({ server });
 //Website
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/subpages', 'register.html'));
 });
 
 app.get('/dashboard', (req, res) => {
@@ -89,7 +93,7 @@ wsSrv.on('connection', (socket, req) => {
                 break;
             case 'fetchMessages':
                 if (eventFunctions.validate(username, password)) {
-                    //eventFunctions.sendMessage(socket, username, event.data);
+                    //eventFunctions.fetchMessages(socket, username, event.data);
                 }
                 break;
             case 'createChat':
