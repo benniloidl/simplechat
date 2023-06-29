@@ -32,7 +32,12 @@ function loginUser(data) {
 function buildChatOverview(chats) {
     chats.forEach(data => {
         const navigator = document.createElement("div");
+        let unreadMessages = data.unreadMessages ? data.unreadMessages : 0;
+        navigator.setAttribute("data-unread-messages", unreadMessages);
         navigator.classList.add("chat-contact");
+        if (unreadMessages > 0) {
+            navigator.classList.add("notification");
+        }
         navigator.setAttribute("data-chat-id", data.chatID);
         navigator.onclick = () => {
             if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
@@ -64,7 +69,6 @@ function TESTBUILDCHATMESSAGES() {
         name: "the magnificant 3",
         type: "group",
         username: 'self',
-        unreadMessages: 5,
         chatID: 1337,
         messages: [
             {
@@ -98,29 +102,28 @@ function TESTBUILDCHATMESSAGES() {
         type: 'user',
         username: 'self',
         chatID: 4242,
-        unreadMessages: 42,
         messages: [
             {
                 message: "message",
-                timestamp: "12 nov 2003 17:01",
+                timeStamp: "12 nov 2003 17:01",
                 readConfirmation: true,
                 author: "Honulullu"
             },
             {
                 message: "answer",
-                timestamp: "13 nov 2003 17:01",
+                timeStamp: "13 nov 2003 17:01",
                 readConfirmation: true,
                 author: "self"
             },
             {
                 message: "some other message",
-                timestamp: "28 jun 2023 18:00",
+                timeStamp: "28 jun 2023 18:00",
                 readConfirmation: true,
                 author: "Honulullu"
             },
             {
                 message: "some other message",
-                timestamp: "28 jun 2023 19:00",
+                timeStamp: Date.now(),
                 readConfirmation: true,
                 author: "Honulullu"
             },
@@ -131,7 +134,7 @@ function TESTBUILDCHATMESSAGES() {
     // } catch (e) {
     //     setTimeout(() => buildChatMessages(testdata, true), 1000);
     // }
-    setTimeout(() => buildChatMessages(testdata), 10);
+    setTimeout(() => buildChatMessages(testdata2), 10);
 
 }
 
@@ -160,7 +163,7 @@ function buildChatMessages(chatData) {
         chatElement.appendChild(messageElement);
 
         const timeElement = document.createElement("span");
-        let messageDate = new Date(data.timestamp); // bspw: "28 Jun 2023 18:50:59"
+        let messageDate = new Date(data.timeStamp); // bspw: "28 Jun 2023 18:50:59"
         let timeDifference = Math.floor((Date.now() - messageDate.valueOf()) / 1000 / 60)
         if (timeDifference < 60 * 24) {
             timeElement.innerHTML = messageDate.toLocaleTimeString("en-UK", {hour: '2-digit', minute: '2-digit'});
@@ -177,7 +180,6 @@ function buildChatMessages(chatData) {
 
         chatBox.appendChild(chatElement);
     });
-    let a = document.getElementById("chat-box");
     document.getElementById("chat-box").replaceWith(chatBox);
     document.getElementById("chat-name").innerHTML = chatData.name;
 
@@ -190,7 +192,7 @@ function buildChatMessages(chatData) {
 function TESTNOTIFICATIONHANDLER() {
     let testNotification = {
         chatID: "649c3b837074414f95088ce2",
-        unreadMessages: 4,
+        //unreadMessages: 4,
         message: {
             message: "Benni hat immer Recht!",
             timestamp: "28 jun 2023 19:00",
@@ -216,7 +218,8 @@ function notificationHandler(notification) {
     let node = get();
     if (node) {
         node.classList.add("notification");
-        node.setAttribute("data-unread-messages", notification.unreadMessages);
+        let unreadMessageAmount = node.getAttribute("data-unread-message");
+        node.setAttribute("data-unread-messages", unreadMessageAmount + 1);
         console.log(node);
     }
 
