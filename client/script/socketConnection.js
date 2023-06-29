@@ -274,7 +274,7 @@ socket.onclose = function (event) {
 function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
-    let pwdElement = document.getElementById("pwd-check");
+    let pwdElement = document.getElementById("pwd2");
     
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
