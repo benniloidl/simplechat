@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>SimpleChat - Login</title>
+    <script charset="utf-8" src="../script/socketConnection.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+        }
+
+        article {
+            box-sizing: border-box;
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 16px;
+        }
+    </style>
+    <link href="../style/general.css" rel="stylesheet">
+    <link href="../style/login.css" rel="stylesheet">
+    <script charset="utf-8" src="../script/general.js"></script>
+</head>
+<body>
+<article class="loginForm">
+    <!--    <div class="loginForm">-->
+    <h1>Login</h1>
+    <h2>Let's Chat</h2>
+    <div class="input-label" data-label="Username">
+        <label for="usr" hidden="hidden"></label>
+        <input id="usr" maxlength="16" placeholder="Username" required="required" tabindex="1"
+               type="text" value="Test12345"><br>
+    </div>
+    <div class="input-label" data-label="Password">
+        <label for="pwd" hidden="hidden"></label>
+        <input id="pwd" placeholder="Password" required="required" tabindex="2"
+               type="password" value="Test123*345u"><br>
+    </div>
+    <i class="error" id="pwdError"></i>
+    <button id="submit" onclick="loginRequest()" tabindex="3">Login</button>
+    <div>
+        <a href="">Forgot Password</a>
+        <a href="../subpages/register.html">Signup</a>
+    </div>
+    <!--    </div>-->
+</article>
+<footer>
+    <span class="appereanceMode" onclick="changeColorScheme()"></span>
+    <a class="footerLink" href="../subpages/imprint.html">Imprint</a>
+    <a class="footerLink" href="../subpages/privacy.html">Privacy</a>
+</footer>
+<script>
+    const input = document.querySelectorAll("input");
+    for (let inputElement of input) {
+        inputElement.addEventListener("keyup", (event) => {
+            if (event.key === "Enter") {
+                loginRequest()
+            }
+        })
+    }
+</script>
+</body>
+</html>
