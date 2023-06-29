@@ -9,6 +9,13 @@ async function validate(username, password) {
     }
 }
 
+async function loadChatHistory(event, socket){
+    let messages = dbFunctions.loadMessages(event.chatID, event.start, event.amount);
+    if(messages != false){
+        socket.send('{event: "chatMessages", messages:'+messages+' }');
+    }
+}
+
 async function fetchchats(event, socket, username){
     const chats = await dbFunctions.fetchChats(username);
     socket.send(JSON.stringify({event: 'fetchChats', "chats": chats}));
@@ -36,5 +43,6 @@ module.exports = {
     validate,
     login,
     signup,
-    fetchchats
+    fetchchats,
+    loadChatHistory
 }
