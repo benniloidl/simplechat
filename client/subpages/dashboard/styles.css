@@ -28,6 +28,7 @@ body {
 }
 
 main {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -72,6 +73,7 @@ main #sidebar .sidebar-callout {
 }
 
 .chat-contact {
+    position: relative;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -319,5 +321,39 @@ main #chat form input[type="submit"]:hover {
     }
     100% {
         transform: scale(1);
+    }
+}
+
+.menu-open,
+.menu-close {
+    font-size: 18px;
+    position: absolute;
+    right: var(--spacing);
+    display: none !important;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 500px) {
+    .menu-open, .menu-close {
+        display: inline !important;
+    }
+
+    main #sidebar {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        padding: var(--spacing) calc(50dvw - 120px);
+    }
+
+    main #chat {
+        padding-left: var(--spacing);
+    }
+
+    main[data-menu-open="true"] #chat {
+        display: none;
+    }
+
+    main[data-menu-open="false"] #sidebar {
+        display: none;
     }
 }

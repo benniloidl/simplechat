@@ -1,11 +1,13 @@
 <div class="chat-contact">
-    <i class="fas fa-user-plus"></i>
-    <p>Start a new chat</p>
+	<i class="fas fa-user-plus"></i>
+	<p>Start a new chat</p>
+	<i class="fas fa-bars menu-open"
+	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 </div>
 
 <form>
-    <h2>What's the name of your friend?</h2>
-    <span>Enter the exact username of your friend.</span>
-    <input maxlength="16" placeholder="Enter username" required type="text">
-    <input type="submit" value="Start chat">
+	<h2>What's the name of your friend?</h2>
+	<span>Enter the exact username of your friend.</span>
+	<input maxlength="16" placeholder="Enter username" required type="text">
+	<input type="submit" value="Start chat">
 </form>
