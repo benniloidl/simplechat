@@ -38,9 +38,9 @@ async function register(data, socket, sockets) {
                 break;
             }
         }
-        socket.send("{event: 'register', status: true}");
+        socket.send(JSON.stringify({event: 'register', status: true}));
     } else {
-        socket.send("{event: 'register', status: false}");
+        socket.send(JSON.stringify({event: 'register', status: false}));
     }
 }
 
