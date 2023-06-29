@@ -79,10 +79,10 @@ wsSrv.on('connection', (socket, req) => {
 
         switch (event.event) {
             case 'login':
-                eventFunctions.login(event.data, socket, sockets);
+                eventFunctions.login( socket,event.data, sockets);
                 break;
             case 'register':
-                eventFunctions.register(event.data, socket, sockets);
+                eventFunctions.register( socket,event.data, sockets);
                 break;
             case 'fetchChats':
                 if (eventFunctions.validate(username, password)) {
@@ -91,22 +91,22 @@ wsSrv.on('connection', (socket, req) => {
                 break;
             case 'sendMessage':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.sendMessage(socket, sockets, event.data, username);
+                    eventFunctions.sendMessage(socket, event.data,  username,sockets);
                 }
                 break;
             case 'fetchMessages':
                 if (eventFunctions.validate(username, password)) {
-                    //eventFunctions.fetchMessages(socket, username, event.data);
+                    eventFunctions.fetchMessages(socket, event.data);
                 }
                 break;
             case 'createChat':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.createChat(event.data, socket, username);
+                    eventFunctions.createChat(socket,event.data,  username);
                 }
                 break;
             case 'readChat':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.readChat(event.data, socket, sockets, username);
+                    eventFunctions.readChat(socket,event.data, username,  sockets);
                 }
                 break;
             default: return -1;

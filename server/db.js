@@ -17,7 +17,7 @@ async function connectToDB() {
         console.error("connecting to db failed");
         process.exit(42);
     }
-    
+
     console.log("connected successfully\n");
 }
 
@@ -93,7 +93,7 @@ async function createChat(name, type) {
     return result.insertedId.toString();
 }
 
-async function loadMessages(chatID, start, amount) {
+async function fetchMessages(chatID, start, amount) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
             _id: 0,
@@ -130,7 +130,7 @@ async function addMessage(chatID, message) {
 
 /*
 async function calculateUnreadMessages(username, chatID) {
-    const result = await loadMessages(chatID, 0, 100);
+    const result = await fetchMessages(chatID, 0, 100);
     let unreadMessages = 0;
     if (result) {
         for (const message of result) {
@@ -148,9 +148,9 @@ async function incrementUnreadMessages(username, chatID) {
 }
 
 async function resetUnreadMessages(username, chatID) {
-    await user.updateOne({ "username": username, "chats.chatID": chatID }, { $set:{"chats.$.unreadMessages": 0} });
-    await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID)}, { $set:{"messages.$[elem].readConfirmation": true} },
-    { "arrayFilters": [{ "elem.readConfirmation": false, "elem.author": {$ne: username} }], "multi": true });
+    await user.updateOne({ "username": username, "chats.chatID": chatID }, { $set: { "chats.$.unreadMessages": 0 } });
+    await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "messages.$[elem].readConfirmation": true } },
+        { "arrayFilters": [{ "elem.readConfirmation": false, "elem.author": { $ne: username } }], "multi": true });
 }
 
 async function hasChat(username, chatID) {
@@ -188,7 +188,7 @@ module.exports = {
     removeChat,
     fetchChats,
     createChat,
-    loadMessages,
+    fetchMessages,
     addMessage,
     hasChat,
     getUnreadMessages,
