@@ -17,44 +17,8 @@ async function connectToDB() {
         console.error("connecting to db failed");
         process.exit(42);
     }
+
     console.log("connected successfully\n");
-    
-    /*createChat("user", "user").then((result) => {
-        console.log("createChat: " + result);
-        addChat("Test12345", result).then((result) => {
-            console.log("added ID: " + result);
-        });
-    });*/
-    
-    /*fetchChats("Test12345").then((result) => {
-        console.log(result);
-    });
-    //test the functions
-     validateUser("test123", "123").then((result) => {
-        console.log("validation: " + result);
-    });
-    createUser("Test12345", "Test123*345u").then((result) => {
-        console.log("creating a new user: " + result);
-    }); 
-    createChat("Chat123", "user").then((result) => {
-        console.log("createChat: " + result);
-        addChat("test123", result).then((result) => {
-            console.log("added ID: " + result);
-        });
-    });
-    removeChat("test123", "ID1234").then((result) => {
-        console.log("removed ID: " + result);
-    });
-    addMessage("649be7f00dee1cb81769fae2", { author: "abc123", message: "Hello World", timeStamp: "12:34", readConfirmation: false }).then((result) => {
-        console.log("addMessage: " + result);
-    });
-    loadMessages("649be7f00dee1cb81769fae2", 0, 5).then((result) => {
-        console.log(result);
-    });
-    fetchChats("test123").then((result) => {
-        console.log(result);
-    });*/
-    //end of test
 }
 
 async function validateUser(username, password) {
@@ -115,8 +79,8 @@ async function fetchChats(username) {
         for (let i = 0; i < chatIDs.chats.length; i++) {
             const id = chatIDs.chats[i];
             const detail = await getChatDetails(id.chatID);
-            const unreadMessages = calculateUnreadMessages(username, id.chatID);
-            chats.push({"chatID": id.chatID, "name": detail.name, "type": detail.type, "unreadMessages": unreadMessages});
+            const unreadMessages = await getUnreadMessages(username, id.chatID);
+            chats.push({ "chatID": id.chatID, "name": detail.name, "type": detail.type, "unreadMessages": unreadMessages });
         }
     } else {
         return false;
@@ -129,7 +93,7 @@ async function createChat(name, type) {
     return result.insertedId.toString();
 }
 
-async function loadMessages(chatID, start, amount) {
+async function fetchMessages(chatID, start, amount) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
             _id: 0,
@@ -164,22 +128,33 @@ async function addMessage(chatID, message) {
     }
 }
 
+/*
 async function calculateUnreadMessages(username, chatID) {
-    const result = await loadMessages(chatID, 0, 100);
+    const result = await fetchMessages(chatID, 0, 100);
     let unreadMessages = 0;
-    if(result){
-        for (const message of result){
-            if(message.readConfirmation || message.author == username){
+    if (result) {
+        for (const message of result) {
+            if (message.readConfirmation || message.author == username) {
                 break;
             }
             unreadMessages++;
         }
     }
     return unreadMessages;
+}*/
+
+async function incrementUnreadMessages(username, chatID) {
+    await user.updateOne({ "username": username, "chats.chatID": chatID }, { $inc: { "chats.$.unreadMessages": 1 } });
+}
+
+async function resetUnreadMessages(username, chatID) {
+    await user.updateOne({ "username": username, "chats.chatID": chatID }, { $set: { "chats.$.unreadMessages": 0 } });
+    await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "messages.$[elem].readConfirmation": true } },
+        { "arrayFilters": [{ "elem.readConfirmation": false, "elem.author": { $ne: username } }], "multi": true });
 }
 
 async function hasChat(username, chatID) {
-    const result = await user.findOne({"username": username, "chats.chatID":chatID}, {projection: {_id: 1}});
+    const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
     if (result) {
         return true;
     } else {
@@ -187,22 +162,17 @@ async function hasChat(username, chatID) {
     }
 }
 
-async function calculateUnreadMessages(username, chatID) {
-    const result = await loadMessages(chatID, 0, 100);
-    let unreadMessages = 0;
-    if(result){
-        for (const message of result){
-            if(message.readConfirmation || message.author == username){
-                break;
-            }
-            unreadMessages++;
+async function getUnreadMessages(username, chatID) {
+    const result = await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
+    for (const chat of result.chats) {
+        if (chat.chatID == chatID) {
+            return chat.unreadMessages;
         }
     }
-    return unreadMessages;
 }
 
 async function hasChat(username, chatID) {
-    const result = await user.findOne({"username": username, "chats.chatID":chatID}, {projection: {_id: 1}});
+    const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
     if (result) {
         return true;
     } else {
@@ -218,7 +188,10 @@ module.exports = {
     removeChat,
     fetchChats,
     createChat,
-    loadMessages,
+    fetchMessages,
     addMessage,
-    hasChat
+    hasChat,
+    getUnreadMessages,
+    incrementUnreadMessages,
+    resetUnreadMessages
 };

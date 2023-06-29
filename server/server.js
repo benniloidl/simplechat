@@ -19,7 +19,7 @@ app.use((req, res, next) => {
                 next();
             }
         } else {
-            if (req.path == '/login') {
+            if (req.path == '/login' || req.path == '/register') {
                 next();
             } else {
                 res.redirect("/login");
@@ -38,6 +38,10 @@ const wsSrv = new ws.Server({ server });
 //Website
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/subpages', 'login.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/subpages', 'register.html'));
 });
 
 app.get('/dashboard', (req, res) => {
@@ -75,7 +79,10 @@ wsSrv.on('connection', (socket, req) => {
 
         switch (event.event) {
             case 'login':
-                eventFunctions.login(event.data, socket, sockets);
+                eventFunctions.login(socket, event.data, sockets);
+                break;
+            case 'register':
+                eventFunctions.register(socket, event.data, sockets);
                 break;
             case 'fetchChats':
                 if (eventFunctions.validate(username, password)) {
@@ -84,17 +91,22 @@ wsSrv.on('connection', (socket, req) => {
                 break;
             case 'sendMessage':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.sendMessage(socket,sockets, event.data, username);
+                    eventFunctions.sendMessage(socket, event.data, username, sockets);
                 }
                 break;
             case 'fetchMessages':
                 if (eventFunctions.validate(username, password)) {
-                    //eventFunctions.sendMessage(socket, username, event.data);
+                    eventFunctions.fetchMessages(socket, event.data);
                 }
                 break;
             case 'createChat':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.createChat(event.data, socket, username);
+                    eventFunctions.createChat(socket, event.data, username);
+                }
+                break;
+            case 'readChat':
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.readChat(socket, event.data, username, sockets);
                 }
                 break;
             default: return -1;

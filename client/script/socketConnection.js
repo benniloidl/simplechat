@@ -32,7 +32,7 @@ function loginUser(data) {
 function buildChatOverview(chats) {
     chats.forEach(data => {
         const navigator = document.createElement("div");
-        let unreadMessages = data.unreadMessages != null ? data.unreadMessages : 0;
+        let unreadMessages = data.unreadMessages ? data.unreadMessages : 0;
         navigator.setAttribute("data-unread-messages", unreadMessages);
         navigator.classList.add("chat-contact");
         if (unreadMessages > 0) {
@@ -313,7 +313,7 @@ socket.onclose = function (event) {
 function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
-    let pwdElement = document.getElementById("pwd-check");
+    let pwdElement = document.getElementById("pwd2");
 
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
@@ -357,7 +357,7 @@ function loginRequest() {
         return;
     }
 
-    socket.sendEvent('login', {username: result.username, password: result.password})
+    socket.sendEvent('login', { username: result.username, password: result.password })
 }
 
 function newChat(type) {
