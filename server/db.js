@@ -63,13 +63,12 @@ async function getAllChatIDs(username) {
 }
 
 async function getChatDetails(chatID) {
-    return await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
-        projection: {
-            _id: 0,
-            name: 1,
-            type: 1
-        }
-    });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {projection: {_id: 0,name: 1,type: 1}});
+    if(result){
+        return result;
+    }else{
+        return false;
+    }
 }
 
 async function fetchChats(username) {
@@ -79,8 +78,10 @@ async function fetchChats(username) {
         for (let i = 0; i < chatIDs.chats.length; i++) {
             const id = chatIDs.chats[i];
             const detail = await getChatDetails(id.chatID);
+            if(detail){
             const unreadMessages = await getUnreadMessages(username, id.chatID);
             chats.push({ "chatID": id.chatID, "name": detail.name, "type": detail.type, "unreadMessages": unreadMessages });
+            }
         }
     } else {
         return false;
