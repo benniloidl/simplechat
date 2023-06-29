@@ -44,6 +44,7 @@ main #sidebar {
     width: var(--sidebar-width);
     padding: var(--spacing);
     gap: var(--spacing);
+    user-select: none;
 }
 
 ::-webkit-scrollbar {
@@ -59,6 +60,7 @@ main #sidebar .sidebar-callout {
     transform: translateY(0.2rem);
     text-transform: uppercase;
     opacity: 0.8;
+    user-select: none;
 }
 
 .accent-bar {
@@ -79,6 +81,7 @@ main #sidebar .sidebar-callout {
     border-radius: var(--border-radius);
     background: var(--color-secondary);
     gap: calc(var(--spacing) / 2);
+    user-select: none;
 }
 
 .chat-contact :first-child {
@@ -106,6 +109,7 @@ main #chat {
     padding: var(--spacing);
     padding-left: 0;
     gap: var(--spacing);
+    user-select: none;
 }
 
 main #chat #chat-box {
@@ -145,6 +149,10 @@ main #chat #chat-box .chat-element .subtitle {
     position: absolute;
     margin-top: 2px;
     opacity: 0.8;
+}
+
+main #chat #chat-box .chat-element p {
+    user-select: text;
 }
 
 main #chat #chat-box .chat-element-left {

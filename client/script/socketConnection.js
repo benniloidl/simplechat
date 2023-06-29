@@ -130,7 +130,7 @@ function TESTBUILDCHATMESSAGES() {
     // } catch (e) {
     //     setTimeout(() => buildChatMessages(testdata, true), 1000);
     // }
-    setTimeout(() => buildChatMessages(testdata2), 10);
+    setTimeout(() => buildChatMessages(testdata), 10);
 
 }
 
