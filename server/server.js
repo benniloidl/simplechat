@@ -51,7 +51,7 @@ app.get('*', (req, res) => {
 
 //receive message
 wsSrv.on('connection', (socket, req) => {
-    sockets.push(socket);
+    sockets.push({ socket: socket, "username": null });
 
     socket.on('message', async (data) => {
         let event;
@@ -75,16 +75,21 @@ wsSrv.on('connection', (socket, req) => {
 
         switch (event.event) {
             case 'login':
-                eventFunctions.login(event.data, socket);
+                eventFunctions.login(event.data, socket, sockets);
                 break;
             case 'fetchChats':
                 if (eventFunctions.validate(username, password)) {
                     eventFunctions.fetchchats(socket, username);
                 }
                 break;
-            case 'fetchChatMessage':
+            case 'sendMessage':
                 if (eventFunctions.validate(username, password)) {
-                    //eventFunctions.fetchchats(socket, username);
+                    eventFunctions.sendMessage(socket,sockets, event.data, username);
+                }
+                break;
+            case 'fetchMessages':
+                if (eventFunctions.validate(username, password)) {
+                    //eventFunctions.sendMessage(socket, username, event.data);
                 }
                 break;
             case 'createChat':

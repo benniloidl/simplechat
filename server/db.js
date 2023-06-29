@@ -115,7 +115,8 @@ async function fetchChats(username) {
         for (let i = 0; i < chatIDs.chats.length; i++) {
             const id = chatIDs.chats[i];
             const detail = await getChatDetails(id.chatID);
-            chats.push({ "chatID": id.chatID, "name": detail.name, "type": detail.type });
+            const unreadMessages = calculateUnreadMessages(username, id.chatID);
+            chats.push({"chatID": id.chatID, "name": detail.name, "type": detail.type, "unreadMessages": unreadMessages});
         }
     } else {
         return false;
@@ -138,6 +139,7 @@ async function loadMessages(chatID, start, amount) {
     if (result) {
         let ret;
         try {
+            result.messages.reverse();
             ret = result.messages.slice(start, start + amount);
         } catch {
             try {
@@ -162,6 +164,52 @@ async function addMessage(chatID, message) {
     }
 }
 
+async function calculateUnreadMessages(username, chatID) {
+    const result = await loadMessages(chatID, 0, 100);
+    let unreadMessages = 0;
+    if(result){
+        for (const message of result){
+            if(message.readConfirmation || message.author == username){
+                break;
+            }
+            unreadMessages++;
+        }
+    }
+    return unreadMessages;
+}
+
+async function hasChat(username, chatID) {
+    const result = await user.findOne({"username": username, "chats.chatID":chatID}, {projection: {_id: 1}});
+    if (result) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function calculateUnreadMessages(username, chatID) {
+    const result = await loadMessages(chatID, 0, 100);
+    let unreadMessages = 0;
+    if(result){
+        for (const message of result){
+            if(message.readConfirmation || message.author == username){
+                break;
+            }
+            unreadMessages++;
+        }
+    }
+    return unreadMessages;
+}
+
+async function hasChat(username, chatID) {
+    const result = await user.findOne({"username": username, "chats.chatID":chatID}, {projection: {_id: 1}});
+    if (result) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 module.exports = {
     connectToDB,
     validateUser,
@@ -171,5 +219,6 @@ module.exports = {
     fetchChats,
     createChat,
     loadMessages,
-    addMessage
+    addMessage,
+    hasChat
 };

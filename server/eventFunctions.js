@@ -14,9 +14,15 @@ async function fetchchats(socket, username) {
     socket.send(JSON.stringify({ event: 'fetchChats', "chats": chats }));
 }
 
-async function login(data, socket) {
+async function login(data, socket,sockets) {
     const login = await dbFunctions.validateUser(data.username, data.password);
     if (login) {
+        for (const s of sockets) {
+            if(s.socket == socket){
+                s.username = data.username;
+                break;
+            }
+        }
         socket.send(JSON.stringify({ event: 'login', status: true }));
     } else {
         socket.send(JSON.stringify({ event: 'login', status: false }));
@@ -43,9 +49,21 @@ async function createChat(data, socket, username) {
             for (const user of data.users) {
                 await dbFunctions.addChat(user, chatID);
             }
-         }   
-         socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
+        }
+        socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
     });
+}
+
+async function sendMessage(socket, sockets, data, username) {
+    if (await dbFunctions.addMessage(data.chatID, {message:data.message.message, author: username, readConfirmation: false, timeStamp:Date.now()})) {
+        for (const s of sockets) {
+            if (await dbFunctions.hasChat(s.username, data.chatID)) {
+                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID, "message": message } }));
+            }
+        }
+    } else {
+        socket.send(JSON.stringify({ event: "error", message: "Unable to send message!" }));
+    }
 }
 
 module.exports = {
@@ -53,5 +71,6 @@ module.exports = {
     login,
     signup,
     fetchchats,
-    createChat
+    createChat,
+    sendMessage
 }
