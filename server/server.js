@@ -52,7 +52,7 @@ app.get('*', (req, res) => {
 //receive message
 wsSrv.on('connection', (socket, req) => {
     sockets.push(socket);
-    
+
     socket.on('message', async (data) => {
         let event;
         try {
@@ -75,17 +75,23 @@ wsSrv.on('connection', (socket, req) => {
 
         switch (event.event) {
             case 'login':
-                eventFunctions.login(event, socket);
+                eventFunctions.login(event.data, socket);
                 break;
             case 'fetchChats':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.fetchchats(event, socket, username);
+                    eventFunctions.fetchchats(socket, username);
                 }
                 break;
             case 'fetchChatMessage':
-                if(eventFunctions.validate(username, password)){
-                    eventFunctions.fetchchats(event, socket);
+                if (eventFunctions.validate(username, password)) {
+                    //eventFunctions.fetchchats(socket, username);
                 }
+                break;
+            case 'createChat':
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.createChat(event.data, socket, username);
+                }
+                break;
             default: return -1;
         }
     });

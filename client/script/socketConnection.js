@@ -334,27 +334,27 @@ function chat_send_message(socket, chatId, message) {
     });
 }
 
-function newChat(isGroup) {
+function newChat(type) {
     console.log("newChat")
     let inform = document.querySelector("input[type=text]").value.trim();
     if (inform === "") return;
     let users = [];
 
     let name = inform.trim();
-    if (!isGroup) {
+    if (type == "user") {
         users = [inform];
     } else {
         //TODO add users
 
     }
     console.log(inform, users)
-    chat_create_new_chat(socket, name, isGroup, users);
+    chat_create_new_chat(socket, name, type, users);
 }
 
-function chat_create_new_chat(socket, name, isGroup, users) {
+function chat_create_new_chat(socket, name, type, users) {
     socket.sendEvent('createChat', {
         name: name,
-        type: isGroup ? 'group' : 'user',
+        type: type,
         users: users
     });
 }
