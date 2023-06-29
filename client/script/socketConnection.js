@@ -163,7 +163,7 @@ function buildChatMessages(chatData) {
         let messageDate = new Date(data.timestamp); // bspw: "28 Jun 2023 18:50:59"
         let timeDifference = Math.floor((Date.now() - messageDate.valueOf()) / 1000 / 60)
         if (timeDifference < 60 * 24) {
-            timeElement.innerHTML = messageDate.toLocaleTimeString("en-UK", { hour: '2-digit', minute: '2-digit' });
+            timeElement.innerHTML = messageDate.toLocaleTimeString("en-UK", {hour: '2-digit', minute: '2-digit'});
         } else {
             timeElement.innerHTML = messageDate.toLocaleString();
         }
@@ -371,7 +371,7 @@ function newChat(type) {
     let users = [];
 
     let name = inform.trim();
-    if (type === "chat") {
+    if (type === "user") {
         users = [inform];
     } else {
         //TODO add users
