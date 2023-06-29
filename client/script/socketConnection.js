@@ -31,7 +31,6 @@ function loginUser(data) {
 
 function buildChatOverview(chats) {
     chats.forEach(data => {
-
         const navigator = document.createElement("div");
         navigator.classList.add("chat-contact");
         navigator.setAttribute("chatID", data.chatID);
