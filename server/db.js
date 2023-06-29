@@ -149,6 +149,8 @@ async function incrementUnreadMessages(username, chatID) {
 
 async function resetUnreadMessages(username, chatID) {
     await user.updateOne({ "username": username, "chats.chatID": chatID }, { $set:{"chats.$.unreadMessages": 0} });
+    await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID)}, { $set:{"messages.$[elem].readConfirmation": true} },
+    { "arrayFilters": [{ "elem.readConfirmation": false, "elem.author": {$ne: username} }], "multi": true });
 }
 
 async function hasChat(username, chatID) {
