@@ -43,8 +43,8 @@ main #sidebar {
     flex-direction: column;
     width: var(--sidebar-width);
     padding: var(--spacing);
-    gap: var(--spacing);
     user-select: none;
+    gap: var(--spacing);
 }
 
 ::-webkit-scrollbar {
@@ -57,10 +57,10 @@ main #sidebar .sidebar-callout {
     font-weight: bold;
     line-height: 0.4rem;
     padding-left: var(--spacing);
+    user-select: none;
     transform: translateY(0.2rem);
     text-transform: uppercase;
     opacity: 0.8;
-    user-select: none;
 }
 
 .accent-bar {
@@ -77,11 +77,11 @@ main #sidebar .sidebar-callout {
     flex-direction: row;
     padding: 0 var(--spacing);
     cursor: pointer;
+    user-select: none;
     transition: all .2s ease-in-out;
     border-radius: var(--border-radius);
     background: var(--color-secondary);
     gap: calc(var(--spacing) / 2);
-    user-select: none;
 }
 
 .chat-contact :first-child {
@@ -108,8 +108,8 @@ main #chat {
     height: 100%;
     padding: var(--spacing);
     padding-left: 0;
-    gap: var(--spacing);
     user-select: none;
+    gap: var(--spacing);
 }
 
 main #chat #chat-box {
@@ -271,13 +271,13 @@ main #chat form input {
 }
 
 main #chat form input[type="submit"] {
+    font-family: var(--font-family);
     cursor: pointer;
     transition: all .2s ease-in-out;
+    color: var(--text-color-normal);
+
     border: 4px solid var(--color-primary);
     background: transparent;
-
-    font-family: var(--font-family);
-    color: var(--text-color-normal);
 }
 
 main #chat form input:focus {
@@ -290,6 +290,30 @@ main #chat form input[type="submit"]:hover {
 }
 
 .notification {
-    /*TODO CHANGE NOTIFICATION*/
-    color: red;
+    position: relative;
+}
+
+.notification[data-unread-messages]::after {
+    position: absolute;
+    right: var(--spacing);
+    padding: 0 7px;
+    content: attr(data-unread-messages);
+    transform: scale(0.8);
+    animation: pulse 1s infinite;
+    opacity: 0.8;
+    color: white;
+    border-radius: 50%;
+    background: red;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
