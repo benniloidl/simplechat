@@ -15,8 +15,8 @@ socket.sendEvent = (eventName, eventData) => {
 const fileName = location.href.split("/").slice(-1)
 
 socket.onopen = function () {
-    if (fileName === "dashboard") {
-        socket.sendEvent("fetchChats", "");
+    if (fileName[0] === "dashboard") {
+        chat_overview(socket)
     }
 };
 
@@ -92,7 +92,7 @@ function TESTBUILDCHATMESSAGES() {
                 author: "Honulullu"
             },
             {
-                message: "some other message",
+                message: "next message",
                 timestamp: "28 jun 2023 19:00",
                 readConfirmation: true,
                 author: "Honulullu"
@@ -277,6 +277,7 @@ function errorEvent(message) {
 
 socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
+    console.log(data)
     switch (data.event) {
         case 'login':
             loginUser(data);
