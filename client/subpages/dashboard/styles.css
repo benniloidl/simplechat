@@ -221,9 +221,11 @@ main #chat #chat-actions > div:first-of-type textarea {
     padding: var(--spacing);
     resize: none;
     transition: height .2s ease-in-out;
+    color: var(--text-color-normal);
     border: 2px solid var(--color-secondary);
     border-radius: var(--border-radius);
     outline: none;
+    background: var(--background-color);
 }
 
 main #chat #chat-actions > div:first-of-type textarea:focus {
@@ -265,9 +267,11 @@ main #chat form span {
 main #chat form input {
     width: 100%;
     padding: var(--spacing);
-    border: 2px solid var(--color-secondary);
+    color: var(--text-color-normal);
+    border: 2px solid var(--background-color);
     border-radius: var(--border-radius);
     outline: none;
+    background: var(--background-color);
 }
 
 main #chat form input[type="submit"] {
