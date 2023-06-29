@@ -33,7 +33,7 @@ function buildChatOverview(chats) {
     chats.forEach(data => {
         const navigator = document.createElement("div");
         navigator.classList.add("chat-contact");
-        navigator.setAttribute("chatID", data.chatID);
+        navigator.setAttribute("data-chat-id", data.chatID);
         navigator.onclick = () => {
             if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
             else injectPage("../subpages/dashboard/group.html");
@@ -205,21 +205,20 @@ function TESTNOTIFICATIONHANDLER() {
 
 function notificationHandler(notification) {
     function get() {
-        let childs = document.getElementById("chats").childNodes;
-        for (const child of childs) {
-            let nodeId = child.attributes.chatId.nodeValue;
+        for (const child of document.getElementById("chats").childNodes) {
+            // let nodeId = child.attributes.chat-ID.nodeValue;
+            let nodeId = child.getAttribute("data-chat-id");
             if (nodeId == notification.chatID) {
                 return child;
             }
-            console.log(nodeId);
         }
     }
 
     let node = get();
     if (node) {
         node.classList.add("notification");
-        node.setAttribute("unreadMessages", notification.unreadMessages);
-        console.log(node)
+        node.setAttribute("data-unread-messages", notification.unreadMessages);
+        console.log(node);
     }
 
 }
@@ -233,7 +232,7 @@ function elementHasNotification(element) {
 }
 
 function errorEvent(message) {
-    console.error("Event", message);
+    console.warn("Event", message);
     // TODO POPUP
 }
 
