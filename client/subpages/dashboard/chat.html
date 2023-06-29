@@ -1,38 +1,39 @@
 <div class="chat-contact">
-    <i class="fas fa-user"></i>
-    <p id="chat-name">Some user</p>
+	<i class="fas fa-user"></i>
+	<p id="chat-name">Some user</p>
 </div>
 
 <div id="chat-box">
-    <div class="chat-element chat-element-left loading">
-        <p>Loading... </p>
-        <span class="subtitle">10m ago</span>
-    </div>
-
-    <div class="chat-element chat-element-right loading">
-        <p>Loading... </p>
-        <span class="subtitle">Now</span>
-    </div>
-
-    <div class="chat-element chat-element-right loading">
-        <p>Loading... </p>
-        <span class="subtitle">Now</span>
-    </div>
+	<div class="chat-element chat-element-left loading">
+		<p>Loading... </p>
+		<span class="subtitle">10m ago</span>
+	</div>
+	
+	<div class="chat-element chat-element-right loading">
+		<p>Loading... </p>
+		<span class="subtitle">Now</span>
+	</div>
+	
+	<div class="chat-element chat-element-right loading">
+		<p>Loading... </p>
+		<span class="subtitle">Now</span>
+	</div>
 </div>
 
 <div id="chat-actions">
-    <div>
+	<div>
 		<textarea onfocus="document.getElementById('chat-box').style.marginBottom = 'calc(8 * var(--spacing))'"
-                  onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
-                  placeholder="Enter your message"></textarea>
-    </div>
-
-    <div class="chat-actions-button" id="submit-message">
-        <i class="fas fa-paper-plane"></i>
-        <span>Send</span>
-    </div>
+		          onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
+		          placeholder="Enter your message"
+		          tabindex="1"></textarea>
+	</div>
+	
+	<div class="chat-actions-button" id="submit-message" tabindex="2">
+		<i class="fas fa-paper-plane"></i>
+		<span>Send</span>
+	</div>
 </div>
 
 <script>
-    console.log("Some test")
+	console.log("Some test")
 </script>
