@@ -55,7 +55,7 @@ async function createChat(socket, data, username) {
             socket.send(JSON.stringify({ event: "error", message: "User does not exist." }));
             return false;
         }
-        if(data.users.length != 1){
+        if (data.users.length != 1) {
             socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
             return false;
         }
@@ -93,10 +93,10 @@ async function readChat(socket, data, username, sockets) {
     }
 }
 
-async function fetchMessages(socket, data) {
-    const result = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
-    if (result) {
-        socket.send(JSON.stringify({ event: "fetchMessages", messages: result }));
+async function fetchMessages(socket, data, username) {
+    const messages = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
+    if (messages) {
+        socket.send(JSON.stringify({ event: "fetchMessages", data: { "username": username, "chatID": data.chatID, "messages": messages } }));
     } else {
         socket.send(JSON.stringify({ event: "error", message: "Cannot fetch messages" }));
     }

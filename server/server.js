@@ -99,7 +99,7 @@ wsSrv.on('connection', (socket, req) => {
                 break;
             case 'fetchMessages':
                 if (eventFunctions.validate(username, password)) {
-                    eventFunctions.fetchMessages(socket, event.data);
+                    eventFunctions.fetchMessages(socket, event.data, username);
                 }
                 break;
             case 'createChat':
