@@ -196,6 +196,7 @@ function buildMessageObject(messageObject, username, type) {
     let lastAuthor = localStorage.getItem("lastAuthor");
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
+    console.log(messageObject.author , username, messageObject.author === username)
     chatElement.classList.add(messageObject.author === username ? "chat-element-right" : "chat-element-left");
     
     if (type === 'group' && lastAuthor !== messageObject.author) {
@@ -284,8 +285,10 @@ function notificationHandler(notification) {
     if (openedChatId === notification.chatID) {
         let chatType = chatNode.getAttribute("chattype");
         injectMessage(notification.message, notification.username, chatType);
-        //chat_selected(socket, notification.chatID);
+        chat_read_event(socket, notification.chatID);
         return;
+    } else{
+        chat_overview(socket);
     }
     
     if (chatNode) {
