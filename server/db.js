@@ -29,7 +29,7 @@ async function connectToDB() {
 }
 
 async function validateUser(username, password) {
-    if(!username){
+    if (!username) {
         return false;
     }
     username = username.toLowerCase();
@@ -42,7 +42,7 @@ async function validateUser(username, password) {
 }
 
 async function createUser(username, password) {
-    if(!username.match(/^[a-zA-Z0-9._\-+]*$/g)){
+    if (!username.match(/^[a-zA-Z0-9._\-+]*$/g)) {
         return false;
     }
     const result = await user.findOne({ "username": username }, { projection: { _id: 1 } });
@@ -55,10 +55,10 @@ async function createUser(username, password) {
 }
 
 async function userExists(username) {
-    const result = await user.findOne({ "username": username}, { projection: { _id: 1 } });
+    const result = await user.findOne({ "username": username }, { projection: { _id: 1 } });
     if (result) {
         return true;
-    }else{
+    } else {
         return false;
     }
 }
@@ -87,10 +87,10 @@ async function getAllChatIDs(username) {
 }
 
 async function getChatDetails(chatID) {
-    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {projection: {_id: 0,name: 1,type: 1}});
-    if(result){
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, name: 1, type: 1 } });
+    if (result) {
         return result;
-    }else{
+    } else {
         return false;
     }
 }
@@ -102,15 +102,31 @@ async function fetchChats(username) {
         for (let i = 0; i < chatIDs.chats.length; i++) {
             const id = chatIDs.chats[i];
             const detail = await getChatDetails(id.chatID);
-            if(detail){
-            const unreadMessages = await getUnreadMessages(username, id.chatID);
-            chats.push({ "chatID": id.chatID, "name": detail.name, "type": detail.type, "unreadMessages": unreadMessages });
+            if (detail) {
+                const unreadMessages = await getUnreadMessages(username, id.chatID);
+                if (detail.type === "user") {
+                    const otherUsername = await getOtherUsername(username, id.chatID);
+                    if (otherUsername) {
+                        detail.name = otherUsername;
+                    }
+                }
+                chats.push({ "chatID": id.chatID, "name": detail.name, "type": detail.type, "unreadMessages": unreadMessages });
             }
         }
     } else {
         return false;
     }
     return chats;
+}
+
+async function getOtherUsername(username, chatID) {
+    const result = await user.findOne({ "username": { $ne: username }, "chats.chatID": chatID },
+        { projection: { _id: 1, username: 1 } });
+    if (result) {
+        return result.username;
+    } else {
+        return false;
+    }
 }
 
 async function createChat(name, type) {
@@ -178,15 +194,6 @@ async function resetUnreadMessages(username, chatID) {
         { "arrayFilters": [{ "elem.readConfirmation": false, "elem.author": { $ne: username } }], "multi": true });
 }
 
-async function hasChat(username, chatID) {
-    const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
-    if (result) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 async function getUnreadMessages(username, chatID) {
     const result = await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
     for (const chat of result.chats) {
@@ -205,6 +212,45 @@ async function hasChat(username, chatID) {
     }
 }
 
+async function chatExists(username, otherUsername) {
+    if (username === otherUsername) {
+        const chatIDs = await getAllChatIDs(username);
+        if (chatIDs) {
+            for (const id of chatIDs.chats) {
+                const detail = await getChatDetails(id.chatID);
+                if (detail.name === username) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    } else {
+        const chatIDs1 = await getAllChatIDs(username);
+        const chatIDs2 = await getAllChatIDs(otherUsername);
+        if (chatIDs1 && chatIDs2) {
+            for (const id1 of chatIDs1.chats) {
+                for (const id2 of chatIDs2.chats) {
+                    if (id1.chatID == id2.chatID) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } else {
+            return false;
+        }
+    }
+}
+
+async function fetchGroupUsers(chatID) {
+    const result = await user.find({"chats.chatID": chatID }, { projection: { _id: 0, username: 1 } });
+    let users = [];
+    result.forEach(user => {
+        users.push(user);
+    });
+    return users;
+}
+
 module.exports = {
     connectToDB,
     validateUser,
@@ -219,5 +265,7 @@ module.exports = {
     hasChat,
     getUnreadMessages,
     incrementUnreadMessages,
-    resetUnreadMessages
+    resetUnreadMessages,
+    chatExists,
+    fetchGroupUsers
 };

@@ -55,30 +55,33 @@ async function createChat(socket, data, username) {
             socket.send(JSON.stringify({ event: "error", message: "User does not exist." }));
             return false;
         }
+        if (await dbFunctions.chatExists(username, data.users[0])) {
+            socket.send(JSON.stringify({ event: "error", message: "Chat already exists." }));
+            return false;
+        }
         if (data.users.length != 1) {
             socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
             return false;
         }
     }
-    await dbFunctions.createChat(data.name, data.type).then(async (chatID) => {
-        await dbFunctions.addChat(username, chatID);
-        if (data.users.length > 0) {
-            for (const user of data.users) {
-                await dbFunctions.addChat(user, chatID);
-            }
+    const chatID = await dbFunctions.createChat(data.type === "user" ? username === data.users[0] ? username : "userChat" : data.name, data.type);
+    await dbFunctions.addChat(username, chatID);
+    if (data.users.length > 0) {
+        for (const user of data.users) {
+            await dbFunctions.addChat(user, chatID);
         }
-        socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
-    });
+    }
+    socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
 }
 
 async function sendMessage(socket, data, username, sockets) {
     if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() })) {
         for (const s of sockets) {
             if (await dbFunctions.hasChat(s.username, data.chatID)) {
-                if(s.username != username){
-                   await dbFunctions.incrementUnreadMessages(s.username, data.chatID);
+                if (s.username != username) {
+                    await dbFunctions.incrementUnreadMessages(s.username, data.chatID);
                 }
-                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":s.username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
+                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID, "username": s.username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
             }
         }
     } else {
@@ -104,6 +107,15 @@ async function fetchMessages(socket, data, username) {
     }
 }
 
+async function fetchGroupUsers(socket, data) {
+    const users = await dbFunctions.fetchGroupUsers(data.chatID);
+    if (users) {
+        socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users} }));
+    } else {
+        socket.send(JSON.stringify({ event: "error", message: "Cannot fetch group users." }));
+    }
+}
+
 module.exports = {
     validate,
     login,
@@ -111,5 +123,6 @@ module.exports = {
     createChat,
     sendMessage,
     readChat,
-    fetchMessages
+    fetchMessages,
+    fetchGroupUsers
 }

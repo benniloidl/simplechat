@@ -81,12 +81,12 @@ wsSrv.on('connection', (socket, req) => {
 
         let socketExists = false;
         for (let i = 0; i < sockets.length; i++) {
-            if(sockets[i].username == username){
+            if (sockets[i].username == username) {
                 sockets[i] = { socket: socket, "username": username };
                 socketExists = true;
             }
         }
-        if(!socketExists){
+        if (!socketExists) {
             sockets.push({ socket: socket, "username": username });
         }
 
@@ -120,6 +120,11 @@ wsSrv.on('connection', (socket, req) => {
             case 'readChat':
                 if (eventFunctions.validate(username, password)) {
                     eventFunctions.readChat(socket, event.data, username, sockets);
+                }
+                break;
+            case 'fetchGroupUsers':
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.fetchGroupUsers(socket, event.data);
                 }
                 break;
             default: return -1;
