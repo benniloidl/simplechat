@@ -50,9 +50,15 @@ async function login(socket, data, sockets, type) {
 }
 
 async function createChat(socket, data, username) {
-    if (data.type == "user" && data.users.length != 1) {
-        socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
-        return false;
+    if (data.type == "user") {
+        if (!await dbFunctions.userExists(data.users[0])) {
+            socket.send(JSON.stringify({ event: "error", message: "User does not exist." }));
+            return false;
+        }
+        if (data.users.length != 1) {
+            socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
+            return false;
+        }
     }
     await dbFunctions.createChat(data.name, data.type).then(async (chatID) => {
         await dbFunctions.addChat(username, chatID);
@@ -70,7 +76,7 @@ async function sendMessage(socket, data, username, sockets) {
         for (const s of sockets) {
             if (await dbFunctions.hasChat(s.username, data.chatID)) {
                 dbFunctions.incrementUnreadMessages(s.username, data.chatID);
-                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID, "message": message } }));
+                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":username, "message": message } }));
             }
         }
     } else {
@@ -87,10 +93,10 @@ async function readChat(socket, data, username, sockets) {
     }
 }
 
-async function fetchMessages(socket, data) {
-    const result = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
-    if (result) {
-        socket.send(JSON.stringify({ event: "fetchMessages", messages: result }));
+async function fetchMessages(socket, data, username) {
+    const messages = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
+    if (messages) {
+        socket.send(JSON.stringify({ event: "fetchMessages", data: { "username": username, "chatID": data.chatID, "messages": messages } }));
     } else {
         socket.send(JSON.stringify({ event: "error", message: "Cannot fetch messages" }));
     }

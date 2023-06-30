@@ -47,6 +47,16 @@ async function createUser(username, password) {
     }
 }
 
+async function userExists(username) {
+    const result = await user.findOne({ "username": username}, { projection: { _id: 1 } });
+    if (result) {
+        return true;
+    }else{
+        return false;
+    }
+}
+
+
 async function addChat(username, chatID) {
     const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
     if (result) {
@@ -193,6 +203,7 @@ module.exports = {
     validateUser,
     createUser,
     addChat,
+    userExists,
     removeChat,
     fetchChats,
     createChat,
