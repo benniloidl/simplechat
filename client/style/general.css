@@ -165,7 +165,8 @@ footer .appearanceMode {
 }
 
 .overview-container hr {
-    margin: 0 var(--spacing) var(--spacing) 0;
+    width: calc(100% - var(--spacing) * 2);
+    margin: var(--spacing) auto;
     opacity: 0.5;
 }
 
