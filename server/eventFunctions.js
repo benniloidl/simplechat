@@ -78,7 +78,7 @@ async function sendMessage(socket, data, username, sockets) {
                 if(s.username != username){
                    await dbFunctions.incrementUnreadMessages(s.username, data.chatID);
                 }
-                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":username, "message": data.message } }));
+                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
             }
         }
     } else {

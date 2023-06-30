@@ -191,6 +191,7 @@ function getChatOverview(overviewDiv) {
 }
 
 function buildMessageObject(messageObject, username, type) {
+    console.log("build", messageObject)
     let lastAuthor = localStorage.getItem("lastAuthor");
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
