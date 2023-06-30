@@ -55,7 +55,6 @@ app.get('*', (req, res) => {
 
 //receive message
 wsSrv.on('connection', (socket, req) => {
-    sockets.push({ socket: socket, "username": null });
 
     socket.on('message', async (data) => {
         let event;
@@ -79,6 +78,17 @@ wsSrv.on('connection', (socket, req) => {
             username = username.toLowerCase();
         }
         const password = JSONCookie.password;
+
+        let socketExists = false;
+        for (let i = 0; i < sockets.length; i++) {
+            if(sockets[i].username == username){
+                sockets[i] = { socket: socket, "username": username };
+                socketExists = true;
+            }
+        }
+        if(!socketExists){
+            sockets.push({ socket: socket, "username": username });
+        }
 
         switch (event.event) {
             case 'login':

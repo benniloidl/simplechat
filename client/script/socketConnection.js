@@ -43,7 +43,7 @@ function buildChatOverview(chats) {
         navigator.onclick = () => {
             if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
             else injectPage("../subpages/dashboard/group.html");
-            TESTBUILDCHATMESSAGES();
+            //TESTBUILDCHATMESSAGES();
             localStorage.setItem("openedChat", data.chatID.toString())
             chat_selected(socket, data.chatID);
             // if()
@@ -100,10 +100,10 @@ function TESTBUILDCHATMESSAGES() {
         ]
     }
     let testdata2 = {
-        name: "Theresa König",
-        type: 'user',
+        // name: "Theresa König",
+        // type: 'user',
         username: 'self',
-        chatID: 4242,
+        chatID: "649e8f8dbbc6ef0e740648d6",
         messages: [
             {
                 message: "message",
@@ -141,18 +141,28 @@ function TESTBUILDCHATMESSAGES() {
 }
 
 function buildChatMessages(chatData) {
+    if (!chatData.messages) {
+        console.log("empty message")
+        return;
+    };
+    const chatNode = getChatNodeById(chatData.chatID);
+    if(!chatNode) return;
+    let type = chatNode.getAttribute("chattype");
+    let name = chatNode.lastChild.innerHTML;
+    // console.log(chatNode.lastChild.innerHTML)
+
     const chatBox = document.createElement("div");
     const overviewDiv = document.createElement("div");
     getChatOverview(overviewDiv);
     chatBox.id = "chat-box";
     localStorage.setItem("lastAuthor", null);
     chatData.messages.forEach(data => {
-        let chatElement = buildMessageObject(data, chatData.username, chatData.type);
+        let chatElement = buildMessageObject(data, chatData.username, type);
         chatBox.appendChild(chatElement);
     });
     document.getElementById("chat-box").replaceWith(chatBox);
     document.getElementById("chat-overview").replaceWith(overviewDiv);
-    document.getElementById("chat-name").innerHTML = chatData.name;
+    document.getElementById("chat-name").innerHTML = name;
 
     document.getElementById("submit-message").onclick = () => {
         sendMessage(chatData.chatID);
@@ -173,7 +183,6 @@ function getChatOverview(overviewDiv){
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             overviewDiv.innerHTML = xhr.responseText;
-            console.log("OK")
         }
     };
     xhr.send();
@@ -255,22 +264,21 @@ function TESTNOTIFICATIONHANDLER() {
 
     notificationHandler(testNotification);
 }
-
-function notificationHandler(notification) {
-    function getNotifiedChatNode() {
-        for (const child of document.getElementById("chats").childNodes) {
-            let nodeId = child.getAttribute("data-chat-id");
-            if (nodeId === notification.chatID) {
-                return child;
-            }
+function getChatNodeById(chatId) {
+    for (const child of document.getElementById("chats").childNodes) {
+        let nodeId = child.getAttribute("data-chat-id");
+        if (nodeId === chatId) {
+            return child;
         }
     }
+}
+function notificationHandler(notification) {
     let openedChatId = localStorage.getItem("openedChat");
-    let chatNode = getNotifiedChatNode();
+    let chatNode = getChatNodeById(notification.chatID);
     if (openedChatId === notification.chatID) {
         let chatType = chatNode.getAttribute("chattype");
         injectMessage(notification.message, notification.username, chatType);
-        chat_selected(socket, notification.chatID);
+        //chat_selected(socket, notification.chatID);
         return;
     }
 
@@ -315,14 +323,15 @@ socket.onmessage = function (event) {
             }
             break;
         case 'fetchMessages':
+            console.log("get message Object", data.data)
             try {
-                buildChatMessages(data.content)
+                buildChatMessages(data.data)
             } catch (e) {
-                setTimeout(() => buildChatMessages(data.content), 1000);
+                setTimeout(() => buildChatMessages(data.data), 1000);
             }
             break;
         case 'messageNotification': {
-            notificationHandler(data);
+            notificationHandler(data.notification);
             break;
         }
 
@@ -431,7 +440,7 @@ function chat_leave(socket, chatId){
     chat_overview(socket);
 }
 function chat_selected(socket, chatId) {
-    socket.sendEvent('loadChatMessages', {
+    socket.sendEvent('fetchMessages', {
         chatID: chatId,
         start: 0,
         amount: chatMessageAmount
@@ -450,7 +459,7 @@ function chat_scrolled(socket, chatId) {
 function chat_send_message(socket, chatId, message) {
     socket.sendEvent('sendMessage', {
         message: message,
-        chatId: chatId,
+        chatID: chatId,
 
         // Data injected by server!
         timestamp: undefined,
@@ -469,7 +478,7 @@ function chat_create_new_chat(socket, name, type, users) {
 
 function chat_read_event(socket, chatId) {
     socket.sendEvent('readChat', {
-        chatId: chatId
+        chatID: chatId
     })
 }
 

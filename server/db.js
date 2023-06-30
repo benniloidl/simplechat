@@ -19,6 +19,13 @@ async function connectToDB() {
     }
 
     console.log("connected successfully\n");
+    // console.log(await addMessage("649e8f8dbbc6ef0e740648d6", {
+    //     message: "message",
+    //     // Data injected by server!
+    //     timeStamp: "undefined",
+    //     author: "undefined",
+    //     readConfirmation: false
+    // }));
 }
 
 async function validateUser(username, password) {

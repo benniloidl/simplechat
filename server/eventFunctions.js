@@ -72,11 +72,13 @@ async function createChat(socket, data, username) {
 }
 
 async function sendMessage(socket, data, username, sockets) {
-    if (await dbFunctions.addMessage(data.chatID, { message: data.message.message, author: username, readConfirmation: false, timeStamp: Date.now() })) {
+    if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() })) {
         for (const s of sockets) {
             if (await dbFunctions.hasChat(s.username, data.chatID)) {
-                dbFunctions.incrementUnreadMessages(s.username, data.chatID);
-                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":username, "message": message } }));
+                if(s.username != username){
+                   await dbFunctions.incrementUnreadMessages(s.username, data.chatID);
+                }
+                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":username, "message": data.message } }));
             }
         }
     } else {
@@ -87,7 +89,7 @@ async function sendMessage(socket, data, username, sockets) {
 async function readChat(socket, data, username, sockets) {
     await dbFunctions.resetUnreadMessages(username, data.chatID);
     for (const s of sockets) {
-        if (s.socket != socket && s.hasChat(s.username, data.chatID)) {
+        if (s.socket != socket && await s.hasChat(s.username, data.chatID)) {
             s.socket.send(JSON.stringify({ event: "messagesRead", chatID: data.chatID }));
         }
     }
