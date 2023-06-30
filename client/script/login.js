@@ -1,3 +1,8 @@
+/**
+ * Read username and password and checks semantic
+ * Automatic detection between Registration and Login
+ * @returns {{mode: (string), password: *, username: *}|null}
+ */
 function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
@@ -15,6 +20,9 @@ function getValues() {
         return null;
     }
 
+    /* Check password semantic,
+        because every criterion should match, expression cannot be compressed
+     */
     if (
         !(
             pwd.match(/[a-z]/g) &&
@@ -34,7 +42,7 @@ function getValues() {
         pwdError("Passwords doesn't match");
         return null;
     }
-    pwdError("client side password ok");
+    pwdError("username and password semantic ok");
     return {
         username: usr,
         password: pwd,
@@ -42,6 +50,10 @@ function getValues() {
     };
 }
 
+/**
+ * Write Error messages for the login Form
+ * @param errorMessage
+ */
 function pwdError(errorMessage) {
     document.getElementById("pwdError").innerHTML = errorMessage;
 
