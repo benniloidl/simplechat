@@ -151,7 +151,7 @@ function buildChatMessages(chatData) {
     document.getElementById("chat-box").replaceWith(chatBox);
     document.getElementById("chat-name").innerHTML = chatData.name;
 
-    document.getElementById("submit-message").onclick = () =>{
+    document.getElementById("submit-message").onclick = () => {
         sendMessage(chatData.chatID);
     };
     document.querySelector("#chat-actions div textarea").addEventListener("keydown", (event) => {
@@ -163,7 +163,7 @@ function buildChatMessages(chatData) {
 }
 
 
-function buildMessageObject(messageObject, username, type){
+function buildMessageObject(messageObject, username, type) {
     let lastAuthor = localStorage.getItem("lastAuthor");
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
@@ -187,7 +187,7 @@ function buildMessageObject(messageObject, username, type){
     let messageDate = new Date(messageObject.timeStamp); // bspw: "28 Jun 2023 18:50:59"
     let timeDifference = Math.floor((Date.now() - messageDate.valueOf()) / 1000 / 60)
     if (timeDifference < 60 * 24) {
-        timeElement.innerHTML = messageDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+        timeElement.innerHTML = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else {
         timeElement.innerHTML = messageDate.toLocaleDateString([], {});
     }
@@ -209,18 +209,18 @@ function buildMessageObject(messageObject, username, type){
     return chatElement;
 }
 
-function injectMessage(messageObject, username, type){
+function injectMessage(messageObject, username, type) {
     let chatObject = buildMessageObject(messageObject, username, type);
     document.getElementById("chat-box").appendChild(chatObject);
 }
 
-function sendMessage(chatID){
+function sendMessage(chatID) {
     let textField = document.querySelector("#chat-actions div textarea")
     let message = textField.value.trim();
     textField.value = "";
     let temp = message.replace("[\n\t ]", "");
 
-    if(temp === "") return;
+    if (temp === "") return;
 
     chat_send_message(socket, chatID, message);
 }
@@ -251,8 +251,8 @@ function notificationHandler(notification) {
     }
     let openedChatId = localStorage.getItem("openedChat");
     let chatNode = getNotifiedChatNode();
-    if(openedChatId === notification.chatID){
-        let chatType =  chatNode.getAttribute("chattype");
+    if (openedChatId === notification.chatID) {
+        let chatType = chatNode.getAttribute("chattype");
         injectMessage(notification.message, notification.username, chatType);
         chat_selected(socket, notification.chatID);
         return;
@@ -286,6 +286,9 @@ socket.onmessage = function (event) {
     console.log(data)
     switch (data.event) {
         case 'login':
+            loginUser(data);
+            break;
+        case 'register':
             loginUser(data);
             break;
         case 'fetchChats':
@@ -361,14 +364,19 @@ function pwdError(errorMessage) {
 
 }
 
-function loginRequest() {
+function loginRequest(type) {
     const result = getValues()
     if (result === null) {
         console.log("Not in format")
-        return;
+        return false;
+    }
+    if (type === "login") {
+        socket.sendEvent('login', { username: result.username, password: result.password })
+    } else {
+        socket.sendEvent('register', { username: result.username, password: result.password })
     }
 
-    socket.sendEvent(result.mode, { username: result.username, password: result.password })
+    return false;
 }
 
 function newChat(type) {

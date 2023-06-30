@@ -71,7 +71,7 @@ wsSrv.on('connection', (socket, req) => {
         if (cookie) {
             cookie.split(/\s*;\s*/).forEach(function (pair) {
                 pair = pair.split(/\s*=\s*/);
-                JSONCookie[pair[0]] = pair.splice(1).join('=');
+                JSONCookie[pair[0]] = pair.slice(1).join('=');
             });
         }
         const username = JSONCookie.username;

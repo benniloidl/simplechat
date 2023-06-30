@@ -30,7 +30,7 @@
 	<h1>Register</h1>
 	<h2>Let's Chat</h2>
 	
-	<form>
+	<form onsubmit="return loginRequest('register')">
 		<div class="input-label" data-label="Username">
 			<label for="usr" hidden="hidden"></label>
 			<input id="usr" maxlength="16" placeholder="Username" required="required" tabindex="1"
@@ -50,7 +50,7 @@
 		</div>
 		
 		<i class="error" id="pwdError"></i>
-		<input id="submit" onclick="loginRequest()" tabindex="3" type="submit" value="Create account">
+		<input id="submit" tabindex="3" type="submit" value="Create account">
 		<a href="./login">Login</a>
 	</form>
 </article>
