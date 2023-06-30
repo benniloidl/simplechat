@@ -142,6 +142,8 @@ function TESTBUILDCHATMESSAGES() {
 
 function buildChatMessages(chatData) {
     const chatBox = document.createElement("div");
+    const overviewDiv = document.createElement("div");
+    getChatOverview(overviewDiv);
     chatBox.id = "chat-box";
     localStorage.setItem("lastAuthor", null);
     chatData.messages.forEach(data => {
@@ -149,6 +151,7 @@ function buildChatMessages(chatData) {
         chatBox.appendChild(chatElement);
     });
     document.getElementById("chat-box").replaceWith(chatBox);
+    document.getElementById("chat-overview").replaceWith(overviewDiv);
     document.getElementById("chat-name").innerHTML = chatData.name;
 
     document.getElementById("submit-message").onclick = () => {
@@ -161,7 +164,20 @@ function buildChatMessages(chatData) {
         }
     })
 }
+function getChatOverview(overviewDiv){
+    overviewDiv.style.background = "#999999"
+    let url="../subpages/dashboard/chat-overview.html"
+    const xhr = new XMLHttpRequest();
 
+    xhr.open("GET", "dashboard/" + url, true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            overviewDiv.innerHTML = xhr.responseText;
+            console.log("OK")
+        }
+    };
+    xhr.send();
+}
 
 function buildMessageObject(messageObject, username, type) {
     let lastAuthor = localStorage.getItem("lastAuthor");
@@ -397,8 +413,9 @@ function newChat(type) {
 }
 
 function leaveChat(){
-    let chatID = localStorage.getItem("openedChat");
-    chat_leave(socket, chatID);
+    console.error("NOT IMPLEMENTED")
+    // let chatID = localStorage.getItem("openedChat");
+    // chat_leave(socket, chatID);
 
 }
 
@@ -406,6 +423,7 @@ function chat_leave(socket, chatId){
     socket.sendEvent('leaveChat', {
         chatID: chatId
     });
+    chat_overview(socket);
 }
 function chat_selected(socket, chatId) {
     socket.sendEvent('loadChatMessages', {
