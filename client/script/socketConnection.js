@@ -41,17 +41,7 @@ function buildChatOverview(chats) {
         navigator.setAttribute("data-chat-id", data.chatID);
         navigator.setAttribute("chatType", data.type);
         navigator.onclick = () => {
-            if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
-            else injectPage("../subpages/dashboard/group.html");
-            //TESTBUILDCHATMESSAGES();
-            localStorage.setItem("openedChat", data.chatID.toString())
-            chat_selected(socket, data.chatID);
-            // if()
-            if (elementHasNotification(navigator)) {
-                chat_read_event(socket, data.chatID);
-                navigator.classList.remove("notification");
-                console.log("remove notification")
-            }
+            loadChat(data, navigator);
         }
         
         const icon = document.createElement("i");
@@ -64,6 +54,23 @@ function buildChatOverview(chats) {
         
         document.getElementById("chats").appendChild(navigator);
     });
+}
+
+function loadChat(data, navigator){
+    let box = document.getElementById("chat-box");
+    if (box === null) {
+        if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
+        else injectPage("../subpages/dashboard/group.html");
+    }
+
+    localStorage.setItem("openedChat", data.chatID.toString())
+    chat_selected(socket, data.chatID);
+    // if()
+    if (elementHasNotification(navigator)) {
+        chat_read_event(socket, data.chatID);
+        navigator.classList.remove("notification");
+        console.log("remove notification")
+    }
 }
 
 function TESTBUILDCHATMESSAGES() {
@@ -145,12 +152,14 @@ function buildChatMessages(chatData) {
         console.log("empty message")
         return;
     }
-
     const chatNode = getChatNodeById(chatData.chatID);
-    if (!chatNode) return;
+    if (!chatNode) {
+        console.log("no Node", chatNode)
+        return;
+    }
+
     let type = chatNode.getAttribute("chattype");
-    let name = chatNode.lastChild.innerHTML;
-    // console.log(chatNode.lastChild.innerHTML)
+    let name = chatNode.lastChild.textContent;
     if(type==="group"){
         chat_get_group_users(socket, chatData.chatID);
     }
@@ -176,7 +185,8 @@ function buildChatMessages(chatData) {
             event.preventDefault();
             sendMessage(chatData.chatID);
         }
-    })
+    });
+    console.log("build Message")
 }
 
 function getChatOverview(overviewDiv) {
@@ -195,11 +205,9 @@ function getChatOverview(overviewDiv) {
 }
 
 function buildMessageObject(messageObject, username, type) {
-    console.log("build", messageObject)
     let lastAuthor = localStorage.getItem("lastAuthor");
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
-    console.log(messageObject.author , username, messageObject.author === username)
     chatElement.classList.add(messageObject.author === username ? "chat-element-right" : "chat-element-left");
     
     if (type === 'group' && lastAuthor !== messageObject.author) {
@@ -319,7 +327,7 @@ function errorEvent(message) {
 
 socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
-    console.log(data)
+    console.log("onMessage", data.event, data)
     switch (data.event) {
         case 'login':
             loginUser(data);
@@ -338,7 +346,8 @@ socket.onmessage = function (event) {
             try {
                 buildChatMessages(data.data)
             } catch (e) {
-                setTimeout(() => buildChatMessages(data.data), 1000);
+                console.log("fetch2", e)
+                setTimeout(() => buildChatMessages(data.data), 100);
             }
             break;
         case 'messageNotification': {
