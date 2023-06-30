@@ -50,9 +50,15 @@ async function login(socket, data, sockets, type) {
 }
 
 async function createChat(socket, data, username) {
-    if (data.type == "user" && data.users.length != 1) {
-        socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
-        return false;
+    if (data.type == "user") {
+        if (!await dbFunctions.userExists(data.users[0])) {
+            socket.send(JSON.stringify({ event: "error", message: "User does not exist." }));
+            return false;
+        }
+        if(data.users.length != 1){
+            socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
+            return false;
+        }
     }
     await dbFunctions.createChat(data.name, data.type).then(async (chatID) => {
         await dbFunctions.addChat(username, chatID);

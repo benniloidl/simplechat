@@ -75,7 +75,7 @@ wsSrv.on('connection', (socket, req) => {
             });
         }
         let username = JSONCookie.username;
-        if(username){
+        if (username) {
             username = username.toLowerCase();
         }
         const password = JSONCookie.password;
