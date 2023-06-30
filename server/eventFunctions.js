@@ -76,7 +76,7 @@ async function sendMessage(socket, data, username, sockets) {
         for (const s of sockets) {
             if (await dbFunctions.hasChat(s.username, data.chatID)) {
                 dbFunctions.incrementUnreadMessages(s.username, data.chatID);
-                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID, "message": message } }));
+                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":username, "message": message } }));
             }
         }
     } else {
