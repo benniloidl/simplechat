@@ -359,3 +359,17 @@ main #chat form input[type="submit"]:hover {
         display: none;
     }
 }
+
+.read-confirmation{
+    position: relative;
+}
+
+.read-confirmation::before{
+    position: absolute;
+    right: calc(var(--spacing) * 0.25);
+    bottom: calc(var(--spacing) * 0);
+    padding: 0 1px;
+    content: "r";
+    color: var(--color-secondary);
+    border-radius: 50%;
+}

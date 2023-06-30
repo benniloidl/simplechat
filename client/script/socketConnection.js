@@ -234,11 +234,11 @@ function buildMessageObject(messageObject, username, type) {
     chatElement.style.order = modifiedTime1.toString();
     // console.log(messageDate.valueOf(),modifiedTime, modifiedTime1 , chatElement.style.order);
     
-    // TODO style and insert read indicator
-    const readIndicator = document.createElement("span");
-    readIndicator.innerHTML = "READELEMENT";
-    // chatElement.appendChild(readIndicator);
-    
+    // TODO reading confirmation should be done by @Benni
+    if(messageObject.readConfirmation === true){
+    chatElement.classList.add("read-confirmation");
+    }
+
     return chatElement;
 }
 
