@@ -161,7 +161,7 @@ function buildChatMessages(chatData) {
         chatBox.appendChild(chatElement);
     });
     document.getElementById("chat-box").replaceWith(chatBox);
-    // document.getElementById("chat-overview").replaceWith(overviewDiv);
+    document.getElementById("chat-overview").replaceWith(overviewDiv);
     document.getElementById("chat-name").innerHTML = name;
 
     document.getElementById("submit-message").onclick = () => {
@@ -284,6 +284,8 @@ function notificationHandler(notification) {
         injectMessage(notification.message, notification.username, chatType);
         chat_read_event(socket, notification.chatID);
         return;
+    } else{
+        chat_overview(socket);
     }
 
     if (chatNode) {
