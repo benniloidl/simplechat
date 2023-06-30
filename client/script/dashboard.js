@@ -103,8 +103,7 @@ function buildChatMessages(chatData) {
         console.log("no Node", chatNode)
         return;
     }
-
-    let type = chatNode.getAttribute("chattype");
+    let type = chatNode.getAttribute("chatType");
     let name = chatNode.lastChild.textContent;
     const chatBox = document.createElement("div");
     chatBox.id = "chat-box";
@@ -166,7 +165,7 @@ function buildMessageObject(messageObject, username, type) {
 
     // timestamp
     const timeElement = document.createElement("span");
-    let messageDate = new Date(messageObject.timeStamp); // bspw: "28 Jun 2023 18:50:59"
+    let messageDate = new Date(messageObject.timeStamp); // eg: "28 Jun 2023 18:50:59"
     let timeDifference = Math.floor((Date.now() - messageDate.valueOf()) / 1000 / 60)
     if (timeDifference < 60 * 24) {
         timeElement.innerHTML = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -203,10 +202,10 @@ function injectMessage(messageObject, username, type) {
 /**
  *
  * @param chatId
- * @returns {ChildNode}
+ * @returns {Element | undefined}
  */
 function getChatNodeById(chatId) {
-    for (const child of document.getElementById("chats").childNodes) {
+    for (const child of document.getElementById("chats").children) {
         let nodeId = child.getAttribute("data-chat-id");
         if (nodeId === chatId) {
             return child;
@@ -223,7 +222,7 @@ function notificationHandler(notification) {
     let chatNode = getChatNodeById(notification.chatID);
     if (openedChatId === notification.chatID) {
         // chat is shown
-        let chatType = chatNode.getAttribute("chattype");
+        let chatType = chatNode.getAttribute("chatType");
         injectMessage(notification.message, notification.username, chatType);
         chat_read_event(socket, notification.chatID);
         return;

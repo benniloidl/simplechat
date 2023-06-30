@@ -55,6 +55,7 @@ socket.onmessage = function (event) {
         }
         case 'fetchGroupUsers':{
             createViewContainer(data.data.users);
+            break;
         }
         
         case 'error': {
@@ -198,7 +199,7 @@ function chat_fetch_overview(socket) {
 }
 
 function chat_get_group_users(socket, groupId){
-    console.log("groupid", groupId);
+    console.log("groupId", groupId);
     socket.sendEvent('fetchGroupUsers', {
         chatID: groupId
     });

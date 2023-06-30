@@ -1,12 +1,7 @@
 const dbFunctions = require('./db');
 
 async function validate(username, password) {
-    const valid = await dbFunctions.validateUser(username, password);
-    if (valid) {
-        return true;
-    } else {
-        return false;
-    }
+    return await dbFunctions.validateUser(username, password);
 }
 
 async function fetchchats(socket, username) {

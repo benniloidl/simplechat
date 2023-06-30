@@ -44,10 +44,12 @@
 
 <div id="chat-actions">
 	<div>
-		<textarea onfocus="document.getElementById('chat-box').style.marginBottom = 'calc(8 * var(--spacing))'"
-		          onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
-		          placeholder="Enter your message"
-		          tabindex="1"></textarea>
+		<label>
+			<textarea onfocus="document.getElementById('chat-box').style.marginBottom = 'calc(8 * var(--spacing))'"
+					  onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
+					  placeholder="Enter your message"
+					  tabindex="1"></textarea>
+		</label>
 	</div>
 	
 	<div class="chat-actions-button" id="submit-message" tabindex="2">
