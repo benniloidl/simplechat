@@ -315,6 +315,7 @@ function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd2");
+    let mode = pwdElement?"register":"login";
 
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
@@ -335,14 +336,17 @@ function getValues() {
             "number and a special character");
         return null;
     }
+
+    // compare passwords if register
     if (pwdElement && pwdElement.value !== pwd) {
         pwdError("Passwords doesn't match");
         return null;
     }
-    pwdError("OK");
+    pwdError("client side password ok");
     return {
         username: usr,
-        password: pwd
+        password: pwd,
+        mode: mode
     };
 }
 
@@ -358,7 +362,7 @@ function loginRequest() {
         return;
     }
 
-    socket.sendEvent('login', { username: result.username, password: result.password })
+    socket.sendEvent(result.mode, { username: result.username, password: result.password })
 }
 
 function newChat(type) {
@@ -422,5 +426,5 @@ function chat_read_event(socket, chatId) {
 }
 
 function chat_overview(socket) {
-    socket.sendEvent('fetchChats', {})
+    socket.sendEvent('fetchChats', "")
 }
