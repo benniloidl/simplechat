@@ -185,53 +185,15 @@ socket.onmessage = function (event) {
 socket.onclose = function (event) {
 };
 
-function getValues() {
-    let usr = document.getElementById("usr").value;
-    let pwd = document.getElementById("pwd").value;
-    let pwdElement = document.getElementById("pwd2");
-    let mode = pwdElement ? "register" : "login";
-    
-    // further client side checking
-    if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
-        pwdError("Please fill in the missing fields!")
-        return null;
-    }
-    
-    if (!usr.match(/^[a-zA-Z0-9._\-+]*$/g)) {
-        pwdError("Username must only contain upper- and lowercase letters, digits and the special characters \+\-\_\.");
-        return null;
-    }
-    
-    if (
-        !(
-            pwd.match(/[a-z]/g) &&
-            pwd.match(/[A-Z]/g) &&
-            pwd.match(/[0-9]/g) &&
-            pwd.match(/\W/g) &&
-            pwd.length >= 8
-        )
-    ) {
-        pwdError("Password must have at least 8 characters, containing an upper- and lowercase letter, " +
-            "digit and a special character");
-        return null;
-    }
-    
-    // compare passwords if register
-    if (pwdElement && pwdElement.value !== pwd) {
-        pwdError("Passwords doesn't match");
-        return null;
-    }
-    pwdError("client side password ok");
-    return {
-        username: usr,
-        password: pwd,
-        mode: mode
-    };
-}
+function sendMessage(chatID) {
+    let textField = document.querySelector("#chat-actions div textarea")
+    let message = textField.value.trim();
+    textField.value = "";
+    let temp = message.replace("[\n\t ]", "");
 
-function pwdError(errorMessage) {
-    document.getElementById("pwdError").innerHTML = errorMessage;
-    
+    if (temp === "") return;
+
+    chat_send_message(socket, chatID, message);
 }
 
 function loginRequest(type) {
@@ -301,11 +263,11 @@ function chat_send_message(socket, chatId, message) {
     socket.sendEvent('sendMessage', {
         message: message,
         chatID: chatId,
-        
-        // Data injected by server!
-        timestamp: undefined,
-        author: undefined,
-        read: undefined
+        //
+        // // Data injected by server!
+        // timeStamp: undefined,
+        // author: undefined,
+        // read: undefined
     });
 }
 

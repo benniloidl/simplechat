@@ -166,16 +166,6 @@ function injectMessage(messageObject, username, type) {
     document.getElementById("chat-box").appendChild(chatObject);
 }
 
-function sendMessage(chatID) {
-    let textField = document.querySelector("#chat-actions div textarea")
-    let message = textField.value.trim();
-    textField.value = "";
-    let temp = message.replace("[\n\t ]", "");
-
-    if (temp === "") return;
-
-    chat_send_message(socket, chatID, message);
-}
 
 function getChatNodeById(chatId) {
     for (const child of document.getElementById("chats").childNodes) {
