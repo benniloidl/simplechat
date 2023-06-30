@@ -14,8 +14,28 @@ async function fetchchats(socket, username) {
     socket.send(JSON.stringify({ event: 'fetchChats', "chats": chats }));
 }
 
-async function login(socket, data, sockets) {
-    const login = await dbFunctions.validateUser(data.username, data.password);
+async function login(socket, data, sockets, type) {
+    data.username = data.username.toLowerCase();
+    if (
+        !(
+            data.password.match(/[a-z]/g) &&
+            data.password.match(/[A-Z]/g) &&
+            data.password.match(/[0-9]/g) &&
+            data.password.match(/\W/g) &&
+            data.password.length >= 8
+        )
+    ) {
+        socket.send(JSON.stringify({ event: 'login', status: false }));
+        return;
+    }
+
+    let login;
+    if (type === "login") {
+        login = await dbFunctions.validateUser(data.username, data.password);
+    } else {
+        login = await dbFunctions.createUser(data.username, data.password);
+    }
+
     if (login) {
         for (const s of sockets) {
             if (s.socket == socket) {
@@ -26,21 +46,6 @@ async function login(socket, data, sockets) {
         socket.send(JSON.stringify({ event: 'login', status: true }));
     } else {
         socket.send(JSON.stringify({ event: 'login', status: false }));
-    }
-}
-
-async function register(socket, data, sockets) {
-    const register = await dbFunctions.createUser(data.username, data.password);
-    if (register) {
-        for (const s of sockets) {
-            if (s.socket == socket) {
-                s.username = data.username;
-                break;
-            }
-        }
-        socket.send(JSON.stringify({ event: 'register', status: true }));
-    } else {
-        socket.send(JSON.stringify({ event: 'register', status: false }));
     }
 }
 
@@ -84,17 +89,16 @@ async function readChat(socket, data, username, sockets) {
 
 async function fetchMessages(socket, data) {
     const result = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
-    if(result){
-        socket.send(JSON.stringify({event:"fetchMessages", messages:result}));
-    }else{
-        socket.send(JSON.stringify({event:"error", message:"Cannot fetch messages"}));
+    if (result) {
+        socket.send(JSON.stringify({ event: "fetchMessages", messages: result }));
+    } else {
+        socket.send(JSON.stringify({ event: "error", message: "Cannot fetch messages" }));
     }
 }
 
 module.exports = {
     validate,
     login,
-    register,
     fetchchats,
     createChat,
     sendMessage,

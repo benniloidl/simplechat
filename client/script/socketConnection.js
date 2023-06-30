@@ -331,6 +331,11 @@ function getValues() {
         pwdError("Please fill in the missing fields!")
         return null;
     }
+    
+    if(!usr.match(/^[a-zA-Z0-9._\-+]*$/g)){
+        pwdError("Username must only contain upper- and lowercase letters, digits and the special characters \+\-\_\.");
+        return null;
+    }
 
     if (
         !(
@@ -341,8 +346,8 @@ function getValues() {
             pwd.length >= 8
         )
     ) {
-        pwdError("Password must at least 8 characters and upper- and lowercase character, " +
-            "number and a special character");
+        pwdError("Password must have at least 8 characters, containing an upper- and lowercase letter, " +
+            "digit and a special character");
         return null;
     }
 

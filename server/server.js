@@ -74,15 +74,18 @@ wsSrv.on('connection', (socket, req) => {
                 JSONCookie[pair[0]] = pair.slice(1).join('=');
             });
         }
-        const username = JSONCookie.username;
+        let username = JSONCookie.username;
+        if(username){
+            username = username.toLowerCase();
+        }
         const password = JSONCookie.password;
 
         switch (event.event) {
             case 'login':
-                eventFunctions.login(socket, event.data, sockets);
+                eventFunctions.login(socket, event.data, sockets, "login");
                 break;
             case 'register':
-                eventFunctions.register(socket, event.data, sockets);
+                eventFunctions.login(socket, event.data, sockets, "register");
                 break;
             case 'fetchChats':
                 if (eventFunctions.validate(username, password)) {
