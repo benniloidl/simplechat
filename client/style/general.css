@@ -118,3 +118,72 @@ footer .appearanceMode {
     content: var(--appearance-switch);
     color: white;
 }
+
+.chat-overview-wrapper {
+    z-index: 1;
+    overflow: scroll;
+    height: 200px;
+    max-height: 200px;
+    margin-top: calc(var(--spacing) * -1 - var(--border-radius));
+    transition: all 250ms ease;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    background: var(--background-color-accent);
+}
+
+.chat-overview-wrapper[data-overview-open="false"] {
+    height: 0;
+    padding-bottom: var(--spacing);
+    opacity: 0;
+}
+
+.overview-container {
+    padding-top: var(--spacing);
+}
+
+.overview-container ul {
+    list-style: none;
+}
+
+.overview-container ul li {
+    position: relative;
+    padding-left: var(--spacing);
+}
+
+.overview-container ul li .fa-user {
+    font-size: 18px;
+    position: absolute;
+    top: 2px;
+    left: calc(var(--spacing) * -1);
+}
+
+.overview-container ul li .fa-minus {
+    font-size: 18px;
+    position: absolute;
+    top: 2px;
+    right: var(--spacing);
+    cursor: pointer;
+}
+
+.overview-container hr {
+    margin: 0 var(--spacing) var(--spacing) 0;
+    opacity: 0.5;
+}
+
+.overview-container form {
+    display: flex;
+    align-items: center !important;
+    flex-direction: row !important;
+    padding-block: 0 !important;
+}
+
+.overview-container form label {
+    white-space: nowrap;
+}
+
+.overview-container form input {
+    padding-block: calc(var(--spacing) * 0.5) !important;
+}
+
+.overview-container form input[type="submit"] {
+    width: fit-content !important;
+}

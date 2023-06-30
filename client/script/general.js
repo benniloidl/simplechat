@@ -68,3 +68,17 @@ function logout() {
     document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     window.location.href = "/login";
 }
+
+function toggleChatOverview(event) {
+    const chatOverview = document.querySelector('.chat-overview-wrapper')
+    if (!chatOverview) return
+    
+    let attr = chatOverview.getAttribute('data-overview-open')
+    attr = attr === 'true' ? 'false' : 'true'
+    chatOverview.setAttribute('data-overview-open', attr)
+    
+    if (event.target.hasAttribute("data-selected"))
+        event.target.removeAttribute("data-selected")
+    else
+        event.target.setAttribute("data-selected", "")
+}

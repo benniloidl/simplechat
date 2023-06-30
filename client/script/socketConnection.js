@@ -53,15 +53,15 @@ function buildChatOverview(chats) {
                 console.log("remove notification")
             }
         }
-
+        
         const icon = document.createElement("i");
         icon.classList.add("fas", data.type === "user" ? "fa-user" : "fa-users");
         navigator.appendChild(icon);
-
+        
         const name = document.createElement("p");
         name.innerHTML = data.name;
         navigator.appendChild(name);
-
+        
         document.getElementById("chats").appendChild(navigator);
     });
 }
@@ -137,7 +137,7 @@ function TESTBUILDCHATMESSAGES() {
     //     setTimeout(() => buildChatMessages(testdata, true), 1000);
     // }
     setTimeout(() => buildChatMessages(testdata2), 10);
-
+    
 }
 
 function buildChatMessages(chatData) {
@@ -153,7 +153,7 @@ function buildChatMessages(chatData) {
     document.getElementById("chat-box").replaceWith(chatBox);
     document.getElementById("chat-overview").replaceWith(overviewDiv);
     document.getElementById("chat-name").innerHTML = chatData.name;
-
+    
     document.getElementById("submit-message").onclick = () => {
         sendMessage(chatData.chatID);
     };
@@ -164,11 +164,13 @@ function buildChatMessages(chatData) {
         }
     })
 }
-function getChatOverview(overviewDiv){
-    overviewDiv.style.background = "#999999"
-    let url="../subpages/dashboard/chat-overview.html"
-    const xhr = new XMLHttpRequest();
 
+function getChatOverview(overviewDiv) {
+    overviewDiv.classList.add("chat-overview-wrapper");
+    overviewDiv.setAttribute("data-overview-open", "false");
+    let url = "../subpages/dashboard/chat-overview.html";
+    const xhr = new XMLHttpRequest();
+    
     xhr.open("GET", "dashboard/" + url, true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -184,7 +186,7 @@ function buildMessageObject(messageObject, username, type) {
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
     chatElement.classList.add(messageObject.author === username ? "chat-element-right" : "chat-element-left");
-
+    
     if (type === 'group' && lastAuthor !== messageObject.author) {
         if (messageObject.author !== username) {
             const senderElement = document.createElement("span");
@@ -194,11 +196,11 @@ function buildMessageObject(messageObject, username, type) {
         }
         localStorage.setItem("lastAuthor", messageObject.author);
     }
-
+    
     const messageElement = document.createElement("p");
     messageElement.innerHTML = messageObject.message;
     chatElement.appendChild(messageElement);
-
+    
     const timeElement = document.createElement("span");
     let messageDate = new Date(messageObject.timeStamp); // bspw: "28 Jun 2023 18:50:59"
     let timeDifference = Math.floor((Date.now() - messageDate.valueOf()) / 1000 / 60)
@@ -213,15 +215,15 @@ function buildMessageObject(messageObject, username, type) {
     // resolution 1 second, 20 Years, reference 29 june 2023
     // let modifiedTime = Math.round((messageDate.valueOf()/1000) -  1000000000 -  688000000); // Try to convert long of Date to integer
     // resolution 0.1 second 4 Years selected
-    let modifiedTime1 = Math.round((messageDate.valueOf()/100) - 10000000000 - 6880000000); // Try to convert long of Date to integer
+    let modifiedTime1 = Math.round((messageDate.valueOf() / 100) - 10000000000 - 6880000000); // Try to convert long of Date to integer
     chatElement.style.order = modifiedTime1.toString();
     // console.log(messageDate.valueOf(),modifiedTime, modifiedTime1 , chatElement.style.order);
-
+    
     // TODO style and insert read indicator
     const readIndicator = document.createElement("span");
     readIndicator.innerHTML = "READELEMENT";
     // chatElement.appendChild(readIndicator);
-
+    
     return chatElement;
 }
 
@@ -235,9 +237,9 @@ function sendMessage(chatID) {
     let message = textField.value.trim();
     textField.value = "";
     let temp = message.replace("[\n\t ]", "");
-
+    
     if (temp === "") return;
-
+    
     chat_send_message(socket, chatID, message);
 }
 
@@ -252,7 +254,7 @@ function TESTNOTIFICATIONHANDLER() {
             author: "Honulullu"
         }
     }
-
+    
     notificationHandler(testNotification);
 }
 
@@ -265,6 +267,7 @@ function notificationHandler(notification) {
             }
         }
     }
+    
     let openedChatId = localStorage.getItem("openedChat");
     let chatNode = getNotifiedChatNode();
     if (openedChatId === notification.chatID) {
@@ -273,15 +276,15 @@ function notificationHandler(notification) {
         chat_selected(socket, notification.chatID);
         return;
     }
-
+    
     if (chatNode) {
-
+        
         chatNode.classList.add("notification");
         let unreadMessageAmount = chatNode.getAttribute("data-unread-message");
         chatNode.setAttribute("data-unread-messages", unreadMessageAmount + 1);
         // console.log(chatNode);
     }
-
+    
 }
 
 function elementHasNotification(element) {
@@ -325,7 +328,7 @@ socket.onmessage = function (event) {
             notificationHandler(data);
             break;
         }
-
+        
         case 'error': {
             errorEvent(data);
             break;
@@ -340,19 +343,19 @@ function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd2");
-    let mode = pwdElement?"register":"login";
-
+    let mode = pwdElement ? "register" : "login";
+    
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
         pwdError("Please fill in the missing fields!")
         return null;
     }
     
-    if(!usr.match(/^[a-zA-Z0-9._\-+]*$/g)){
+    if (!usr.match(/^[a-zA-Z0-9._\-+]*$/g)) {
         pwdError("Username must only contain upper- and lowercase letters, digits and the special characters \+\-\_\.");
         return null;
     }
-
+    
     if (
         !(
             pwd.match(/[a-z]/g) &&
@@ -366,7 +369,7 @@ function getValues() {
             "digit and a special character");
         return null;
     }
-
+    
     // compare passwords if register
     if (pwdElement && pwdElement.value !== pwd) {
         pwdError("Passwords doesn't match");
@@ -382,7 +385,7 @@ function getValues() {
 
 function pwdError(errorMessage) {
     document.getElementById("pwdError").innerHTML = errorMessage;
-
+    
 }
 
 function loginRequest(type) {
@@ -396,7 +399,7 @@ function loginRequest(type) {
     } else {
         socket.sendEvent('register', { username: result.username, password: result.password })
     }
-
+    
     return false;
 }
 
@@ -405,31 +408,32 @@ function newChat(type) {
     let inform = document.querySelector("input[type=text]").value.trim();
     if (inform === "") return;
     let users = [];
-
+    
     let name = inform.trim();
     if (type === "user") {
         users = [inform];
     } else {
         //TODO add users
-
+        
     }
     // console.log(inform, users)
     chat_create_new_chat(socket, name, type, users);
 }
 
-function leaveChat(){
+function leaveChat() {
     console.error("NOT IMPLEMENTED")
     // let chatID = localStorage.getItem("openedChat");
     // chat_leave(socket, chatID);
-
+    
 }
 
-function chat_leave(socket, chatId){
+function chat_leave(socket, chatId) {
     socket.sendEvent('leaveChat', {
         chatID: chatId
     });
     chat_overview(socket);
 }
+
 function chat_selected(socket, chatId) {
     socket.sendEvent('loadChatMessages', {
         chatID: chatId,
@@ -451,7 +455,7 @@ function chat_send_message(socket, chatId, message) {
     socket.sendEvent('sendMessage', {
         message: message,
         chatId: chatId,
-
+        
         // Data injected by server!
         timestamp: undefined,
         author: undefined,
