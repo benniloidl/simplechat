@@ -30,8 +30,8 @@ async function login(socket, data, sockets) {
 }
 
 async function register(socket, data, sockets) {
-    const login = await dbFunctions.createUser(data.username, data.password);
-    if (login) {
+    const register = await dbFunctions.createUser(data.username, data.password);
+    if (register) {
         for (const s of sockets) {
             if (s.socket == socket) {
                 s.username = data.username;
