@@ -245,7 +245,7 @@ async function chatExists(username, otherUsername) {
 async function fetchGroupUsers(chatID) {
     const result = await user.find({"chats.chatID": chatID }, { projection: { _id: 0, username: 1 } });
     let users = [];
-    result.forEach(user => {
+    await result.forEach(user => {
         users.push(user);
     });
     return users;

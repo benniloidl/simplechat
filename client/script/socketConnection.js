@@ -145,16 +145,19 @@ function buildChatMessages(chatData) {
         console.log("empty message")
         return;
     }
-    ;
+
     const chatNode = getChatNodeById(chatData.chatID);
     if (!chatNode) return;
     let type = chatNode.getAttribute("chattype");
     let name = chatNode.lastChild.innerHTML;
     // console.log(chatNode.lastChild.innerHTML)
-    
+    if(type==="group"){
+        chat_get_group_users(socket, chatData.chatID);
+    }
+
     const chatBox = document.createElement("div");
-    const overviewDiv = document.createElement("div");
-    getChatOverview(overviewDiv);
+    //const overviewDiv = document.createElement("div");
+    //getChatOverview(overviewDiv);
     chatBox.id = "chat-box";
     localStorage.setItem("lastAuthor", null);
     chatData.messages.forEach(data => {
@@ -162,7 +165,7 @@ function buildChatMessages(chatData) {
         chatBox.appendChild(chatElement);
     });
     document.getElementById("chat-box").replaceWith(chatBox);
-    document.getElementById("chat-overview").replaceWith(overviewDiv);
+    // document.getElementById("chat-overview").replaceWith(overviewDiv);
     document.getElementById("chat-name").innerHTML = name;
     
     document.getElementById("submit-message").onclick = () => {
@@ -342,6 +345,9 @@ socket.onmessage = function (event) {
             notificationHandler(data.notification);
             break;
         }
+        case 'fetchGroupUsers':{
+            createViewContainer(data.data.users);
+        }
         
         case 'error': {
             errorEvent(data);
@@ -496,6 +502,7 @@ function chat_overview(socket) {
 }
 
 function chat_get_group_users(socket, groupId){
+    console.log("groupid", groupId);
     socket.sendEvent('fetchGroupUsers', {
         chatID: groupId
     });

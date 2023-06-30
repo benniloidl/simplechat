@@ -86,5 +86,5 @@ function toggleChatOverview(event) {
     else
         event.target.setAttribute("data-selected", "")
 
-    chat_get_group_users(socket, openedChatId);
+    // chat_get_group_users(socket, openedChatId);
 }
