@@ -494,3 +494,9 @@ function chat_read_event(socket, chatId) {
 function chat_overview(socket) {
     socket.sendEvent('fetchChats', "")
 }
+
+function chat_get_group_users(socket, groupId){
+    socket.sendEvent('GroupUsers', {
+        chatID: groupId
+    });
+}

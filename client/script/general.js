@@ -71,14 +71,20 @@ function logout() {
 
 function toggleChatOverview(event) {
     const chatOverview = document.querySelector('.chat-overview-wrapper')
-    if (!chatOverview) return
+    const openedChatId = localStorage.getItem("openedChat");
+
+    if (!chatOverview || !openedChatId) return
+    const type = getChatNodeById(openedChatId).getAttribute("chattype");
+    // TODO change overview by type group <-> user
     
     let attr = chatOverview.getAttribute('data-overview-open')
-    attr = attr === 'true' ? 'false' : 'true'
+    attr = (attr === 'true') ? 'false' : 'true'
     chatOverview.setAttribute('data-overview-open', attr)
     
     if (event.target.hasAttribute("data-selected"))
         event.target.removeAttribute("data-selected")
     else
         event.target.setAttribute("data-selected", "")
+
+    chat_get_group_users(socket, openedChatId);
 }
