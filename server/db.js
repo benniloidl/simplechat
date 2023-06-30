@@ -215,10 +215,10 @@ async function hasChat(username, chatID) {
 async function chatExists(username, otherUsername) {
     if (username === otherUsername) {
         const chatIDs = await getAllChatIDs(username);
-        if(chatIDs){
+        if (chatIDs) {
             for (const id of chatIDs.chats) {
                 const detail = await getChatDetails(id.chatID);
-                if(detail.name === username){
+                if (detail.name === username) {
                     return true;
                 }
             }
@@ -242,6 +242,15 @@ async function chatExists(username, otherUsername) {
     }
 }
 
+async function fetchGroupUsers(chatID) {
+    const result = await user.find({"chats.chatID": chatID }, { projection: { _id: 0, username: 1 } });
+    let users = [];
+    result.forEach(user => {
+        users.push(user);
+    });
+    return users;
+}
+
 module.exports = {
     connectToDB,
     validateUser,
@@ -257,5 +266,6 @@ module.exports = {
     getUnreadMessages,
     incrementUnreadMessages,
     resetUnreadMessages,
-    chatExists
+    chatExists,
+    fetchGroupUsers
 };

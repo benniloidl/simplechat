@@ -107,6 +107,15 @@ async function fetchMessages(socket, data, username) {
     }
 }
 
+async function fetchGroupUsers(socket, data) {
+    const users = await dbFunctions.fetchGroupUsers(data.chatID);
+    if (users) {
+        socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users} }));
+    } else {
+        socket.send(JSON.stringify({ event: "error", message: "Cannot fetch group users." }));
+    }
+}
+
 module.exports = {
     validate,
     login,
@@ -114,5 +123,6 @@ module.exports = {
     createChat,
     sendMessage,
     readChat,
-    fetchMessages
+    fetchMessages,
+    fetchGroupUsers
 }
