@@ -78,7 +78,7 @@ async function sendMessage(socket, data, username, sockets) {
                 if(s.username != username){
                    await dbFunctions.incrementUnreadMessages(s.username, data.chatID);
                 }
-                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
+                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID,"username":s.username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
             }
         }
     } else {
@@ -89,7 +89,7 @@ async function sendMessage(socket, data, username, sockets) {
 async function readChat(socket, data, username, sockets) {
     await dbFunctions.resetUnreadMessages(username, data.chatID);
     for (const s of sockets) {
-        if (s.socket != socket && await s.hasChat(s.username, data.chatID)) {
+        if (s.socket != socket && await dbFunctions.hasChat(s.username, data.chatID)) {
             s.socket.send(JSON.stringify({ event: "messagesRead", chatID: data.chatID }));
         }
     }
