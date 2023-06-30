@@ -22,6 +22,10 @@ async function connectToDB() {
 }
 
 async function validateUser(username, password) {
+    if(!username){
+        return false;
+    }
+    username = username.toLowerCase();
     const result = await user.findOne({ "username": username, "password": password }, { projection: { _id: 1 } });
     if (result) {
         return true;
@@ -31,6 +35,9 @@ async function validateUser(username, password) {
 }
 
 async function createUser(username, password) {
+    if(!username.match(/^[a-zA-Z0-9._\-+]*$/g)){
+        return false;
+    }
     const result = await user.findOne({ "username": username }, { projection: { _id: 1 } });
     if (result) {
         return false;
