@@ -213,19 +213,32 @@ async function hasChat(username, chatID) {
 }
 
 async function chatExists(username, otherUsername) {
-    const chatIDs1 = await getAllChatIDs(username);
-    const chatIDs2 = await getAllChatIDs(otherUsername);
-    if (chatIDs1 && chatIDs2) {
-        for (const id1 of chatIDs1.chats) {
-            for (const id2 of chatIDs2.chats) {
-                if(id1.chatID == id2.chatID){
+    if (username === otherUsername) {
+        const chatIDs = await getAllChatIDs(username);
+        if(chatIDs){
+            for (const id of chatIDs.chats) {
+                const detail = await getChatDetails(id.chatID);
+                if(detail.name === username){
                     return true;
                 }
             }
+            return false;
         }
-        return false;
     } else {
-        return false;
+        const chatIDs1 = await getAllChatIDs(username);
+        const chatIDs2 = await getAllChatIDs(otherUsername);
+        if (chatIDs1 && chatIDs2) {
+            for (const id1 of chatIDs1.chats) {
+                for (const id2 of chatIDs2.chats) {
+                    if (id1.chatID == id2.chatID) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } else {
+            return false;
+        }
     }
 }
 
