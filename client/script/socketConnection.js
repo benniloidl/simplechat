@@ -119,7 +119,7 @@ function TESTBUILDCHATMESSAGES() {
             },
             {
                 message: "some other message",
-                timeStamp: "28 jun 2023 18:00",
+                timeStamp: "29 jun 2023 18:00",
                 readConfirmation: true,
                 author: "Honulullu"
             },
@@ -193,7 +193,13 @@ function buildMessageObject(messageObject, username, type){
     }
     timeElement.classList.add("subtitle");
     chatElement.appendChild(timeElement);
-    chatElement.style.order = messageDate.valueOf().toString();
+    //2147483647 maximum value for order
+    // resolution 1 second, 20 Years, reference 29 june 2023
+    // let modifiedTime = Math.round((messageDate.valueOf()/1000) -  1000000000 -  688000000); // Try to convert long of Date to integer
+    // resolution 0.1 second 4 Years selected
+    let modifiedTime1 = Math.round((messageDate.valueOf()/100) - 10000000000 - 6880000000); // Try to convert long of Date to integer
+    chatElement.style.order = modifiedTime1.toString();
+    // console.log(messageDate.valueOf(),modifiedTime, modifiedTime1 , chatElement.style.order);
 
     // TODO style and insert read indicator
     const readIndicator = document.createElement("span");
@@ -221,11 +227,11 @@ function sendMessage(chatID){
 
 function TESTNOTIFICATIONHANDLER() {
     let testNotification = {
-        chatID: "649c3b837074414f95088ce2",
+        chatID: "649dba9727ab3fc60655df5f",
         username: "self",
         message: {
             message: "Benni hat immer Recht!",
-            timeStamp: "28 jun 2023 19:01",
+            timeStamp: "29 jun 2023 19:01",
             readConfirmation: true,
             author: "Honulullu"
         }
@@ -382,6 +388,17 @@ function newChat(type) {
     chat_create_new_chat(socket, name, type, users);
 }
 
+function leaveChat(){
+    let chatID = localStorage.getItem("openedChat");
+    chat_leave(socket, chatID);
+
+}
+
+function chat_leave(socket, chatId){
+    socket.sendEvent('leaveChat', {
+        chatID: chatId
+    });
+}
 function chat_selected(socket, chatId) {
     socket.sendEvent('loadChatMessages', {
         chatID: chatId,
