@@ -5,7 +5,35 @@
 	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 </div>
 
-<div id="chat-overview"></div>
+<div class="chat-overview-wrapper" data-overview-open="false">
+	<div class="overview-container">
+		<ul>
+			<li>
+				<i class="fas fa-user"></i>
+				Adam Smith
+				<i class="fas fa-minus"></i>
+			</li>
+			<li>
+				<i class="fas fa-user"></i>
+				Theresa König
+				<i class="fas fa-minus"></i>
+			</li>
+			<li>
+				<i class="fas fa-user"></i>
+				Adam Smith
+				<i class="fas fa-minus"></i>
+			</li>
+		</ul>
+		
+		<hr>
+		
+		<form>
+			<label for="add-member">Add friend</label>
+			<input id="add-member" placeholder="Enter username" required type="text">
+			<input type="submit" value="Add">
+		</form>
+	</div>
+</div>
 
 <div id="chat-box">
 	<div class="chat-element chat-element-left">
