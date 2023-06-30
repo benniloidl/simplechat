@@ -55,6 +55,10 @@ async function createChat(socket, data, username) {
             socket.send(JSON.stringify({ event: "error", message: "User does not exist." }));
             return false;
         }
+        if(await dbFunctions.chatExists(username, data.users[0])){
+            socket.send(JSON.stringify({ event: "error", message: "Chat already exists." }));
+            return false;
+        }
         if (data.users.length != 1) {
             socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
             return false;

@@ -194,15 +194,6 @@ async function resetUnreadMessages(username, chatID) {
         { "arrayFilters": [{ "elem.readConfirmation": false, "elem.author": { $ne: username } }], "multi": true });
 }
 
-async function hasChat(username, chatID) {
-    const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
-    if (result) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 async function getUnreadMessages(username, chatID) {
     const result = await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
     for (const chat of result.chats) {
@@ -216,6 +207,23 @@ async function hasChat(username, chatID) {
     const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
     if (result) {
         return true;
+    } else {
+        return false;
+    }
+}
+
+async function chatExists(username, otherUsername) {
+    const chatIDs1 = await getAllChatIDs(username);
+    const chatIDs2 = await getAllChatIDs(otherUsername);
+    if (chatIDs1 && chatIDs2) {
+        for (const id1 of chatIDs1.chats) {
+            for (const id2 of chatIDs2.chats) {
+                if(id1.chatID == id2.chatID){
+                    return true;
+                }
+            }
+        }
+        return false;
     } else {
         return false;
     }
@@ -235,5 +243,6 @@ module.exports = {
     hasChat,
     getUnreadMessages,
     incrementUnreadMessages,
-    resetUnreadMessages
+    resetUnreadMessages,
+    chatExists
 };
