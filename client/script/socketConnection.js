@@ -174,9 +174,11 @@ function buildChatMessages(chatData) {
         }
     })
 }
-function getChatOverview(overviewDiv){
-    overviewDiv.style.background = "#999999"
-    let url="../subpages/dashboard/chat-overview.html"
+
+function getChatOverview(overviewDiv) {
+    overviewDiv.classList.add("chat-overview-wrapper");
+    overviewDiv.setAttribute("data-overview-open", "false");
+    let url = "../subpages/dashboard/chat-overview.html";
     const xhr = new XMLHttpRequest();
 
     xhr.open("GET", "dashboard/" + url, true);
@@ -323,7 +325,6 @@ socket.onmessage = function (event) {
             }
             break;
         case 'fetchMessages':
-            console.log("get message Object", data.data)
             try {
                 buildChatMessages(data.data)
             } catch (e) {
@@ -349,7 +350,7 @@ function getValues() {
     let usr = document.getElementById("usr").value;
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd2");
-    let mode = pwdElement?"register":"login";
+    let mode = pwdElement ? "register" : "login";
 
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
@@ -357,7 +358,7 @@ function getValues() {
         return null;
     }
     
-    if(!usr.match(/^[a-zA-Z0-9._\-+]*$/g)){
+    if (!usr.match(/^[a-zA-Z0-9._\-+]*$/g)) {
         pwdError("Username must only contain upper- and lowercase letters, digits and the special characters \+\-\_\.");
         return null;
     }
@@ -426,14 +427,14 @@ function newChat(type) {
     chat_create_new_chat(socket, name, type, users);
 }
 
-function leaveChat(){
+function leaveChat() {
     console.error("NOT IMPLEMENTED")
     // let chatID = localStorage.getItem("openedChat");
     // chat_leave(socket, chatID);
 
 }
 
-function chat_leave(socket, chatId){
+function chat_leave(socket, chatId) {
     socket.sendEvent('leaveChat', {
         chatID: chatId
     });

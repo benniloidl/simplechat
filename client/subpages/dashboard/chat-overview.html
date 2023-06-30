@@ -1,21 +1,34 @@
-<div class="chat-contact">
+<!--<div class="chat-contact">
 	<i class="fas fa-pen"></i>
 	<p>Overview</p>
 	<i class="fas fa-bars menu-open"
 	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 </div>
+-->
 <div class="overview-container">
 	<ul>
-		<li>Adam Smith</li>
-		<li>Adam Smith</li>
-		<li>Theresia König</li>
+		<li>
+			<i class="fas fa-user"></i>
+			Adam Smith
+			<i class="fas fa-minus"></i>
+		</li>
+		<li>
+			<i class="fas fa-user"></i>
+			Theresa König
+			<i class="fas fa-minus"></i>
+		</li>
+		<li>
+			<i class="fas fa-user"></i>
+			Adam Smith
+			<i class="fas fa-minus"></i>
+		</li>
 	</ul>
+	
+	<hr>
+	
+	<form>
+		<label for="add-member">Add friend</label>
+		<input id="add-member" placeholder="Enter username" required type="text">
+		<input type="submit" value="Add">
+	</form>
 </div>
-<!--<form>-->
-<!--	<h2>What's the name of your friend?</h2>-->
-<!--	<span>Enter the exact username of your friend.</span>-->
-<!--	<input maxlength="16" placeholder="Enter username" required type="text">-->
-<!--&lt;!&ndash;	<input type="submit" value="Start chat">&ndash;&gt;-->
-<!--	<button>add</button>-->
-<!--	<button>remove</button>-->
-<!--</form>-->
