@@ -161,7 +161,7 @@ function buildChatMessages(chatData) {
         chatBox.appendChild(chatElement);
     });
     document.getElementById("chat-box").replaceWith(chatBox);
-    document.getElementById("chat-overview").replaceWith(overviewDiv);
+    // document.getElementById("chat-overview").replaceWith(overviewDiv);
     document.getElementById("chat-name").innerHTML = name;
 
     document.getElementById("submit-message").onclick = () => {
