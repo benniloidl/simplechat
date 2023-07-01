@@ -19,13 +19,6 @@ async function connectToDB() {
     }
 
     console.log("connected successfully\n");
-    // console.log(await addMessage("649e8f8dbbc6ef0e740648d6", {
-    //     message: "message",
-    //     // Data injected by server!
-    //     timeStamp: "undefined",
-    //     author: "undefined",
-    //     readConfirmation: false
-    // }));
 }
 
 async function validateUser(username, password) {
@@ -42,11 +35,7 @@ async function validateUser(username, password) {
 }
 
 async function createUser(username, password) {
-    if (!username.match(/^[a-zA-Z0-9._\-+]*$/g)) {
-        return false;
-    }
-    const result = await user.findOne({ "username": username }, { projection: { _id: 1 } });
-    if (result) {
+    if (!username.match(/^[a-zA-Z0-9._\-+]*$/g) || await userExists(username)) {
         return false;
     } else {
         await user.insertOne({ "username": username, "password": password, chats: [] });
@@ -65,21 +54,21 @@ async function userExists(username) {
 
 
 async function addChat(username, chatID) {
-    const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
-    if (result) {
+    if (await hasChat(username, chatID)) {
         return false;
+    } else {
+        await user.updateOne({ "username": username }, { $push: { chats: { "chatID": chatID, "unreadMessages": 0 } } });
+        return true;
     }
-    await user.updateOne({ "username": username }, { $push: { chats: { "chatID": chatID, "unreadMessages": 0 } } });
-    return true;
 }
 
 async function removeChat(username, chatID) {
-    const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
-    if (!result) {
+    if (await hasChat(username, chatID)) {
+        await user.updateOne({ "username": username }, { $pull: { chats: { "chatID": chatID } } });
+        return true;
+    } else {
         return false;
     }
-    await user.updateOne({ "username": username }, { $pull: { chats: { "chatID": chatID } } });
-    return true;
 }
 
 async function getAllChatIDs(username) {
@@ -87,7 +76,7 @@ async function getAllChatIDs(username) {
 }
 
 async function getChatDetails(chatID) {
-    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, name: 1, type: 1 } });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, name: 1, type: 1, members: 1 } });
     if (result) {
         return result;
     } else {
@@ -120,27 +109,21 @@ async function fetchChats(username) {
 }
 
 async function getOtherUsername(username, chatID) {
-    const result = await user.findOne({ "username": { $ne: username }, "chats.chatID": chatID },
-        { projection: { _id: 1, username: 1 } });
-    if (result) {
-        return result.username;
+    const users = await fetchGroupUsers(chatID);
+    if (users.length === 2) {
+        return users[0].username === username ? users[1].username : users[0].username;
     } else {
         return false;
     }
 }
 
-async function createChat(name, type) {
-    const result = await chatHistory.insertOne({ "name": name, "type": type, "messages": [] });
+async function createChat(name, type, members) {
+    const result = await chatHistory.insertOne({ "name": name, "type": type, "members": members, "messages": [] });
     return result.insertedId.toString();
 }
 
 async function fetchMessages(chatID, start, amount) {
-    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
-        projection: {
-            _id: 0,
-            messages: 1
-        }
-    });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, messages: 1 } });
     if (result) {
         let ret;
         try {
@@ -160,29 +143,13 @@ async function fetchMessages(chatID, start, amount) {
 }
 
 async function addMessage(chatID, message) {
-    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 1 } });
-    if (result) {
+    if (await chatExists(chatID)) {
         await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $push: { messages: message } });
         return true;
     } else {
         return false;
     }
 }
-
-/*
-async function calculateUnreadMessages(username, chatID) {
-    const result = await fetchMessages(chatID, 0, 100);
-    let unreadMessages = 0;
-    if (result) {
-        for (const message of result) {
-            if (message.readConfirmation || message.author == username) {
-                break;
-            }
-            unreadMessages++;
-        }
-    }
-    return unreadMessages;
-}*/
 
 async function incrementUnreadMessages(username, chatID) {
     await user.updateOne({ "username": username, "chats.chatID": chatID }, { $inc: { "chats.$.unreadMessages": 1 } });
@@ -212,43 +179,94 @@ async function hasChat(username, chatID) {
     }
 }
 
-async function chatExists(username, otherUsername) {
-    if (username === otherUsername) {
-        const chatIDs = await getAllChatIDs(username);
-        if (chatIDs) {
-            for (const id of chatIDs.chats) {
-                const detail = await getChatDetails(id.chatID);
-                if (detail.name === username) {
+async function userChatExists(users) {
+    const chatIDs = await getAllChatIDs(users[0]);
+    if (chatIDs) {
+        for (const id of chatIDs.chats) {
+            const detail = await getChatDetails(id.chatID);
+            if (detail.type === "user") {
+                if (users[0] === users[1]) {
+                    if (detail.members[0] === detail.members[1] && detail.members[0] === users[0]) {
+                        return true;
+                    }
+                } else if (detail.members.includes(users[0]) && detail.members.includes(users[1])) {
                     return true;
                 }
             }
-            return false;
         }
+        return false;
+    }
+}
+
+async function chatExists(chatID) {
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 1 } });
+    if (result) {
+        return true;
     } else {
-        const chatIDs1 = await getAllChatIDs(username);
-        const chatIDs2 = await getAllChatIDs(otherUsername);
-        if (chatIDs1 && chatIDs2) {
-            for (const id1 of chatIDs1.chats) {
-                for (const id2 of chatIDs2.chats) {
-                    if (id1.chatID == id2.chatID) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        } else {
-            return false;
-        }
+        return false;
     }
 }
 
 async function fetchGroupUsers(chatID) {
-    const result = await user.find({"chats.chatID": chatID }, { projection: { _id: 0, username: 1 } });
+    const result = await user.find({ "chats.chatID": chatID }, { projection: { _id: 0, username: 1 } });
     let users = [];
     await result.forEach(user => {
         users.push(user);
     });
     return users;
+}
+
+async function removeUser(chatID, username) {
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, members: 1 } });
+    if (result && result.members) {
+        const index = result.members.indexOf(username);
+        result.members.splice(index, 1);
+        if (result.members.includes(username)) {
+            const index2 = result.members.indexOf(username);
+            result.members.splice(index2, 1);
+        }
+        if (result.members.length === 0) {
+            if (await deleteChat(chatID)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function deleteChat(chatID) {
+    const result = await chatHistory.deleteOne({ "_id": new mongo.ObjectId(chatID) });
+    if (result && result.deletedCount === 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function addUser(chatID, username) {
+    if (await userExists(username) && await chatExists(chatID)) {
+        await addChat(username, chatID);
+        await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $push: { "members": username } });
+    }
+}
+
+async function deleteAccount(username) {
+    const chatIDs = await getAllChatIDs(username);
+    if (chatIDs.length > 0) {
+        for (const id of chatIDs) {
+            await removeUser(id.chatID);
+        }
+    }
+    const result = await user.deleteOne({ "username": username });
+    if (result && result.deletedCount === 1) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 module.exports = {
@@ -267,5 +285,9 @@ module.exports = {
     incrementUnreadMessages,
     resetUnreadMessages,
     chatExists,
-    fetchGroupUsers
+    fetchGroupUsers,
+    removeUser,
+    addUser,
+    deleteAccount,
+    userChatExists
 };

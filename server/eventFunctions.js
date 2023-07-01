@@ -10,6 +10,9 @@ async function fetchchats(socket, username) {
 }
 
 async function login(socket, data, sockets, type) {
+    if (!data.username || !data.password) {
+        return;
+    }
     data.username = data.username.toLowerCase();
     if (
         !(
@@ -45,21 +48,26 @@ async function login(socket, data, sockets, type) {
 }
 
 async function createChat(socket, data, username) {
+    for (let i = 0; i < data.users.length; i++) {
+        data.users[i] = data.users[i].toLowerCase();
+
+    }
+    data.users.push(username);
     if (data.type == "user") {
         if (!await dbFunctions.userExists(data.users[0])) {
-            socket.send(JSON.stringify({ event: "error", message: "User does not exist." }));
+            sendError(socket, "User does not exist.");
             return false;
         }
-        if (await dbFunctions.chatExists(username, data.users[0])) {
-            socket.send(JSON.stringify({ event: "error", message: "Chat already exists." }));
+        if (data.users.length != 2) {
+            sendError(socket, "Exactly one other user is needed to create a user chat");
             return false;
         }
-        if (data.users.length != 1) {
-            socket.send(JSON.stringify({ event: "error", message: "Exactly one other user is needed to create a user chat" }));
+        if (await dbFunctions.userChatExists(data.users)) {
+            sendError(socket, "Chat already exists.");
             return false;
         }
     }
-    const chatID = await dbFunctions.createChat(data.type === "user" ? username === data.users[0] ? username : "userChat" : data.name, data.type);
+    const chatID = await dbFunctions.createChat(data.type === "user" ? "userChat" : data.name, data.type, data.users);
     await dbFunctions.addChat(username, chatID);
     if (data.users.length > 0) {
         for (const user of data.users) {
@@ -80,7 +88,7 @@ async function sendMessage(socket, data, username, sockets) {
             }
         }
     } else {
-        socket.send(JSON.stringify({ event: "error", message: "Unable to send message!" }));
+        sendError(socket, "Unable to send message!");
     }
 }
 
@@ -98,21 +106,48 @@ async function fetchMessages(socket, data, username) {
     if (messages) {
         socket.send(JSON.stringify({ event: "fetchMessages", data: { "username": username, "chatID": data.chatID, "messages": messages } }));
     } else {
-        socket.send(JSON.stringify({ event: "error", message: "Cannot fetch messages" }));
+        sendError(socket, "Cannot fetch messages");
     }
 }
 
 async function fetchGroupUsers(socket, data) {
     const users = await dbFunctions.fetchGroupUsers(data.chatID);
     if (users.length > 0) {
-        socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users} }));
+        socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users } }));
     } else {
-        socket.send(JSON.stringify({ event: "error", message: "Cannot fetch group users." }));
+        sendError(socket, "Cannot fetch group users.");
     }
 }
 
-async function sendError(socket, message){
-    socket.send(JSON.stringify({event: "error", message:message}))
+async function removeUser(socket, data) {
+    const result = await dbFunctions.removeUser(data.chatID, data.username);
+    if (result) {
+        socket.send(JSON.stringify({ event: "removeUser", data: { "status": true } }));
+    } else {
+        socket.send(JSON.stringify({ event: "removeUser", data: { "status": false } }));
+    }
+}
+
+async function addUser(socket, data) {
+    const result = await dbFunctions.addUser(data.chatID, data.username);
+    if (result) {
+        socket.send(JSON.stringify({ event: "addUser", data: { "status": true } }));
+    } else {
+        socket.send(JSON.stringify({ event: "addUser", data: { "status": false } }));
+    }
+}
+
+async function deleteAccount(socket, username) {
+    const result = await dbFunctions.deleteAccount(username);
+    if (result) {
+        //socket.send(JSON.stringify({ event: "deleteAccount", data: { "status": true } }));
+    } else {
+        sendError(socket, "Couldn't delete account.");
+    }
+}
+
+function sendError(socket, message) {
+    socket.send(JSON.stringify({ event: "error", message: message }))
 }
 
 module.exports = {
@@ -124,5 +159,8 @@ module.exports = {
     readChat,
     fetchMessages,
     fetchGroupUsers,
-    sendError
+    sendError,
+    removeUser,
+    addUser,
+    deleteAccount
 }

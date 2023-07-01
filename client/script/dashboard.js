@@ -47,6 +47,10 @@ function generateUsers(username){
  * @param chats
  */
 function buildChatOverview(chats) {
+    if(!chats){
+        return;
+    }
+    
     chats.forEach(data => {
         const navigator = document.createElement("div");
         let unreadMessages = data.unreadMessages ? data.unreadMessages : 0;

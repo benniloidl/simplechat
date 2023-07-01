@@ -70,82 +70,66 @@ wsSrv.on('connection', (socket, req) => {
         if (cookie) {
             cookie.split(/\s*;\s*/).forEach(function (pair) {
                 pair = pair.split(/\s*=\s*/);
-                JSONCookie[pair[0]] = pair.slice(1).join('=');
+                JSONCookie[pair[0]] = pair.splice(1).join('=');
             });
         }
         let username = JSONCookie.username;
+        const password = JSONCookie.password;
         if (username) {
             username = username.toLowerCase();
-        }
-        const password = JSONCookie.password;
 
-        let socketExists = false;
-        for (let i = 0; i < sockets.length; i++) {
-            if (sockets[i].username == username) {
-                sockets[i] = { socket: socket, "username": username };
-                socketExists = true;
+            let socketExists = false;
+            for (let i = 0; i < sockets.length; i++) {
+                if (sockets[i].username == username) {
+                    sockets[i] = { socket: socket, "username": username.toLowerCase() };
+                    socketExists = true;
+                }
+            }
+            if (!socketExists) {
+                sockets.push({ socket: socket, "username": username.toLowerCase() });
             }
         }
-        if (!socketExists) {
-            sockets.push({ socket: socket, "username": username });
-        }
 
+        if (event.event === "login") {
+            eventFunctions.login(socket, event.data, sockets, "login");
+            return;
+        }
+        if (event.event === "register") {
+            eventFunctions.login(socket, event.data, sockets, "register");
+            return;
+        }
+        if (!eventFunctions.validate(username, password)) {
+            return "Username/Password incorrect";
+        }
         switch (event.event) {
-            case 'login':
-                eventFunctions.login(socket, event.data, sockets, "login");
-                break;
-            case 'register':
-                eventFunctions.login(socket, event.data, sockets, "register");
-                break;
             case 'fetchChats':
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.fetchchats(socket, username);
-                }
+                eventFunctions.fetchchats(socket, username);
                 break;
             case 'sendMessage':
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.sendMessage(socket, event.data, username, sockets);
-                }
+                eventFunctions.sendMessage(socket, event.data, username, sockets);
                 break;
             case 'fetchMessages':
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.fetchMessages(socket, event.data, username);
-                }
+                eventFunctions.fetchMessages(socket, event.data, username);
                 break;
             case 'createChat':
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.createChat(socket, event.data, username);
-                }
+                eventFunctions.createChat(socket, event.data, username);
                 break;
             case 'readChat':
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.readChat(socket, event.data, username, sockets);
-                }
+                eventFunctions.readChat(socket, event.data, username, sockets);
                 break;
             case 'fetchGroupUsers':
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.fetchGroupUsers(socket, event.data);
-                }
+                eventFunctions.fetchGroupUsers(socket, event.data);
                 break;
             case 'removeUser':
-                //TODO BOILERPLATE
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
-                }
+                eventFunctions.removeUser(socket, event.data);
                 break;
             case 'addUser':
-                //TODO BOILERPLATE
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
-                }
+                eventFunctions.addUser(socket, event.data);
                 break;
             case 'deleteAccount':
-                //TODO BOILERPLATE
-                if (eventFunctions.validate(username, password)) {
-                    eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
-                }
+                eventFunctions.deleteAccount(socket, username);
                 break;
-            default:{
+            default: {
                 eventFunctions.sendError(socket, `unknown event: ${event.event}`);
                 return -1;
             }
