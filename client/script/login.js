@@ -15,7 +15,7 @@ function getValues() {
         return null;
     }
 
-    if (!usr.match(/^[a-zA-Z0-9._\-+]*$/g)) {
+    if (!checkUsernameSemantic(usr)) {
         pwdError("Username must only contain upper- and lowercase letters, digits and the special characters \+\-\_\.");
         return null;
     }

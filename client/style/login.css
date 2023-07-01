@@ -5,7 +5,7 @@
     --login-color: var(--color-primary);
     --login-accent-color: var(--color-primary);
 
-    --color-error: hsl(0deg, 100%, 50%);
+
 }
 
 :root[data-theme='dark'] {
@@ -113,8 +113,4 @@
 
 #submit:hover, #submit:focus {
     background-color: var(--login-accent-color);
-}
-
-.error {
-    color: var(--color-error);
 }

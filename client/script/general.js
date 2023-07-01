@@ -96,3 +96,7 @@ function deleteUserAccount(){
     localStorage.clear();
     logout();
 }
+
+function checkUsernameSemantic(username){
+    return username.match(/^[a-zA-Z0-9._\-+]*$/g);
+}

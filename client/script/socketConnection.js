@@ -83,7 +83,8 @@ function loginUser(data) {
  * @param message
  */
 function errorEvent(message) {
-    console.warn("EventError: ", message);
+    // console.warn("EventError: ", message);
+    dashboardError(message);
     // TODO POPUP
 }
 
@@ -131,15 +132,23 @@ function loginRequest(type) {
  * @param type
  */
 function newChat(type) {
-    let inform = document.querySelector("input[type=text]").value.trim();
-    if (inform === "") return;
+
+    let chatName = document.querySelector("input[type=text]").value.trim();
+    if (chatName === "") return;
     let users = [];
     
-    let name = inform.trim();
+    let name = chatName.trim();
     if (type === "user") {
-        users = [inform];
+        if(!checkUsernameSemantic(chatName)) {
+            dashboardError("Username must only contain upper- and lowercase " +
+                "letters, digits and the special characters \\+\\-\\_\\.");
+            return;
+        }
+        users = [chatName];
     }
     // else {/*Empty Group*/}
+
+    dashboardError("");
     chat_create_new_chat(socket, name, type, users);
 }
 

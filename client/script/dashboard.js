@@ -313,13 +313,13 @@ function addUserToGroup(){
 
     let username = field.value.trim();
     console.log(username)
-    if(!username.match(/^[a-zA-Z0-9._\-+]*$/g)) {
-        document.getElementById("usrError").innerHTML = "\"Username must only contain upper- and lowercase " +
-            "letters, digits and the special characters \\+\\-\\_\\.\"";
+    if(!checkUsernameSemantic(username)) {
+       dashboardError("Username must only contain upper- and lowercase " +
+            "letters, digits and the special characters \\+\\-\\_\\.");
         console.error("username doesn't match", username)
         return false;
     } else{
-        document.getElementById("usrError").innerHTML = "";
+        dashboardError("");
         field.value = "";
     }
 
@@ -345,4 +345,25 @@ function injectFileWithForm(path, formEventFunction, parameter) {
             formEventFunction(parameter)
         });
     });
+}
+
+/**
+ * Show or hide error messages in element id: "dashboardError"
+ * @param message
+ * @param errorId
+ */
+function dashboardError(message, errorId){
+    errorId = (errorId?errorId:"dashboardError");
+    // reset error message if message is ""
+    const messagebox = document.getElementById(errorId);
+    if (!messagebox){
+        console.error("Error thrown by handling another Error: " +
+            "Messagebox to inject message is not defined, " +
+            "Errormessage to print: ", message);
+        return;
+    }
+    document.getElementById("dashboardError").innerHTML = message;
+    if(message){
+        console.warn(message);
+    }
 }

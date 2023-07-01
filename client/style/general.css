@@ -27,6 +27,7 @@
     --appearance-switch: '\263E';
 
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    --color-error: hsl(0deg, 100%, 50%);
 }
 
 :root[data-theme='dark'] {
@@ -210,4 +211,9 @@ footer .appearanceMode {
     background-color: var(--background-color-accent);
     border: solid;
     padding: var(--spacing);
+}
+
+.error {
+    color: var(--color-error);
+    /*padding-left: var(--spacing);*/
 }
