@@ -42,6 +42,7 @@ socket.onmessage = function (event) {
             }
             break;
         case 'fetchMessages':
+            console.log("fetchMessage", data.data)
             try {
                 buildChatMessages(data.data)
             } catch (e) {
@@ -90,6 +91,9 @@ function errorEvent(message) {
  * @param chatID
  */
 function sendMessage(chatID) {
+    const chatID2 = sessionStorage.getItem("openedChat");
+    console.log("chatIDComp", chatID, chatID2)
+
     let textField = document.querySelector("#chat-actions div textarea")
     let message = textField.value.trim();
     textField.value = "";
@@ -143,7 +147,7 @@ function newChat(type) {
  */
 function leaveChat() {
     console.error("NOT IMPLEMENTED")
-    // let chatID = localStorage.getItem("openedChat");
+    // let chatID = sessionStorage.getItem("openedChat");
     // chat_leave(socket, chatID);
     
 }

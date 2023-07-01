@@ -73,20 +73,35 @@ function buildChatOverview(chats) {
 }
 
 function loadChat(data, navigator){
-    let box = document.getElementById("chat-box");
-    if (box === null) {
-        if (data.type === "user") injectPage("../subpages/dashboard/chat.html");
-        else injectPage("../subpages/dashboard/group.html");
+    /* Workaround: If template has to load, it creates a delay till xml is loaded
+        TODO make injecting async, remove timeout
+     */
+
+    function next(){
+        sessionStorage.setItem("openedChat", data.chatID.toString())
+        chat_selected(socket, data.chatID);
+        // if()
+        if (elementHasNotification(navigator)) {
+            chat_read_event(socket, data.chatID);
+            navigator.classList.remove("notification");
+            console.log("remove notification")
+        }
     }
 
-    localStorage.setItem("openedChat", data.chatID.toString())
-    chat_selected(socket, data.chatID);
-    // if()
-    if (elementHasNotification(navigator)) {
-        chat_read_event(socket, data.chatID);
-        navigator.classList.remove("notification");
-        console.log("remove notification")
+    let box = document.getElementById("chat-box");
+    const oldNode = getChatNodeById(sessionStorage.getItem("openedChat"));
+    const oldNodeType = oldNode.getAttribute("chatType");
+    console.log("NNN", oldNodeType, data.type)
+    if (box === null || oldNodeType !== data.type || true) {
+        if (data.type === "user") {
+            injectPage("../subpages/dashboard/chat.html");
+        }
+        else injectPage("../subpages/dashboard/group.html");
+        setTimeout(() => next(), 100)
+    } else{
+        next();
     }
+
 }
 
 /**
@@ -103,11 +118,12 @@ function buildChatMessages(chatData) {
         console.log("no Node", chatNode)
         return;
     }
+    console.log(chatNode)
     let type = chatNode.getAttribute("chatType");
     let name = chatNode.lastChild.textContent;
     const chatBox = document.createElement("div");
     chatBox.id = "chat-box";
-    localStorage.setItem("lastAuthor", null);
+    sessionStorage.setItem("lastAuthor", null);
 
     // build chat messages
     chatData.messages.forEach(data => {
@@ -142,7 +158,7 @@ function buildChatMessages(chatData) {
  * @returns {HTMLDivElement}
  */
 function buildMessageObject(messageObject, username, type) {
-    let lastAuthor = localStorage.getItem("lastAuthor");
+    let lastAuthor = sessionStorage.getItem("lastAuthor");
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
     chatElement.classList.add(messageObject.author === username ? "chat-element-right" : "chat-element-left");
@@ -155,7 +171,7 @@ function buildMessageObject(messageObject, username, type) {
             senderElement.innerHTML = messageObject.author;
             chatElement.appendChild(senderElement);
         }
-        localStorage.setItem("lastAuthor", messageObject.author);
+        sessionStorage.setItem("lastAuthor", messageObject.author);
     }
 
     // message
@@ -218,7 +234,7 @@ function getChatNodeById(chatId) {
  * @param notification
  */
 function notificationHandler(notification) {
-    let openedChatId = localStorage.getItem("openedChat");
+    let openedChatId = sessionStorage.getItem("openedChat");
     let chatNode = getChatNodeById(notification.chatID);
     if (openedChatId === notification.chatID) {
         // chat is shown
@@ -251,4 +267,24 @@ function elementHasNotification(element) {
         if (value === "notification") return true;
     }
     return false;
+}
+
+async function injectPageAsync(url) {
+    const main = document.querySelector('main');
+    if (main !== undefined) main.setAttribute('data-menu-open', 'false');
+
+    const chatDiv = document.getElementById("chat");
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("GET", "dashboard/" + url, true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            chatDiv.innerHTML = xhr.responseText;
+
+            document.querySelectorAll(".username").forEach(function (element) {
+                element.innerHTML = getCookie("username");
+            });
+        }
+    };
+    await xhr.send();
 }
