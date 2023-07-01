@@ -86,7 +86,7 @@ async function validateUser(username, password) {
 }
 
 async function createUser(username, password) {
-    if (!username.match(/^[a-zA-Z0-9._\-+]*$/g) || await userExists(username)) {
+    if (await userExists(username)) {
         return false;
     } else {
         let pwObject = await createPasswordHash(password);
