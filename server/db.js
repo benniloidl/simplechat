@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const { MongoClient } = mongo;
 const uri = "mongodb://127.0.0.1:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
-let db, user, chatHistory;
+let db, user, chatHistory, sessions;
 
 
 //DB functions
@@ -14,6 +14,7 @@ async function connectToDB() {
         db = dbClient.db();
         user = db.collection("user");
         chatHistory = db.collection("chatHistory");
+        sessions = db.collection("sessions");
     } catch {
         console.error("connecting to db failed");
         process.exit(42);
@@ -30,7 +31,7 @@ async function connectToDB() {
 }
 
 
-async function setPassword(password){
+async function createPasswordHash(password){
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto.pbkdf2Sync(password, salt,
         1000, 64, 'sha512').toString('hex');
@@ -43,6 +44,35 @@ function validatePassword(passwordToCheck, passwordObject){
     return passwordHash === passwordObject.password;
 }
 
+function createSessionToken(username){
+    let key = Date.now().toString()+username;
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.pbkdf2Sync(key, salt,
+        10, 30, 'sha512').toString('hex');
+    return hash;
+}
+
+async function storeSessionCookie(username){
+    const token = createSessionToken(username);
+
+
+    try{
+        // remove existing tokens
+        sessions.deleteMany({"username":username});
+    }catch (e) {
+        console.warn(e)
+    }
+    let res =  await sessions.insertOne({"username":username, "token":token});
+    const result = await sessions.findOne({ "username": username}, { projection: { _id: 1 } });
+    return token;
+}
+async function checkSessionCookie(username, sessionToken){
+    if(username === undefined || sessionToken === undefined) return false;
+    // const result = await sessions.findOne({ "username": username, "token":sessionToken}, { projection: { _id: 1 } });
+    const result = await sessions.findOne({ "username": username.toLowerCase()}, { projection: { _id: 1 } });
+    return !!result;
+}
+
 async function validateUser(username, password) {
     if (!username) {
         return false;
@@ -51,7 +81,8 @@ async function validateUser(username, password) {
     const pwdObject = await user.findOne({"username": username}, {projection:{password:1, salt:1, _id:0}});
     if (!pwdObject) return;
     const result = validatePassword(password, pwdObject);
-    return result;
+    if(result) return storeSessionCookie(username);
+    return false;
 }
 
 async function createUser(username, password) {
@@ -62,10 +93,10 @@ async function createUser(username, password) {
     if (result) {
         return false;
     } else {
-        let pwObject = await setPassword(password);
+        let pwObject = await createPasswordHash(password);
         let res = await user.insertOne({ "username": username, "password": pwObject.hash, "salt": pwObject.salt, chats: [] });
         if (!res.acknowledged) console.error("Creation of user went wrong!", pwObject, res, username);
-        return true;
+        return storeSessionCookie(username);
     }
 }
 
@@ -282,5 +313,6 @@ module.exports = {
     incrementUnreadMessages,
     resetUnreadMessages,
     chatExists,
-    fetchGroupUsers
+    fetchGroupUsers,
+    checkSessionCookie
 };

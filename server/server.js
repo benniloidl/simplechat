@@ -11,7 +11,8 @@ let sockets = [];
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
-    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+    // dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+    dbFunctions.checkSessionCookie(req.cookies.username, req.cookies.sessionToken).then((result) => {
         if (result) {
             if (req.path == '/login') {
                 res.redirect("/dashboard");
@@ -77,7 +78,8 @@ wsSrv.on('connection', (socket, req) => {
         if (username) {
             username = username.toLowerCase();
         }
-        const password = JSONCookie.password;
+        // const sessionToken = JSONCookie.password;
+        const sessionToken = JSONCookie.sessionToken;
 
         let socketExists = false;
         for (let i = 0; i < sockets.length; i++) {
@@ -98,50 +100,50 @@ wsSrv.on('connection', (socket, req) => {
                 eventFunctions.login(socket, event.data, sockets, "register");
                 break;
             case 'fetchChats':
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.fetchchats(socket, username);
                 }
                 break;
             case 'sendMessage':
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.sendMessage(socket, event.data, username, sockets);
                 }
                 break;
             case 'fetchMessages':
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.fetchMessages(socket, event.data, username);
                 }
                 break;
             case 'createChat':
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.createChat(socket, event.data, username);
                 }
                 break;
             case 'readChat':
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.readChat(socket, event.data, username, sockets);
                 }
                 break;
             case 'fetchGroupUsers':
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.fetchGroupUsers(socket, event.data);
                 }
                 break;
             case 'removeUser':
                 //TODO BOILERPLATE
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
                 }
                 break;
             case 'addUser':
                 //TODO BOILERPLATE
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
                 }
                 break;
             case 'deleteAccount':
                 //TODO BOILERPLATE
-                if (eventFunctions.validate(username, password)) {
+                if (eventFunctions.validate(username, sessionToken)) {
                     eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
                 }
                 break;
