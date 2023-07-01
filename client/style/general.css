@@ -122,8 +122,10 @@ footer .appearanceMode {
 .chat-overview-wrapper {
     z-index: 1;
     overflow: scroll;
-    height: 200px;
-    max-height: 200px;
+    /*height: 200px;*/
+    /*max-height: 200px;*/
+    height: 60%;
+    max-height: 60%;
     margin-top: calc(var(--spacing) * -1 - var(--border-radius));
     transition: all 250ms ease;
     border-radius: 0 0 var(--border-radius) var(--border-radius);
@@ -187,4 +189,18 @@ footer .appearanceMode {
 
 .overview-container form input[type="submit"] {
     width: fit-content !important;
+}
+
+/*TODO style leave chat*/
+.overview-container button{
+    padding-block: calc(var(--spacing) * 0.5) !important;
+    color: red;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    font-weight: bolder;
+    font-family: var(--font-family);
+    padding-top: var(--spacing);
+    margin: var(--spacing) auto 0;
+    display: block;
 }
