@@ -20,7 +20,10 @@ async function login(socket, data, sockets, type) {
             data.password.match(/[A-Z]/g) &&
             data.password.match(/[0-9]/g) &&
             data.password.match(/\W/g) &&
-            data.password.length >= 8
+            data.password.length >= 8 &&
+            data.password.length <= 32 &&
+            data.username.match(/^[a-zA-Z0-9._\-+]*$/g) &&
+            data.username.length <= 16
         )
     ) {
         socket.send(JSON.stringify({ event: 'login', status: false }));
