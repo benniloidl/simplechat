@@ -45,6 +45,7 @@ socket.onmessage = function (event) {
             buildChatMessages(data.data)
             break;
         case 'messageNotification': {
+            //TODO fix unreadMessages counter
             notificationHandler(data.notification);
             break;
         }
