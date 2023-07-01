@@ -67,6 +67,7 @@ function logout() {
     document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     window.location.href = "/login";
+    sessionStorage.clear();
 }
 
 function toggleChatOverview(event) {
@@ -82,4 +83,12 @@ function toggleChatOverview(event) {
         event.target.removeAttribute("data-selected")
     else
         event.target.setAttribute("data-selected", "")
+}
+
+function deleteUserAccount(){
+    let username = getCookie("username");
+    chat_delete_account(socket, username);
+    sessionStorage.clear();
+    localStorage.clear();
+    logout();
 }

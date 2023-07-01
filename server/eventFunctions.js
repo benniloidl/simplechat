@@ -111,6 +111,10 @@ async function fetchGroupUsers(socket, data) {
     }
 }
 
+async function sendError(socket, message){
+    socket.send(JSON.stringify({event: "error", message:message}))
+}
+
 module.exports = {
     validate,
     login,
@@ -119,5 +123,6 @@ module.exports = {
     sendMessage,
     readChat,
     fetchMessages,
-    fetchGroupUsers
+    fetchGroupUsers,
+    sendError
 }

@@ -60,7 +60,7 @@ socket.onmessage = function (event) {
         }
         
         case 'error': {
-            errorEvent(data);
+            errorEvent(data.message);
             break;
         }
     }
@@ -82,7 +82,7 @@ function loginUser(data) {
  * @param message
  */
 function errorEvent(message) {
-    console.warn("Event", message);
+    console.warn("EventError: ", message);
     // TODO POPUP
 }
 
@@ -145,16 +145,12 @@ function newChat(type) {
 /**
  * User-event: leave chat
  */
-function leaveChat() {
-    console.error("NOT IMPLEMENTED")
-    // let chatID = sessionStorage.getItem("openedChat");
-    // chat_leave(socket, chatID);
-    
-}
+function removeUser(username) {
+    let chatID = sessionStorage.getItem("openedChat");
 
-function chat_leave(socket, chatId) {
-    socket.sendEvent('leaveChat', {
-        chatID: chatId
+    socket.sendEvent('removeUser', {
+        chatID: chatID,
+        username: username
     });
     chat_fetch_overview(socket);
 }
@@ -206,5 +202,12 @@ function chat_get_group_users(socket, groupId){
     console.log("groupId", groupId);
     socket.sendEvent('fetchGroupUsers', {
         chatID: groupId
+    });
+}
+
+function chat_delete_account(socket, username){
+    // username should be redundant, you should only be able to delete your own account
+    socket.sendEvent("deleteAccount", {
+        username: username
     });
 }

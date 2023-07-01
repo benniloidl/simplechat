@@ -32,6 +32,8 @@ function generateUsers(username){
     element.innerHTML = username;
     element.appendChild(minus);
 
+    minus.addEventListener("click", () => {removeUser(username)})
+
     return element;
 }
 

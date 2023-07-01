@@ -127,7 +127,10 @@ wsSrv.on('connection', (socket, req) => {
                     eventFunctions.fetchGroupUsers(socket, event.data);
                 }
                 break;
-            default: return -1;
+            default:{
+                eventFunctions.sendError(socket, `unknown event: ${event.event}`);
+                return -1;
+            }
         }
     });
 });
