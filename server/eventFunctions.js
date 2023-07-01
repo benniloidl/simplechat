@@ -75,6 +75,8 @@ async function createChat(socket, data, username) {
             sendError(socket, "Chat already exists.");
             return false;
         }
+    }else if(data.name && (data.name.length<=0 || data.name.length > 16)){
+        sendError(socket, "Length of group name must be between 0 and 16");
     }
     const chatID = await dbFunctions.createChat(data.type === "user" ? "userChat" : data.name, data.type, data.users);
     await dbFunctions.addChat(username, chatID);
