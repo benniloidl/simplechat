@@ -87,17 +87,28 @@ function loadChat(data, navigator){
             console.log("remove notification")
         }
     }
+    function timer(func){
+        // busy waiting
+        setTimeout(() => {
+            if(document.getElementById("chat-box")){
+                func();
+            }else{
+                console.log("wait again")
+                timer(func);
+            }
+        }, 10);
+    }
 
     let box = document.getElementById("chat-box");
     const oldNode = getChatNodeById(sessionStorage.getItem("openedChat"));
     const oldNodeType = oldNode.getAttribute("chatType");
-    console.log("NNN", oldNodeType, data.type)
+    // console.log("NNN", oldNodeType, data.type)
     if (box === null || oldNodeType !== data.type || true) {
         if (data.type === "user") {
             injectPage("../subpages/dashboard/chat.html");
         }
         else injectPage("../subpages/dashboard/group.html");
-        setTimeout(() => next(), 100)
+        timer(next);
     } else{
         next();
     }
@@ -118,7 +129,6 @@ function buildChatMessages(chatData) {
         console.log("no Node", chatNode)
         return;
     }
-    console.log(chatNode)
     let type = chatNode.getAttribute("chatType");
     let name = chatNode.lastChild.textContent;
     const chatBox = document.createElement("div");
@@ -269,7 +279,7 @@ function elementHasNotification(element) {
     return false;
 }
 
-async function injectPageAsync(url) {
+function injectPageSync(url) {
     const main = document.querySelector('main');
     if (main !== undefined) main.setAttribute('data-menu-open', 'false');
 
@@ -277,14 +287,12 @@ async function injectPageAsync(url) {
     const xhr = new XMLHttpRequest();
 
     xhr.open("GET", "dashboard/" + url, true);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            chatDiv.innerHTML = xhr.responseText;
+    xhr.send();
+    if (xhr.status === 200) {
+        chatDiv.innerHTML = xhr.responseText;
 
-            document.querySelectorAll(".username").forEach(function (element) {
-                element.innerHTML = getCookie("username");
-            });
-        }
-    };
-    await xhr.send();
+        document.querySelectorAll(".username").forEach(function (element) {
+            element.innerHTML = getCookie("username");
+        });
+    }
 }
