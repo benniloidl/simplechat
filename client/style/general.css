@@ -217,3 +217,31 @@ footer .appearanceMode {
     color: var(--color-error);
     /*padding-left: var(--spacing);*/
 }
+
+.missingConnection{
+    z-index: 1000;
+    position: fixed;
+    background-color: hsla(0deg, 100%, 50%, 0.2);
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    cursor: not-allowed;
+    display: flex;
+    justify-self: center;
+    align-items: center;
+}
+
+.missingConnection div{
+
+    background-color: var(--color-secondary);
+    cursor: auto;
+    margin: 0 auto;
+    padding: var(--spacing);
+    box-sizing: border-box;
+    border: none;
+    border-radius: var(--border-radius) var(--border-radius) var(--border-radius) 0;
+    /*padding: 2em;*/
+}

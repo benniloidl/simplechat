@@ -218,6 +218,13 @@ function buildMessageObject(messageObject, username, type) {
     return chatElement;
 }
 
+function markChatAsRead(){
+    const elements = document.querySelectorAll("#chat-box .chat-element-right")
+    for (const element of elements) {
+        element.classList.add("read-confirmation")
+    }
+}
+
 function injectMessage(messageObject, username, type) {
     let chatObject = buildMessageObject(messageObject, username, type);
     document.getElementById("chat-box").appendChild(chatObject);
@@ -251,14 +258,13 @@ function notificationHandler(notification) {
         chat_read_event(socket, notification.chatID);
         return;
     }
-    // chat is not selected: reload chat overview sidebar
-    chat_fetch_overview(socket);
 
     // Notification style
     if (chatNode) {
-        chatNode.classList.add("notification");
+        chatNode.classList.remove("notification");
         let unreadMessageAmount = chatNode.getAttribute("data-unread-message");
         chatNode.setAttribute("data-unread-messages", unreadMessageAmount + 1);
+        chatNode.classList.add("notification");
         // console.log(chatNode);
     }
 
@@ -370,4 +376,40 @@ function dashboardError(message, errorId){
     if(message){
         console.warn(message);
     }
+}
+function serverConnectionLost(){
+    const element = document.createElement("div");
+    const wrapper = document.createElement("div");
+    const heading = document.createElement("h1");
+    const text = document.createElement("p");
+    const button = document.createElement("button");
+    heading.textContent = "You lost connection with our server!";
+    button.textContent = "Reload";
+    text.textContent ="Reconnect will be attempted in 5 seconds."
+
+    wrapper.appendChild(heading);
+    wrapper.appendChild(text);
+    wrapper.appendChild(button);
+
+    // wrapper.innerHTML = "some Text ";
+    element.classList.add("missingConnection");
+
+    element.appendChild(wrapper);
+    document.body.appendChild(element);
+    // document.body.replaceWith(element)
+
+    function timer(){
+        setTimeout(() => {
+            console.log("timer");
+           window.location.reload();
+           timer();
+        }, 5000);
+    }
+
+    element.addEventListener("load", ()=>{
+        // window.location.reload();
+        timer();
+    });
+    timer();
+
 }

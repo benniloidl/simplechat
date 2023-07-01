@@ -49,8 +49,7 @@ socket.onmessage = function (event) {
             break;
         }
         case 'messagesRead':{
-            // TODO
-            console.log(data);
+            markChatAsRead()
             break
         }
         case 'fetchGroupUsers':{
@@ -86,6 +85,9 @@ socket.onmessage = function (event) {
 };
 
 socket.onclose = function (event) {
+    // alert("Connection Lost");
+    serverConnectionLost();
+    //
 };
 
 /**
