@@ -204,3 +204,10 @@ footer .appearanceMode {
     margin: var(--spacing) auto 0;
     display: block;
 }
+
+.dangerousButton{
+    color: red;
+    background-color: var(--background-color-accent);
+    border: solid;
+    padding: var(--spacing);
+}

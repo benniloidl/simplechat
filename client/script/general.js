@@ -86,6 +86,10 @@ function toggleChatOverview(event) {
 }
 
 function deleteUserAccount(){
+    // last chance
+    let confirmation = confirm("Are you sure to delete Account?!");
+    if(!confirmation) return;
+
     let username = getCookie("username");
     chat_delete_account(socket, username);
     sessionStorage.clear();
