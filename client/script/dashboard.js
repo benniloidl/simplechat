@@ -73,46 +73,21 @@ function buildChatOverview(chats) {
 }
 
 function loadChat(data, navigator){
-    /* Workaround: If template has to load, it creates a delay till xml is loaded
-        TODO make injecting async, remove timeout
+    /* Workaround: If template has to load, execution has to wait till elements are loaded.
+    Otherwise, Script tries to access not existing element
      */
 
-    function next(){
+    const path = (data.type === "user")? "../subpages/dashboard/chat.html":"../subpages/dashboard/group.html";
+    injectPageAsync(path, () => {
         sessionStorage.setItem("openedChat", data.chatID.toString())
         chat_selected(socket, data.chatID);
-        // if()
+
         if (elementHasNotification(navigator)) {
             chat_read_event(socket, data.chatID);
             navigator.classList.remove("notification");
-            console.log("remove notification")
+            // console.log("remove notification")
         }
-    }
-    function timer(func){
-        // busy waiting
-        setTimeout(() => {
-            if(document.getElementById("chat-box")){
-                func();
-            }else{
-                console.log("wait again")
-                timer(func);
-            }
-        }, 10);
-    }
-
-    let box = document.getElementById("chat-box");
-    const oldNode = getChatNodeById(sessionStorage.getItem("openedChat"));
-    const oldNodeType = oldNode.getAttribute("chatType");
-    // console.log("NNN", oldNodeType, data.type)
-    if (box === null || oldNodeType !== data.type || true) {
-        if (data.type === "user") {
-            injectPage("../subpages/dashboard/chat.html");
-        }
-        else injectPage("../subpages/dashboard/group.html");
-        timer(next);
-    } else{
-        next();
-    }
-
+    });
 }
 
 /**
@@ -279,7 +254,7 @@ function elementHasNotification(element) {
     return false;
 }
 
-function injectPageSync(url) {
+function injectPageAsync(url, execution) {
     const main = document.querySelector('main');
     if (main !== undefined) main.setAttribute('data-menu-open', 'false');
 
@@ -287,12 +262,16 @@ function injectPageSync(url) {
     const xhr = new XMLHttpRequest();
 
     xhr.open("GET", "dashboard/" + url, true);
-    xhr.send();
-    if (xhr.status === 200) {
-        chatDiv.innerHTML = xhr.responseText;
+    xhr.onreadystatechange =  () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            chatDiv.innerHTML = xhr.responseText;
 
-        document.querySelectorAll(".username").forEach(function (element) {
-            element.innerHTML = getCookie("username");
-        });
-    }
+            execution()
+
+            document.querySelectorAll(".username").forEach(function (element) {
+                element.innerHTML = getCookie("username");
+            });
+        }
+    };
+    xhr.send();
 }
