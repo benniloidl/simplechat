@@ -13,6 +13,9 @@ app.use(cookieParser());
 app.use((req, res, next) => {
     dbFunctions.checkSessionCookie(req.cookies.username, req.cookies.sessionToken).then((result) => {
         if (result) {
+                // res.cookie("hallo", "welt", {httpOnly: true, secure:true, maxAge:5000000, sameSite:"lax"}); // httpOnly cookie refuses to set other cookies via JS
+                // res.cookie("sessionToken", req.cookies.sessionToken, {httpOnly: true, secure:true, maxAge:5000000, sameSite:"lax"}); // httpOnly cookie refuses to set other cookies via JS
+                // res.cookie("username", req.cookies.username, {httpOnly: false, secure:true, maxAge:5000000, sameSite:"lax"}); // httpOnly cookie refuses to set other cookies via JS
             if (req.path == '/login') {
                 res.redirect("/dashboard");
             } else {

@@ -97,9 +97,12 @@ socket.onclose = function (event) {
 function loginUser(data) {
     if (data.status) {
         const result = getValues()
-        document.cookie = "username= " + result.username + ";";
+        // const maxAge = 5184000; // 2 months (60 sec * 60 min * 24h * 30d * 2)
+        const maxAge = 172800; // 2 days (60 sec * 60 min * 24h * 2)
+        document.cookie = "username= " + result.username + ";Max-Age="+maxAge;
+        document.cookie = `username=${result.username};Max-Age=${maxAge};secure;sameSite=lax`;
         // document.cookie = "password= " + result.password + ";secure";
-        document.cookie = "sessionToken= " + data.sessionToken + ";secure";
+        document.cookie = `sessionToken=${data.sessionToken};Max-Age=${maxAge};secure;sameSite=lax`;
         window.location.href = "/dashboard";
     } else {
         pwdError("invalid login credentials");
