@@ -77,7 +77,7 @@ socket.onmessage = function (event) {
             }
             break;
         }
-        
+
         case 'error': {
             errorEvent(data.message);
             break;
@@ -87,12 +87,17 @@ socket.onmessage = function (event) {
 
 socket.onclose = function (event) {
 };
+
+/**
+ * data = { event: 'login', status: true, sessionToken: loginToken}
+ * @param data {event: string, status: boolean, sessionToken: String}
+ */
 function loginUser(data) {
     if (data.status) {
         const result = getValues()
-        console.log(result);
         document.cookie = "username= " + result.username + ";";
-        document.cookie = "password= " + result.password + ";secure";
+        // document.cookie = "password= " + result.password + ";secure";
+        document.cookie = "sessionToken= " + data.sessionToken + ";secure";
         window.location.href = "/dashboard";
     } else {
         pwdError("invalid login credentials");

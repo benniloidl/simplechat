@@ -1,7 +1,12 @@
 const dbFunctions = require('./db');
 
-async function validate(username, password) {
-    return await dbFunctions.validateUser(username, password);
+async function validate(username, sessionToken /*password*/) {
+    // return await dbFunctions.validateUser(username, password);
+    const result = await dbFunctions.checkSessionCookie(username, sessionToken);
+    if(!result){
+        // redirect to log in
+    }
+    return result;
 }
 
 async function fetchchats(socket, username) {
@@ -27,23 +32,24 @@ async function login(socket, data, sockets, type) {
         return;
     }
 
-    let login;
+    let loginToken;
     if (type === "login") {
-        login = await dbFunctions.validateUser(data.username, data.password);
+        loginToken = await dbFunctions.validateUser(data.username, data.password);
     } else {
-        login = await dbFunctions.createUser(data.username, data.password);
+        loginToken = await dbFunctions.createUser(data.username, data.password);
     }
 
-    if (login) {
+    if (loginToken) {
         for (const s of sockets) {
             if (s.socket == socket) {
                 s.username = data.username;
                 break;
             }
         }
-        socket.send(JSON.stringify({ event: 'login', status: true }));
+        console.log("login successfully", data.username, loginToken);
+        socket.send(JSON.stringify({ event: 'login', status: true, sessionToken: loginToken}));
     } else {
-        socket.send(JSON.stringify({ event: 'login', status: false }));
+        socket.send(JSON.stringify({ event: 'login', status: false, sessionToken: null}));
     }
 }
 

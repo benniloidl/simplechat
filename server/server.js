@@ -11,7 +11,7 @@ let sockets = [];
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
-    dbFunctions.validateUser(req.cookies.username, req.cookies.password).then((result) => {
+    dbFunctions.checkSessionCookie(req.cookies.username, req.cookies.sessionToken).then((result) => {
         if (result) {
             if (req.path == '/login') {
                 res.redirect("/dashboard");
@@ -74,9 +74,11 @@ wsSrv.on('connection', (socket, req) => {
             });
         }
         let username = JSONCookie.username;
-        const password = JSONCookie.password;
         if (username) {
             username = username.toLowerCase();
+        }
+        // const sessionToken = JSONCookie.password;
+        const sessionToken = JSONCookie.sessionToken;
 
             let socketExists = false;
             for (let i = 0; i < sockets.length; i++) {
@@ -98,7 +100,7 @@ wsSrv.on('connection', (socket, req) => {
             eventFunctions.login(socket, event.data, sockets, "register");
             return;
         }
-        if (!eventFunctions.validate(username, password)) {
+        if (!eventFunctions.validate(username, sessionToken)) {
             return "Username/Password incorrect";
         }
         switch (event.event) {
