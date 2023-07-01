@@ -155,6 +155,15 @@ function removeUser(username) {
     chat_fetch_overview(socket);
 }
 
+function chat_addUser(username){
+    let chatID = sessionStorage.getItem("openedChat");
+
+    socket.sendEvent('addUser', {
+        chatID: chatID,
+        username: username
+    });
+}
+
 function chat_selected(socket, chatId) {
     socket.sendEvent('fetchMessages', {
         chatID: chatId,

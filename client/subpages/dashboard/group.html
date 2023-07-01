@@ -9,11 +9,12 @@
 	<div class="overview-container">
 		<button>Leave group</button>
 		<hr>
-		<form onsubmit="return">
+		<form onsubmit="return addUserToGroup()">
 			<label for="add-member">Add friend</label>
 			<input id="add-member" placeholder="Enter username" required type="text">
 			<input type="submit" value="Add">
 		</form>
+		<i class="error" id="usrError"></i>
 		<hr>
 		<ul>
 			<li>

@@ -79,6 +79,13 @@ function buildChatOverview(chats) {
     });
 }
 
+/**
+ * Load chat template and inject messages
+ *
+ * navigator is the chat-node of the side-menu containing important chat-information
+ * @param data
+ * @param navigator
+ */
 function loadChat(data, navigator){
     /* Workaround: If template has to load, execution has to wait till elements are loaded.
     Otherwise, Script tries to access not existing element
@@ -213,7 +220,7 @@ function injectMessage(messageObject, username, type) {
 }
 
 /**
- *
+ * Searches the Chat-node containing important chat-information with the chatID
  * @param chatId
  * @returns {Element | undefined}
  */
@@ -266,6 +273,11 @@ function elementHasNotification(element) {
     return false;
 }
 
+/**
+ * request page to inject, if page is injected execution method will be called
+ * @param url
+ * @param execution
+ */
 function injectPageAsync(url, execution) {
     const main = document.querySelector('main');
     if (main !== undefined) main.setAttribute('data-menu-open', 'false');
@@ -286,4 +298,31 @@ function injectPageAsync(url, execution) {
         }
     };
     xhr.send();
+}
+
+/**
+ * Query username in group information and make request to add user
+ * return false to disable form
+ * @returns {false}
+ */
+function addUserToGroup(){
+    const field = document.getElementById("add-member");
+    if(!field) return false;
+    let chatID = sessionStorage.getItem("openedChat");
+    if(getChatNodeById(chatID).getAttribute("chatType") !== "group") return false;
+
+    let username = field.value.trim();
+    console.log(username)
+    if(!username.match(/^[a-zA-Z0-9._\-+]*$/g)) {
+        document.getElementById("usrError").innerHTML = "\"Username must only contain upper- and lowercase " +
+            "letters, digits and the special characters \\+\\-\\_\\.\"";
+        console.error("username doesn't match", username)
+        return false;
+    } else{
+        document.getElementById("usrError").innerHTML = "";
+        field.value = "";
+    }
+
+    chat_addUser(username);
+    return false;
 }
