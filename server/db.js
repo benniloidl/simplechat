@@ -1,4 +1,5 @@
 const mongo = require('mongodb');
+const crypto = require('crypto');
 const { MongoClient } = mongo;
 const uri = "mongodb://127.0.0.1:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
@@ -28,17 +29,29 @@ async function connectToDB() {
     // }));
 }
 
+
+async function setPassword(password){
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.pbkdf2Sync(password, salt,
+        1000, 64, 'sha512').toString('hex');
+    return {salt: salt, hash: hash};
+}
+
+function validatePassword(passwordToCheck, passwordObject){
+    const passwordHash = crypto.pbkdf2Sync(passwordToCheck, passwordObject.salt,
+        1000, 64, 'sha512').toString('hex');
+    return passwordHash === passwordObject.password;
+}
+
 async function validateUser(username, password) {
     if (!username) {
         return false;
     }
     username = username.toLowerCase();
-    const result = await user.findOne({ "username": username, "password": password }, { projection: { _id: 1 } });
-    if (result) {
-        return true;
-    } else {
-        return false;
-    }
+    const pwdObject = await user.findOne({"username": username}, {projection:{password:1, salt:1, _id:0}});
+    if (!pwdObject) return;
+    const result = validatePassword(password, pwdObject);
+    return result;
 }
 
 async function createUser(username, password) {
@@ -49,7 +62,9 @@ async function createUser(username, password) {
     if (result) {
         return false;
     } else {
-        await user.insertOne({ "username": username, "password": password, chats: [] });
+        let pwObject = await setPassword(password);
+        let res = await user.insertOne({ "username": username, "password": pwObject.hash, "salt": pwObject.salt, chats: [] });
+        if (!res.acknowledged) console.error("Creation of user went wrong!", pwObject, res, username);
         return true;
     }
 }
