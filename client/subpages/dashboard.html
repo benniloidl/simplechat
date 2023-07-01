@@ -8,24 +8,14 @@
 	
 	<link href="../subpages/dashboard/styles.css" rel="stylesheet">
 	<link href="../style/general.css" rel="stylesheet">
-	<script src="../script/general.js"></script>
-	<script charset="utf-8" src="../script/socketConnection.js"></script>
-	<script charset="utf-8" src="../script/dashboard.js"></script>
+	<script src="../script/general.js" type="text/javascript"></script>
+	<script charset="utf-8" src="../script/socketConnection.js" type="text/javascript"></script>
+	<script charset="utf-8" src="../script/dashboard.js" type="text/javascript"></script>
 
 	<script crossorigin="anonymous" src="https://kit.fontawesome.com/6b0af4bcb3.js"></script>
 	
-	<script>
-		function disableForm(path, event_function, parameter) {
-			injectPage(path);
-			setTimeout(() => {
-				let form = document.forms[0];
-				form.addEventListener("submit", (event) => {
-					event.preventDefault();
-					event_function(parameter)
-				})
-			}, 1000);
-			
-		}
+	<script type="text/javascript">
+		let cleanStorage = () =>{sessionStorage.clear()};
 	</script>
 </head>
 <body>
@@ -39,7 +29,7 @@
 		
 		<span class="sidebar-callout">Your Profile</span>
 		
-		<div class="chat-contact" onclick='injectPage("../subpages/dashboard/profile.html")'>
+		<div class="chat-contact" onclick='injectPageAsync("../subpages/dashboard/profile.html", cleanStorage)'>
 			<i class="fas fa-user"></i>
 			<p class="username">Your Username</p>
 		</div>
@@ -58,12 +48,12 @@
 		
 		<span class="sidebar-callout">Get in touch</span>
 		
-		<div class="chat-contact" onclick='disableForm("../subpages/dashboard/create-chat.html", newChat, "user")'>
+		<div class="chat-contact" onclick='injectFileWithForm("../subpages/dashboard/create-chat.html", newChat, "user")'>
 			<i class="fas fa-user-plus"></i>
 			<p>New Chat</p>
 		</div>
 		
-		<div class="chat-contact" onclick='disableForm("../subpages/dashboard/create-group.html", newChat, "group")'>
+		<div class="chat-contact" onclick='injectFileWithForm("../subpages/dashboard/create-group.html", newChat, "group")'>
 			<i class="fas fa-pen"></i>
 			<p>New Group</p>
 		</div>
@@ -79,27 +69,7 @@
 </main>
 
 <script>
-	function injectPage(url) {
-		const main = document.querySelector('main');
-		if (main !== undefined) main.setAttribute('data-menu-open', 'false');
-		
-		const chatDiv = document.getElementById("chat");
-		const xhr = new XMLHttpRequest();
-		
-		xhr.open("GET", "dashboard/" + url, true);
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState === 4 && xhr.status === 200) {
-				chatDiv.innerHTML = xhr.responseText;
-				
-				document.querySelectorAll(".username").forEach(function (element) {
-					element.innerHTML = getCookie("username");
-				});
-			}
-		};
-		xhr.send();
-	}
-	
-	injectPage("../subpages/dashboard/profile.html")
+	injectPageAsync("../subpages/dashboard/profile.html", () => {});
 </script>
 </body>
 </html>

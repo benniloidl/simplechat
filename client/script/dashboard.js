@@ -94,7 +94,7 @@ function loadChat(data, navigator){
     const path = (data.type === "user")? "../subpages/dashboard/chat.html":"../subpages/dashboard/group.html";
     injectPageAsync(path, () => {
         sessionStorage.setItem("openedChat", data.chatID.toString())
-        chat_selected(socket, data.chatID);
+        chat_fetchMessage(socket, data.chatID);
 
         if (elementHasNotification(navigator)) {
             chat_read_event(socket, data.chatID);
@@ -325,4 +325,24 @@ function addUserToGroup(){
 
     chat_addUser(username);
     return false;
+}
+
+/**
+ * Adjusts injectPageAsync by overwriting action of form with javaScript function
+ * must return false or use event.preventDefault
+ * onsubmit = () => formEventFunction(parameter)
+ * + delete irrelevant data of sessionStorage
+ * @param path
+ * @param formEventFunction
+ * @param parameter
+ */
+function injectFileWithForm(path, formEventFunction, parameter) {
+    sessionStorage.clear();
+    injectPageAsync(path, () =>{
+        let form = document.forms[0];
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            formEventFunction(parameter)
+        });
+    });
 }

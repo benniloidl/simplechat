@@ -42,17 +42,16 @@ socket.onmessage = function (event) {
             }
             break;
         case 'fetchMessages':
-            console.log("fetchMessage", data.data)
-            try {
-                buildChatMessages(data.data)
-            } catch (e) {
-                console.log("fetch2", e)
-                setTimeout(() => buildChatMessages(data.data), 100);
-            }
+            buildChatMessages(data.data)
             break;
         case 'messageNotification': {
             notificationHandler(data.notification);
             break;
+        }
+        case 'messagesRead':{
+            // TODO
+            console.log(data);
+            break
         }
         case 'fetchGroupUsers':{
             createViewContainer(data.data.users);
@@ -74,6 +73,8 @@ function loginUser(data) {
         document.cookie = "username= " + result.username + ";";
         document.cookie = "password= " + result.password + ";secure";
         window.location.href = "/dashboard";
+    } else {
+        pwdError("invalid login credentials");
     }
 }
 
@@ -164,7 +165,7 @@ function chat_addUser(username){
     });
 }
 
-function chat_selected(socket, chatId) {
+function chat_fetchMessage(socket, chatId) {
     socket.sendEvent('fetchMessages', {
         chatID: chatId,
         start: 0,

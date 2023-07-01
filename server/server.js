@@ -127,6 +127,24 @@ wsSrv.on('connection', (socket, req) => {
                     eventFunctions.fetchGroupUsers(socket, event.data);
                 }
                 break;
+            case 'removeUser':
+                //TODO BOILERPLATE
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
+                }
+                break;
+            case 'addUser':
+                //TODO BOILERPLATE
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
+                }
+                break;
+            case 'deleteAccount':
+                //TODO BOILERPLATE
+                if (eventFunctions.validate(username, password)) {
+                    eventFunctions.sendError(socket, `NOT IMPLEMENTED: ${event.event}`);
+                }
+                break;
             default:{
                 eventFunctions.sendError(socket, `unknown event: ${event.event}`);
                 return -1;
