@@ -120,7 +120,7 @@ async function fetchGroupUsers(socket, data) {
 }
 
 async function removeUser(socket, data) {
-    const result = await dbFunctions.removeUser(data.chatID, data.username);
+    const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
     if (result) {
         socket.send(JSON.stringify({ event: "removeUser", data: { "status": true } }));
     } else {
@@ -129,7 +129,7 @@ async function removeUser(socket, data) {
 }
 
 async function addUser(socket, data) {
-    const result = await dbFunctions.addUser(data.chatID, data.username);
+    const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
     if (result) {
         socket.send(JSON.stringify({ event: "addUser", data: { "status": true } }));
     } else {

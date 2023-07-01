@@ -110,8 +110,8 @@ async function fetchChats(username) {
 
 async function getOtherUsername(username, chatID) {
     const users = await fetchGroupUsers(chatID);
-    if (users.length === 2) {
-        return users[0].username === username ? users[1].username : users[0].username;
+    if (users.members.length === 2) {
+        return (users.members[0] === username) ? users.members[1] : users.members[0];
     } else {
         return false;
     }
@@ -208,12 +208,12 @@ async function chatExists(chatID) {
 }
 
 async function fetchGroupUsers(chatID) {
-    const result = await user.find({ "chats.chatID": chatID }, { projection: { _id: 0, username: 1 } });
-    let users = [];
-    await result.forEach(user => {
-        users.push(user);
-    });
-    return users;
+    const members = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID)  }, { projection: { _id: 0, members: 1 } });
+    if(members){
+        return members;
+    }else{
+        return false;
+    }
 }
 
 async function removeUser(chatID, username) {
@@ -225,6 +225,7 @@ async function removeUser(chatID, username) {
             const index2 = result.members.indexOf(username);
             result.members.splice(index2, 1);
         }
+        await removeChat(username, chatID);
         if (result.members.length === 0) {
             if (await deleteChat(chatID)) {
                 return true;
