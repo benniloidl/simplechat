@@ -4,11 +4,10 @@
  * @returns {{mode: (string), password: *, username: *}|null}
  */
 function getValues() {
-    let usr = document.getElementById("usr").value;
+    let usr = document.getElementById("usr").value.toLowerCase();
     let pwd = document.getElementById("pwd").value;
     let pwdElement = document.getElementById("pwd2");
     let mode = pwdElement ? "register" : "login";
-
     // further client side checking
     if (usr === "" || pwd === "" || (pwdElement && pwdElement.value === "")) {
         pwdError("Please fill in the missing fields!")

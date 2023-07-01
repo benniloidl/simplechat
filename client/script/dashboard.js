@@ -7,7 +7,7 @@ function createViewContainer(users){
     const ul = document.createElement("ul");
 
     for (const user of users) {
-        let userObject = generateUsers(user.username);
+        let userObject = generateUsers(user);
         ul.appendChild(userObject);
     }
 

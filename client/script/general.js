@@ -92,9 +92,9 @@ function deleteUserAccount(){
 
     let username = getCookie("username");
     chat_delete_account(socket, username);
-    sessionStorage.clear();
-    localStorage.clear();
-    logout();
+    // sessionStorage.clear();
+    // localStorage.clear();
+    // logout();
 }
 
 function checkUsernameSemantic(username){

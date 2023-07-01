@@ -57,6 +57,26 @@ socket.onmessage = function (event) {
             createViewContainer(data.data.users);
             break;
         }
+        case 'deleteAccount':
+            sessionStorage.clear();
+            localStorage.clear();
+            logout();
+            break;
+        case 'addUser':{
+            if(data.data.status){
+                // const a = getChatNodeById(data.data.chatID);
+                // if(a) a.remove();
+            }
+            break;
+        }
+        case 'removeUser':{
+            if(data.data.status){
+                const a = getChatNodeById(data.data.chatID);
+                if(a) a.remove();
+                injectPageAsync("../subpages/dashboard/profile.html", cleanStorage);
+            }
+            break;
+        }
         
         case 'error': {
             errorEvent(data.message);
@@ -70,6 +90,7 @@ socket.onclose = function (event) {
 function loginUser(data) {
     if (data.status) {
         const result = getValues()
+        console.log(result);
         document.cookie = "username= " + result.username + ";";
         document.cookie = "password= " + result.password + ";secure";
         window.location.href = "/dashboard";
@@ -162,7 +183,6 @@ function removeUser(username) {
         chatID: chatID,
         username: username
     });
-    chat_fetch_overview(socket);
 }
 
 function chat_addUser(username){

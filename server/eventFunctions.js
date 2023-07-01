@@ -122,25 +122,25 @@ async function fetchGroupUsers(socket, data) {
 async function removeUser(socket, data) {
     const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
     if (result) {
-        socket.send(JSON.stringify({ event: "removeUser", data: { "status": true } }));
+        socket.send(JSON.stringify({ event: "removeUser", data: { "status": true, "chatID": data.chatID } }));
     } else {
-        socket.send(JSON.stringify({ event: "removeUser", data: { "status": false } }));
+        socket.send(JSON.stringify({ event: "removeUser", data: { "status": false, "chatID": data.chatID  } }));
     }
 }
 
 async function addUser(socket, data) {
     const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
     if (result) {
-        socket.send(JSON.stringify({ event: "addUser", data: { "status": true } }));
+        socket.send(JSON.stringify({ event: "addUser", data: { "status": true, "chatID": data.chatID  } }));
     } else {
-        socket.send(JSON.stringify({ event: "addUser", data: { "status": false } }));
+        socket.send(JSON.stringify({ event: "addUser", data: { "status": false, "chatID": data.chatID  } }));
     }
 }
 
 async function deleteAccount(socket, username) {
     const result = await dbFunctions.deleteAccount(username);
     if (result) {
-        //socket.send(JSON.stringify({ event: "deleteAccount", data: { "status": true } }));
+        socket.send(JSON.stringify({ event: "deleteAccount", data: { "status": true } }));
     } else {
         sendError(socket, "Couldn't delete account.");
     }
