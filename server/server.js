@@ -76,10 +76,6 @@ wsSrv.on('connection', (socket, req) => {
         let username = JSONCookie.username;
         if (username) {
             username = username.toLowerCase();
-        }
-        // const sessionToken = JSONCookie.password;
-        const sessionToken = JSONCookie.sessionToken;
-
             let socketExists = false;
             for (let i = 0; i < sockets.length; i++) {
                 if (sockets[i].username == username) {
@@ -91,6 +87,8 @@ wsSrv.on('connection', (socket, req) => {
                 sockets.push({ socket: socket, "username": username.toLowerCase() });
             }
         }
+        // const sessionToken = JSONCookie.password;
+        const sessionToken = JSONCookie.sessionToken;
 
         if (event.event === "login") {
             eventFunctions.login(socket, event.data, sockets, "login");
