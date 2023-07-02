@@ -100,3 +100,34 @@ function deleteUserAccount(){
 function checkUsernameSemantic(username){
     return username.match(/^[a-zA-Z0-9._\-+]*$/g);
 }
+
+async function importPublicKey(jwk){
+    return await window.crypto.subtle.importKey("jwk", jwk,{
+            name: "RSA-OAEP",
+            modulusLength: 2048,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256"
+        },
+        true,
+        ["encrypt"]
+    );
+}
+
+async function encryptMessage(message, publicKey){
+    let enc = new TextEncoder();
+    let key = await importPublicKey(publicKey)
+    const cipherText = await window.crypto.subtle.encrypt({name: "RSA-OAEP", }, key, enc.encode(message));
+    return bytesToBase64(new Uint8Array(cipherText));
+}
+function bytesToBase64(bytes){
+    const binString = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
+    return btoa(binString);
+}
+function base64ToBytes(base64) {
+    const binString = atob(base64);
+    return Uint8Array.from(binString, (m) => m.codePointAt(0));
+}
+
+function setSocketEncryption(boolean){
+    localStorage.setItem("socketEncryption", boolean);
+}

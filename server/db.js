@@ -1,5 +1,7 @@
 const mongo = require('mongodb');
 const crypto = require('crypto');
+const encryption = require('./encryption');
+const {getPublicWebKey} = require("./encryption");
 const { MongoClient } = mongo;
 const uri = "mongodb://127.0.0.1:27017/SimpleChat";
 const dbClient = new MongoClient(uri);
@@ -54,22 +56,25 @@ function createSessionToken(username) {
 
 async function storeSessionCookie(username) {
     const token = createSessionToken(username);
-
-
-    try {
+    const keyObject = await encryption.generateKeyPair();
+    const publicKey = await getPublicWebKey(keyObject.publicKey);
+    try{
         // remove existing tokens
         sessions.deleteMany({ "username": username });
     } catch (e) {
         console.warn(e)
     }
-    let res = await sessions.insertOne({ "username": username, "token": token });
-    const result = await sessions.findOne({ "username": username }, { projection: { _id: 1 } });
-    return token;
+    let res =  await sessions.insertOne({"username":username, "token":token, "privateKey":keyObject.privateKey});
+    const result = await sessions.findOne({ "username": username}, { projection: { _id: 1 } });
+    return {
+        token:token,
+        publicKey: publicKey
+    };
 }
-async function checkSessionCookie(username, sessionToken) {
-    if (username === undefined || sessionToken === undefined) return false;
+async function checkSessionCookie(username, sessionToken){
+    if(username === undefined || sessionToken === undefined) return false;
     // const result = await sessions.findOne({ "username": username, "token":sessionToken}, { projection: { _id: 1 } });
-    const result = await sessions.findOne({ "username": username.toLowerCase() }, { projection: { _id: 1 } });
+    const result = await sessions.findOne({ "username": username.toLowerCase()}, { projection: { _id: 1 } });
     return !!result;
 }
 
@@ -81,7 +86,7 @@ async function validateUser(username, password) {
     const pwdObject = await user.findOne({ "username": username }, { projection: { password: 1, salt: 1, _id: 0 } });
     if (!pwdObject) return;
     const result = validatePassword(password, pwdObject);
-    if (result) return storeSessionCookie(username);
+    if(result) return storeSessionCookie(username);
     return false;
 }
 
