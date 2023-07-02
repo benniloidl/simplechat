@@ -5,8 +5,10 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
 const eventFunctions = require('./eventFunctions');
+const {decryptMessage, sendPublicKey} = require("./encryption");
 
 let sockets = [];
+let keys = {};
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
@@ -58,7 +60,7 @@ app.get('*', (req, res) => {
 
 //receive message
 wsSrv.on('connection', (socket, req) => {
-
+    sendPublicKey(socket).then((privateKey) => keys[socket] = privateKey);
     socket.on('message', async (data) => {
         let event;
         try {
@@ -67,6 +69,23 @@ wsSrv.on('connection', (socket, req) => {
         } catch {
             return -1;
         }
+        console.log("event", event);
+        try {
+            if (event.encryptedData) {
+                let privateKey = keys[socket];
+                console.log("pk", privateKey)
+                let data = await decryptMessage(event.encryptedData, privateKey);
+                event.data = JSON.parse(data);
+                console.log("data", event.data);
+            } else {
+                console.log("not encrypted Data")
+            }
+        } catch (e){
+            console.log("Something wrong with encryption");
+            console.log(e);
+            return -1;
+        }
+            console.log("socket keys", keys)
 
         const cookie = req.headers.cookie;
         let JSONCookie = {};

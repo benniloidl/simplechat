@@ -7,13 +7,37 @@ const chatMessageAmount = 10;
  * @param eventName
  * @param eventData
  */
-socket.sendEvent = (eventName, eventData) => {
+socket.sendEvent = async (eventName, eventData) => {
     const message = {
         event: eventName,
         data: eventData,
     };
     console.log("event: " + eventName, eventData);
-    socket.send(JSON.stringify(message));
+    let publicKey = localStorage.getItem("publicKey");
+    if (publicKey) {
+        //* Encryption *//
+
+        console.log(publicKey)
+        // let key = window.btoa(publicKey)
+        // console.log(key);
+        let parsedPublicKey = JSON.parse(publicKey);
+        let parsedEventData = JSON.stringify(eventData);
+        console.log(parsedPublicKey)
+
+        const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
+        console.log("encryptedMessage", encryptedData)
+        console.log("unencrypted: ", parsedEventData);
+        // let username = getCookie("username");
+        socket.send(JSON.stringify({
+            event: eventName,
+            encryptedData: encryptedData,
+        }));
+
+    } else {
+        // not encrypted
+        console.warn("Events are not encrypted");
+        socket.send(JSON.stringify(message));
+    }
 }
 
 const fileName = location.href.split("/").slice(-1)
@@ -28,6 +52,10 @@ socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     console.log("onMessage", data.event, data)
     switch (data.event) {
+        case 'publicKey':
+            const key = JSON.stringify(data.data)
+            localStorage.setItem("publicKey", key);
+            break;
         case 'login':
             loginUser(data);
             break;
@@ -95,15 +123,21 @@ socket.onclose = function (event) {
  * data = { event: 'login', status: true, sessionToken: loginToken}
  * @param data {event: string, status: boolean, sessionToken: String}
  */
-function loginUser(data) {
+async function loginUser(data) {
     if (data.status) {
         const result = getValues()
         // const maxAge = 5184000; // 2 months (60 sec * 60 min * 24h * 30d * 2)
         const maxAge = 172800; // 2 days (60 sec * 60 min * 24h * 2)
-        document.cookie = "username= " + result.username + ";Max-Age="+maxAge;
         document.cookie = `username=${result.username};Max-Age=${maxAge};secure;sameSite=lax`;
         // document.cookie = "password= " + result.password + ";secure";
         document.cookie = `sessionToken=${data.sessionToken};Max-Age=${maxAge};secure;sameSite=lax`;
+
+        console.log("publicKey", data.publicKey);
+        // let keyData = window.btoa(JSON.stringify(data.publicKey));
+        let keyData = JSON.stringify(data.publicKey);
+        console.log("keys-> loginUser", keyData);
+        localStorage.setItem("publicKey", keyData);
+
         window.location.href = "/dashboard";
     } else {
         pwdError("invalid login credentials");
@@ -150,9 +184,15 @@ function loginRequest(type) {
         return false;
     }
     if (type === "login") {
-        socket.sendEvent('login', { username: result.username, password: result.password })
+        socket.sendEvent('login', {
+            username: result.username,
+            password: result.password,
+        });
     } else {
-        socket.sendEvent('register', { username: result.username, password: result.password })
+        socket.sendEvent('register', {
+            username: result.username,
+            password: result.password,
+        });
     }
     
     return false;
