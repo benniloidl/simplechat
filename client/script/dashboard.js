@@ -406,10 +406,7 @@ function serverConnectionLost(){
         }, 5000);
     }
 
-    element.addEventListener("load", ()=>{
-        // window.location.reload();
-        timer();
-    });
+    button.addEventListener("click", () => window.location.reload());
     timer();
 
 }

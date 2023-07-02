@@ -24,7 +24,7 @@ socket.sendEvent = async (eventName, eventData) => {
 
         const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
         // console.log("encryptedMessage", encryptedData)
-        console.log("unencrypted: ", parsedEventData);
+        console.log("encryptedFetch: ", parsedEventData);
         // let username = getCookie("username");
         socket.send(JSON.stringify({
             //event: eventName,
