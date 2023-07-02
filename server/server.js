@@ -8,16 +8,12 @@ const eventFunctions = require('./eventFunctions');
 const {decryptMessage, sendPublicKey} = require("./encryption");
 
 let sockets = [];
-let keys = {};
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
     dbFunctions.checkSessionCookie(req.cookies.username, req.cookies.sessionToken).then((result) => {
         if (result) {
-                // res.cookie("hallo", "welt", {httpOnly: true, secure:true, maxAge:5000000, sameSite:"lax"}); // httpOnly cookie refuses to set other cookies via JS
-                // res.cookie("sessionToken", req.cookies.sessionToken, {httpOnly: true, secure:true, maxAge:5000000, sameSite:"lax"}); // httpOnly cookie refuses to set other cookies via JS
-                // res.cookie("username", req.cookies.username, {httpOnly: false, secure:true, maxAge:5000000, sameSite:"lax"}); // httpOnly cookie refuses to set other cookies via JS
             if (req.path == '/login') {
                 res.redirect("/dashboard");
             } else {
@@ -60,32 +56,16 @@ app.get('*', (req, res) => {
 
 //receive message
 wsSrv.on('connection', (socket, req) => {
-    sendPublicKey(socket).then((privateKey) => keys[socket] = privateKey);
+    sendPublicKey(socket).then(() => null);
     socket.on('message', async (data) => {
         let event;
         try {
             const message = Buffer.from(data).toString('utf-8');
+            // console.log(("%cWebsocket message "+ message), "color: blue;");
             event = JSON.parse(message);
         } catch {
             return -1;
         }
-        console.log("event", event);
-        try {
-            if (event.encryptedData) {
-                let privateKey = keys[socket];
-                console.log("pk", privateKey)
-                let data = await decryptMessage(event.encryptedData, privateKey);
-                event.data = JSON.parse(data);
-                console.log("data", event.data);
-            } else {
-                console.log("not encrypted Data")
-            }
-        } catch (e){
-            console.log("Something wrong with encryption");
-            console.log(e);
-            return -1;
-        }
-            console.log("socket keys", keys)
 
         const cookie = req.headers.cookie;
         let JSONCookie = {};
@@ -101,14 +81,30 @@ wsSrv.on('connection', (socket, req) => {
             let socketExists = false;
             for (let i = 0; i < sockets.length; i++) {
                 if (sockets[i].username == username) {
-                    sockets[i] = { socket: socket, "username": username.toLowerCase() };
+                    sockets[i] = { socket: socket, "username": username.toLowerCase()};
                     socketExists = true;
                 }
             }
             if (!socketExists) {
-                sockets.push({ socket: socket, "username": username.toLowerCase() });
+                sockets.push({ socket: socket, "username": username.toLowerCase()});
             }
         }
+        try {
+            if (event.encryptedData) {
+                let privateKey2 = socket.privateKey;
+                let data = await decryptMessage(event.encryptedData, privateKey2);
+                event = JSON.parse(data);
+                console.log("Decrypted event:",event.event, event.data);
+            } else {
+                console.log("not encrypted Data")
+            }
+        } catch (e){
+            console.warn("Something wrong with encryption");
+            console.log(e);
+            console.log("event", event);
+            return -1;
+        }
+
         // const sessionToken = JSONCookie.password;
         const sessionToken = JSONCookie.sessionToken;
 

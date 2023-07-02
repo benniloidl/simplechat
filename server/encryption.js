@@ -23,22 +23,21 @@ function base64ToBytes(base64) {
 }
 async function decryptMessage(encryptedMessage, privateKey){
     let decoder = new TextDecoder("utf-8");
-    console.log(encryptedMessage)
+    // console.log(encryptedMessage)
     let decrypted = await crypto.subtle.decrypt({name:"RSA-OAEP"}, privateKey, base64ToBytes(encryptedMessage));
-    let decryptedMessage =  decoder.decode(decrypted);
-    console.log("decrypt", decryptedMessage);
-    return decryptedMessage;
+    return decoder.decode(decrypted);
 
 }
 
 async function sendPublicKey(socket){
+    console.log("Sending new public Key!!!")
     const keyPair = await generateKeyPair();
+    socket.privateKey = keyPair.privateKey;
     const publicWebKey = await getPublicWebKey(keyPair.publicKey);
     const message = JSON.stringify({
         event:"publicKey",
         data:publicWebKey
     });
-    console.log(message)
     socket.send(message);
     return keyPair.privateKey;
 }

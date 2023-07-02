@@ -8,28 +8,26 @@ const chatMessageAmount = 10;
  * @param eventData
  */
 socket.sendEvent = async (eventName, eventData) => {
-    const message = {
-        event: eventName,
-        data: eventData,
-    };
     console.log("event: " + eventName, eventData);
     let publicKey = localStorage.getItem("publicKey");
-    if (publicKey) {
-        //* Encryption *//
+    let encryption = localStorage.getItem("socketEncryption");
 
-        console.log(publicKey)
-        // let key = window.btoa(publicKey)
-        // console.log(key);
+    if (publicKey && encryption==="true") {
+        //* Encryption *//
+        const message = {
+            event: eventName,
+            data: eventData,
+        };
+
         let parsedPublicKey = JSON.parse(publicKey);
-        let parsedEventData = JSON.stringify(eventData);
-        console.log(parsedPublicKey)
+        let parsedEventData = JSON.stringify(message);
 
         const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
-        console.log("encryptedMessage", encryptedData)
+        // console.log("encryptedMessage", encryptedData)
         console.log("unencrypted: ", parsedEventData);
         // let username = getCookie("username");
         socket.send(JSON.stringify({
-            event: eventName,
+            //event: eventName,
             encryptedData: encryptedData,
         }));
 
@@ -43,9 +41,9 @@ socket.sendEvent = async (eventName, eventData) => {
 const fileName = location.href.split("/").slice(-1)
 
 socket.onopen = function () {
-    if (fileName[0] === "dashboard") {
-        chat_fetch_overview(socket)
-    }
+    // if (fileName[0] === "dashboard") {
+    //     chat_fetch_overview(socket)
+    // }
 };
 
 socket.onmessage = function (event) {
@@ -55,6 +53,11 @@ socket.onmessage = function (event) {
         case 'publicKey':
             const key = JSON.stringify(data.data)
             localStorage.setItem("publicKey", key);
+
+            if (fileName[0] === "dashboard") {
+                chat_fetch_overview(socket)
+            }
+
             break;
         case 'login':
             loginUser(data);

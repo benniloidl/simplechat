@@ -51,7 +51,6 @@ async function login(socket, data, sockets, type) {
                 break;
             }
         }
-        console.log("login successfully", data.username, loginToken, publicKey);
         socket.send(JSON.stringify({ event: 'login', status: true, sessionToken: loginToken, publicKey: publicKey}));
     } else {
         socket.send(JSON.stringify({ event: 'login', status: false, sessionToken: null}));
