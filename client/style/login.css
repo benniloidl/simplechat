@@ -1,11 +1,7 @@
 :root {
     --login-hue: calc(155 - 75 + 180);
-    /*--login-hue: calc(0);*/
-
     --login-color: var(--color-primary);
     --login-accent-color: var(--color-primary);
-
-
 }
 
 :root[data-theme='dark'] {
@@ -15,21 +11,18 @@
 
 
 .loginForm {
-    box-sizing: border-box;
-    margin: calc(50vh - 200px) auto;
-    max-width: 400px;
-    /*height: 360px;*/
-
-    border: none;
-    border-radius: var(--border-radius) var(--border-radius) var(--border-radius) 0;
-    padding: 2em;
-
-    /*font-family: Calibri, sans-serif;*/
-    background-color: var(--color-secondary);
+    position: relative;
     display: flex;
     flex-direction: column;
-    position: relative;
 
+    box-sizing: border-box;
+    max-width: 400px;
+    margin: calc(50vh - 200px) auto;
+
+    padding: 2em;
+    border: none;
+    border-radius: var(--border-radius) var(--border-radius) var(--border-radius) 0;
+    background-color: var(--color-secondary);
 }
 
 .loginForm::before {
@@ -50,7 +43,6 @@
 }
 
 .loginForm div a {
-    /*border: solid black 1pt;*/
 }
 
 .loginForm h1 {
@@ -71,13 +63,13 @@
 }
 
 .loginForm input {
+    width: 100%;
     padding: var(--spacing);
     color: var(--text-color-normal);
-    background-color: var(--background-color);
-    border-radius: var(--border-radius);
-    width: 100%;
     border: none;
+    border-radius: var(--border-radius);
     outline: none;
+    background-color: var(--background-color);
 }
 
 .input-label {
@@ -86,31 +78,32 @@
 }
 
 .input-label[data-label]::after {
-    pointer-events: none;
-    content: attr(data-label);
     position: absolute;
-    left: var(--spacing);
     top: calc(var(--spacing) + var(--font-size));
-    transition: all 0.2s ease-in-out;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    left: var(--spacing);
     visibility: hidden;
+    content: attr(data-label);
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .input-label:has(input:focus)::after {
-    background-color: var(--background-color);
     top: 0;
-    padding: 0 var(--spacing);
     visibility: visible;
+    padding: 0 var(--spacing);
+    background-color: var(--background-color);
 }
 
 #submit {
-    background-color: var(--login-color);
+    font-weight: 600;
+    padding: var(--spacing);
+    border: 2px solid transparent;
     border-radius: var(--border-radius);
-    border: none;
-    height: 3em;
-    margin-bottom: var(--spacing);
+    background-color: var(--color-primary);
+    margin-block: var(--spacing);
 }
 
 #submit:hover, #submit:focus {
-    background-color: var(--login-accent-color);
+    border-color: var(--text-color-normal);
 }

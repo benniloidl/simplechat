@@ -1,5 +1,5 @@
 :root {
-    /*Initialise CSS-Variables*/
+    /*Initialize CSS-Variables*/
     --width: 100%;
     --max-width: 1000px;
     --spacing: 1rem;
@@ -193,24 +193,24 @@ footer .appearanceMode {
 }
 
 /*TODO style leave chat*/
-.overview-container button{
-    padding-block: calc(var(--spacing) * 0.5) !important;
-    color: red;
-    background-color: transparent;
-    cursor: pointer;
-    border: none;
-    font-weight: bolder;
+.overview-container button {
     font-family: var(--font-family);
-    padding-top: var(--spacing);
-    margin: var(--spacing) auto 0;
+    font-weight: bolder;
     display: block;
+    margin: var(--spacing) auto 0;
+    padding-top: var(--spacing);
+    cursor: pointer;
+    color: red;
+    border: none;
+    background-color: transparent;
+    padding-block: calc(var(--spacing) * 0.5) !important;
 }
 
-.dangerousButton{
-    color: red;
-    background-color: var(--background-color-accent);
-    border: solid;
+.dangerousButton {
     padding: var(--spacing);
+    color: red;
+    border: solid;
+    background-color: var(--background-color-accent);
 }
 
 .error {
@@ -218,30 +218,30 @@ footer .appearanceMode {
     /*padding-left: var(--spacing);*/
 }
 
-.missingConnection{
-    z-index: 1000;
+.missingConnection {
     position: fixed;
-    background-color: hsla(0deg, 100%, 50%, 0.2);
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
     width: 100vw;
     height: 100vh;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
     cursor: not-allowed;
-    display: flex;
+    background-color: hsla(0deg, 100%, 50%, 0.2);
     justify-self: center;
-    align-items: center;
 }
 
-.missingConnection div{
+.missingConnection div {
 
-    background-color: var(--color-secondary);
-    cursor: auto;
+    box-sizing: border-box;
     margin: 0 auto;
     padding: var(--spacing);
-    box-sizing: border-box;
+    cursor: auto;
     border: none;
     border-radius: var(--border-radius) var(--border-radius) var(--border-radius) 0;
+    background-color: var(--color-secondary);
     /*padding: 2em;*/
 }
