@@ -94,14 +94,14 @@ wsSrv.on('connection', (socket, req) => {
                 let privateKey2 = socket.privateKey;
                 let data = await decryptMessage(event.encryptedData, privateKey2);
                 event = JSON.parse(data);
-                console.log("Decrypted event:",event.event, event.data);
+                // console.log("Decrypted event:",event.event, event.data);
             } else {
                 console.log("not encrypted Data")
             }
         } catch (e){
             console.warn("Something wrong with encryption");
             console.log(e);
-            console.log("event", event);
+            // console.log("event", event);
             return -1;
         }
 

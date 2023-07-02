@@ -30,7 +30,7 @@ async function decryptMessage(encryptedMessage, privateKey){
 }
 
 async function sendPublicKey(socket){
-    console.log("Sending new public Key!!!")
+    // console.log("Sending new public Key!!!")
     const keyPair = await generateKeyPair();
     socket.privateKey = keyPair.privateKey;
     const publicWebKey = await getPublicWebKey(keyPair.publicKey);

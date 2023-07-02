@@ -12,13 +12,13 @@ socket.sendEvent = async (eventName, eventData) => {
     let publicKey = localStorage.getItem("publicKey");
     let encryption = localStorage.getItem("socketEncryption");
 
+    const message = {
+        event: eventName,
+        data: eventData,
+    };
+
     if (publicKey && encryption==="true") {
         //* Encryption *//
-        const message = {
-            event: eventName,
-            data: eventData,
-        };
-
         let parsedPublicKey = JSON.parse(publicKey);
         let parsedEventData = JSON.stringify(message);
 
@@ -33,7 +33,7 @@ socket.sendEvent = async (eventName, eventData) => {
 
     } else {
         // not encrypted
-        console.warn("Events are not encrypted");
+        console.warn("Events are not encrypted", encryption!=="true"?"Encryption disabled":"Other error");
         socket.send(JSON.stringify(message));
     }
 }
@@ -116,7 +116,7 @@ socket.onmessage = function (event) {
     }
 };
 
-socket.onclose = function (event) {
+socket.onclose = function () {
     // alert("Connection Lost");
     serverConnectionLost();
     //
