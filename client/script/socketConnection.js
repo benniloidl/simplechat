@@ -70,7 +70,7 @@ socket.onmessage = function (event) {
             break;
         }
         case 'removeUser':{
-            if(data.data.status){
+            if(data.data.status && data.username===getCookie("username")){
                 const a = getChatNodeById(data.data.chatID);
                 if(a) a.remove();
                 injectPageAsync("../subpages/dashboard/profile.html", cleanStorage);
