@@ -125,7 +125,7 @@ async function sendMessage(socket, data, username, sockets) {
             }
         }
         for (const s of sockets) {
-            if (await dbFunctions.hasChat(s.username, data.chatID)) {
+            if (groupMembers.includes(s.username)) {
                 sendEvent(s.socket, 'messageNotification', {
                     "chatID": data.chatID,
                     "username": s.username,
