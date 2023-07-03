@@ -102,6 +102,10 @@ socket.onmessage = function (event) {
         }
         case 'addUser':{
             if(data.status){
+                console.log("addUser", data);
+                chat_get_group_users(socket, data.chatID);
+
+                // createViewContainer(data)
                 // const a = getChatNodeById(data.data.chatID);
                 // if(a) a.remove();
             }
@@ -112,6 +116,8 @@ socket.onmessage = function (event) {
                 const a = getChatNodeById(data.chatID);
                 if(a) a.remove();
                 injectPageAsync("../subpages/dashboard/profile.html", cleanStorage);
+            }else{
+                chat_get_group_users(socket, data.chatID);
             }
             break;
         }
