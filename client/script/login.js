@@ -57,3 +57,28 @@ function pwdError(errorMessage) {
     document.getElementById("pwdError").innerHTML = errorMessage;
 
 }
+
+
+/**
+ * Show or hide error messages in element id: "dashboardError"
+ * @param message
+ * @param errorId
+ */
+function showError(message, errorId){
+    errorId = (errorId?errorId:"dashboardError");
+    // reset error message if message is ""
+    // const messagebox = document.getElementById(errorId);
+    const messageboxList = document.querySelectorAll(".error");
+    for (const messagebox of messageboxList) {
+        if (!messagebox) {
+            console.error("Error thrown by handling another Error: " +
+                "Messagebox to inject message is not defined, " +
+                "Errormessage to print: ", message);
+            return;
+        }
+    }
+    document.getElementById("dashboardError").innerHTML = message;
+    if(message){
+        console.warn(message);
+    }
+}

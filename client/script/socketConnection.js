@@ -160,7 +160,7 @@ async function loginUser(data) {
  */
 function errorEvent(message) {
     // console.warn("EventError: ", message);
-    dashboardError(message);
+    showError(message);
     // TODO POPUP
 }
 
@@ -222,7 +222,7 @@ function newChat(type) {
     let name = chatName.trim();
     if (type === "user") {
         if(!checkUsernameSemantic(chatName)) {
-            dashboardError("Username must only contain upper- and lowercase " +
+            showError("Username must only contain upper- and lowercase " +
                 "letters, digits and the special characters \\+\\-\\_\\.");
             return;
         }
@@ -230,7 +230,7 @@ function newChat(type) {
     }
     // else {/*Empty Group*/}
 
-    dashboardError("");
+    showError("");
     chat_create_new_chat(socket, name, type, users);
 }
 

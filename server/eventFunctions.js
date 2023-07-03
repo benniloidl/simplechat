@@ -118,12 +118,14 @@ async function createChat(socket, data, username) {
 
 async function sendMessage(socket, data, username, sockets) {
     if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() })) {
+        const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
+        for (const groupMember of groupMembers) {
+            if(groupMember !== username){
+                await dbFunctions.incrementUnreadMessages(groupMember, data.chatID);
+            }
+        }
         for (const s of sockets) {
             if (await dbFunctions.hasChat(s.username, data.chatID)) {
-                if (s.username != username) {
-                    await dbFunctions.incrementUnreadMessages(s.username, data.chatID);
-                }
-                // s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID, "username": s.username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
                 sendEvent(s.socket, 'messageNotification', {
                     "chatID": data.chatID,
                     "username": s.username,

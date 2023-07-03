@@ -1,7 +1,6 @@
 const mongo = require('mongodb');
 const crypto = require('crypto');
 const encryption = require('./encryption');
-const { getPublicWebKey } = require("./encryption");
 const { MongoClient } = mongo;
 const uri = "mongodb://127.0.0.1:27017/SimpleChat";
 // const uri = "mongodb+srv://benni:84MnGSHcg3GiqKmb@simplechat.xc7or0f.mongodb.net/?retryWrites=true&w=majority";
@@ -58,7 +57,7 @@ function createSessionToken(username) {
 async function storeSessionCookie(username) {
     const token = createSessionToken(username);
     const keyObject = await encryption.generateKeyPair();
-    const publicKey = await getPublicWebKey(keyObject.publicKey);
+    const publicKey = await encryption.getPublicWebKey(keyObject.publicKey);
     try {
         // remove existing tokens
         sessions.deleteMany({ "username": username });
@@ -399,6 +398,5 @@ module.exports = {
     addUser,
     deleteAccount,
     userChatExists,
-    fetchGroupUsers,
     checkSessionCookie
 };
