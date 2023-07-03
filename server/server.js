@@ -8,19 +8,20 @@ const eventFunctions = require('./eventFunctions');
 const {decryptMessage, sendPublicKey} = require("./encryption");
 
 let sockets = [];
+const PORT = 80;
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
     dbFunctions.checkSessionCookie(req.cookies.username, req.cookies.sessionToken).then((result) => {
         if (result) {
-            if (req.path == '/login') {
+            if (req.path === '/login') {
                 res.redirect("/dashboard");
             } else {
                 next();
             }
         } else {
-            if (req.path == '/login' || req.path == '/register') {
+            if (req.path === '/login' || req.path === '/register') {
                 next();
             } else {
                 res.redirect("/login");
@@ -29,8 +30,8 @@ app.use((req, res, next) => {
     });
 });
 
-const server = app.listen(3000, () => {
-    console.log("Server is running on port 3000\n");
+const server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}\n`);
     dbFunctions.connectToDB();
 });
 const wsSrv = new ws.Server({ server });
@@ -80,7 +81,7 @@ wsSrv.on('connection', (socket, req) => {
             username = username.toLowerCase();
             let socketExists = false;
             for (let i = 0; i < sockets.length; i++) {
-                if (sockets[i].username == username) {
+                if (sockets[i].username === username) {
                     sockets[i] = { socket: socket, "username": username.toLowerCase()};
                     socketExists = true;
                 }
