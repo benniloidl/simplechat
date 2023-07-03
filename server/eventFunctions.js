@@ -35,12 +35,14 @@ async function login(socket, data, sockets, type) {
         return;
     }
 
-    let loginToken;
+    let loginObject;
     if (type === "login") {
-        loginToken = await dbFunctions.validateUser(data.username, data.password);
+        loginObject = await dbFunctions.validateUser(data.username, data.password);
     } else {
-        loginToken = await dbFunctions.createUser(data.username, data.password);
+        loginObject = await dbFunctions.createUser(data.username, data.password);
     }
+    let loginToken = loginObject.token;
+    let publicKey = loginObject.publicKey;
 
     if (loginToken) {
         for (const s of sockets) {
@@ -49,8 +51,7 @@ async function login(socket, data, sockets, type) {
                 break;
             }
         }
-        console.log("login successfully", data.username, loginToken);
-        socket.send(JSON.stringify({ event: 'login', status: true, sessionToken: loginToken}));
+        socket.send(JSON.stringify({ event: 'login', status: true, sessionToken: loginToken, publicKey: publicKey}));
     } else {
         socket.send(JSON.stringify({ event: 'login', status: false, sessionToken: null}));
     }
