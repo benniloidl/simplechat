@@ -131,3 +131,11 @@ function base64ToBytes(base64) {
 function setSocketEncryption(boolean){
     localStorage.setItem("socketEncryption", boolean);
 }
+
+function encryptionAvailable(){
+    if(window.crypto){
+        setSocketEncryption(true);
+    } else{
+        setSocketEncryption(false);
+    }
+}

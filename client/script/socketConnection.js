@@ -47,11 +47,12 @@ socket.onopen = function () {
 };
 
 socket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    console.log("onMessage", data.event, data)
-    switch (data.event) {
+    const parsedEvent = JSON.parse(event.data);
+    const data = parsedEvent.data;
+    console.log("onMessage", parsedEvent.event, data)
+    switch (parsedEvent.event) {
         case 'publicKey':
-            const key = JSON.stringify(data.data)
+            const key = JSON.stringify(data)
             localStorage.setItem("publicKey", key);
 
             if (fileName[0] === "dashboard") {
@@ -67,42 +68,48 @@ socket.onmessage = function (event) {
             break;
         case 'fetchChats':
             try {
-                buildChatOverview(data.chats);
+                buildChatOverview(data);
             } catch (e) { // if the element is not yet loaded
-                setTimeout(() => buildChatOverview(data.chats), 1000);
+                setTimeout(() => buildChatOverview(data), 1000);
             }
             break;
         case 'fetchMessages':
-            buildChatMessages(data.data)
+            buildChatMessages(data);
+            if(data.next && data.next > 0){
+                chat_scrolled(socket, data.chatID, data.next);
+            }
             break;
         case 'messageNotification': {
             //TODO fix unreadMessages counter
-            notificationHandler(data.notification);
+            notificationHandler(data);
             break;
         }
         case 'messagesRead':{
-            markChatAsRead()
+            markChatAsRead(data);
             break
         }
         case 'fetchGroupUsers':{
-            createViewContainer(data.data.users);
+            createViewContainer(data.users);
             break;
         }
-        case 'deleteAccount':
-            sessionStorage.clear();
-            localStorage.clear();
-            logout();
-            break;
+        case 'deleteAccount': {
+            if(data.status) {
+                sessionStorage.clear();
+                localStorage.clear();
+                logout();
+                break;
+            }
+        }
         case 'addUser':{
-            if(data.data.status){
+            if(data.status){
                 // const a = getChatNodeById(data.data.chatID);
                 // if(a) a.remove();
             }
             break;
         }
         case 'removeUser':{
-            if(data.data.status && data.username===getCookie("username")){
-                const a = getChatNodeById(data.data.chatID);
+            if(data.status && data.username===getCookie("username")){
+                const a = getChatNodeById(data.chatID);
                 if(a) a.remove();
                 injectPageAsync("../subpages/dashboard/profile.html", cleanStorage);
             }

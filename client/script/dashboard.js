@@ -46,7 +46,8 @@ function generateUsers(username){
  * Builds the side menu of chats in your Chats
  * @param chats
  */
-function buildChatOverview(chats) {
+function buildChatOverview(data) {
+    const chats = data.chats;
     if(!chats){
         return;
     }

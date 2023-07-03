@@ -11,7 +11,11 @@ async function validate(username, sessionToken /*password*/) {
 
 async function fetchchats(socket, username) {
     const chats = await dbFunctions.fetchChats(username);
-    socket.send(JSON.stringify({ event: 'fetchChats', "chats": chats }));
+    const remainingMessages = 0; // TODO
+    // socket.send(JSON.stringify({ event: 'fetchChats', "chats": chats }));
+    sendEvent(socket, 'fetchChats', {
+        chats: chats,
+    });
 }
 
 async function login(socket, data, sockets, type) {
@@ -31,7 +35,12 @@ async function login(socket, data, sockets, type) {
             data.username.length <= 16
         )
     ) {
-        socket.send(JSON.stringify({ event: 'login', status: false }));
+        // socket.send(JSON.stringify({ event: 'login', status: false }));
+        sendEvent(socket, 'login', {
+            status: false,
+            sessionToken: null,
+            publicKey: null
+        });
         return;
     }
 
@@ -40,6 +49,11 @@ async function login(socket, data, sockets, type) {
         loginObject = await dbFunctions.validateUser(data.username, data.password);
     } else {
         loginObject = await dbFunctions.createUser(data.username, data.password);
+    }
+    if (!loginObject){
+        // Probably user does not exist
+        sendError(socket, "FATAL ERROR during login!");
+        return -1;
     }
     let loginToken = loginObject.token;
     let publicKey = loginObject.publicKey;
@@ -51,9 +65,19 @@ async function login(socket, data, sockets, type) {
                 break;
             }
         }
-        socket.send(JSON.stringify({ event: 'login', status: true, sessionToken: loginToken, publicKey: publicKey}));
+        // socket.send(JSON.stringify({ event: 'login', status: true, sessionToken: loginToken, publicKey: publicKey}));
+        sendEvent(socket, 'login', {
+            status: true,
+            sessionToken: loginToken,
+            publicKey: publicKey
+        });
     } else {
-        socket.send(JSON.stringify({ event: 'login', status: false, sessionToken: null}));
+        // socket.send(JSON.stringify({ event: 'login', status: false, sessionToken: null}));
+        sendEvent(socket, 'login', {
+            status: false,
+            sessionToken: null,
+            publicKey: null
+        });
     }
 }
 
@@ -86,7 +110,10 @@ async function createChat(socket, data, username) {
             await dbFunctions.addChat(user, chatID);
         }
     }
-    socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
+    // socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
+    sendEvent(socket, 'fetchChats', {
+        chats: [{ "chatID": chatID, "name": data.name, "type": data.type }]
+    });
 }
 
 async function sendMessage(socket, data, username, sockets) {
@@ -96,7 +123,17 @@ async function sendMessage(socket, data, username, sockets) {
                 if (s.username != username) {
                     await dbFunctions.incrementUnreadMessages(s.username, data.chatID);
                 }
-                s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID, "username": s.username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
+                // s.socket.send(JSON.stringify({ event: "messageNotification", notification: { "chatID": data.chatID, "username": s.username, "message": { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() } } }));
+                sendEvent(s.socket, 'messageNotification', {
+                    "chatID": data.chatID,
+                    "username": s.username,
+                    "message": {
+                        message: data.message,
+                        author: username,
+                        readConfirmation: false,
+                        timeStamp: Date.now()
+                    }
+                });
             }
         }
     } else {
@@ -108,15 +145,25 @@ async function readChat(socket, data, username, sockets) {
     await dbFunctions.resetUnreadMessages(username, data.chatID);
     for (const s of sockets) {
         if (s.socket != socket && await dbFunctions.hasChat(s.username, data.chatID)) {
-            s.socket.send(JSON.stringify({ event: "messagesRead", chatID: data.chatID }));
+            // s.socket.send(JSON.stringify({ event: "messagesRead", chatID: data.chatID }));
+            sendEvent(s.socket, 'messagesRead', {
+                chatID: data.chatID
+            });
         }
     }
 }
 
 async function fetchMessages(socket, data, username) {
     const messages = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
+    let next = 0; //TODO
     if (messages) {
-        socket.send(JSON.stringify({ event: "fetchMessages", data: { "username": username, "chatID": data.chatID, "messages": messages } }));
+        // socket.send(JSON.stringify({ event: "fetchMessages", data: { "username": username, "chatID": data.chatID, "messages": messages } }));
+        sendEvent(socket, 'fetchMessages', {
+            "username": username,
+            "chatID": data.chatID,
+            "messages": messages,
+            next: next
+        });
     } else {
         sendError(socket, "Cannot fetch messages");
     }
@@ -125,7 +172,10 @@ async function fetchMessages(socket, data, username) {
 async function fetchGroupUsers(socket, data) {
     const users = await dbFunctions.fetchGroupUsers(data.chatID);
     if (users.members.length > 0) {
-        socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users.members } }));
+        // socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users.members } }));
+        sendEvent(socket, 'fetchGroupUsers', {
+            users: users.members
+        });
     } else {
         sendError(socket, "Cannot fetch group users.");
     }
@@ -134,32 +184,60 @@ async function fetchGroupUsers(socket, data) {
 async function removeUser(socket, data) {
     const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
     if (result) {
-        socket.send(JSON.stringify({ event: "removeUser", data: { "status": true, "chatID": data.chatID } }));
+        // socket.send(JSON.stringify({ event: "removeUser", data: { "status": true, "chatID": data.chatID } }));
+        sendEvent(socket, 'removeUser', {
+            status: true,
+            chatID: data.chatID,
+            username: data.username
+        });
     } else {
-        socket.send(JSON.stringify({ event: "removeUser", data: { "status": false, "chatID": data.chatID  } }));
+        // socket.send(JSON.stringify({ event: "removeUser", data: { "status": false, "chatID": data.chatID  } }));
+        sendEvent(socket, 'removeUser', {
+            status: false,
+            chatID: data.chatID,
+            username: data.username
+        });
     }
 }
 
 async function addUser(socket, data) {
     const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
     if (result) {
-        socket.send(JSON.stringify({ event: "addUser", data: { "status": true, "chatID": data.chatID  } }));
+        // socket.send(JSON.stringify({ event: "addUser", data: { "status": true, "chatID": data.chatID  } }));
+        sendEvent(socket, 'addUser', {
+            status: true,
+            chatID: data.chatID
+        });
     } else {
-        socket.send(JSON.stringify({ event: "addUser", data: { "status": false, "chatID": data.chatID  } }));
+        // socket.send(JSON.stringify({ event: "addUser", data: { "status": false, "chatID": data.chatID  } }));
+        sendEvent(socket, 'addUser', {
+            status: false,
+            chatID: data.chatID
+        });
     }
 }
 
 async function deleteAccount(socket, username) {
     const result = await dbFunctions.deleteAccount(username);
     if (result) {
-        socket.send(JSON.stringify({ event: "deleteAccount", data: { "status": true } }));
+        // socket.send(JSON.stringify({ event: "deleteAccount", data: { "status": true } }));
+        sendEvent(socket, 'deleteAccount', {
+            status: true,
+        });
     } else {
         sendError(socket, "Couldn't delete account.");
     }
 }
 
 function sendError(socket, message) {
-    socket.send(JSON.stringify({ event: "error", message: message }))
+    // socket.send(JSON.stringify({ event: "error", message: message }));
+    sendEvent(socket, 'error', {
+        message: message
+    });
+}
+
+function sendEvent(socket, event, data){
+    socket.send(JSON.stringify({event: event, data:data}));
 }
 
 module.exports = {
