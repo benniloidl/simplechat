@@ -2,6 +2,7 @@ const mongo = require('mongodb');
 const crypto = require('crypto');
 const { MongoClient } = mongo;
 const uri = "mongodb://127.0.0.1:27017/SimpleChat";
+// const uri = "mongodb+srv://benni:84MnGSHcg3GiqKmb@simplechat.xc7or0f.mongodb.net/?retryWrites=true&w=majority";
 const dbClient = new MongoClient(uri);
 let db, user, chatHistory, sessions;
 
@@ -19,7 +20,7 @@ async function connectToDB() {
         console.error("connecting to db failed");
         process.exit(42);
     }
-
+    
     console.log("connected successfully\n");
     // console.log(await addMessage("649e8f8dbbc6ef0e740648d6", {
     //     message: "message",
@@ -31,45 +32,46 @@ async function connectToDB() {
 }
 
 
-async function createPasswordHash(password){
+async function createPasswordHash(password) {
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto.pbkdf2Sync(password, salt,
         1000, 64, 'sha512').toString('hex');
-    return {salt: salt, hash: hash};
+    return { salt: salt, hash: hash };
 }
 
-function validatePassword(passwordToCheck, passwordObject){
+function validatePassword(passwordToCheck, passwordObject) {
     const passwordHash = crypto.pbkdf2Sync(passwordToCheck, passwordObject.salt,
         1000, 64, 'sha512').toString('hex');
     return passwordHash === passwordObject.password;
 }
 
-function createSessionToken(username){
-    let key = Date.now().toString()+username;
+function createSessionToken(username) {
+    let key = Date.now().toString() + username;
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto.pbkdf2Sync(key, salt,
         10, 30, 'sha512').toString('hex');
     return hash;
 }
 
-async function storeSessionCookie(username){
+async function storeSessionCookie(username) {
     const token = createSessionToken(username);
-
-
-    try{
+    
+    
+    try {
         // remove existing tokens
-        sessions.deleteMany({"username":username});
-    }catch (e) {
+        sessions.deleteMany({ "username": username });
+    } catch (e) {
         console.warn(e)
     }
-    let res =  await sessions.insertOne({"username":username, "token":token});
-    const result = await sessions.findOne({ "username": username}, { projection: { _id: 1 } });
+    let res = await sessions.insertOne({ "username": username, "token": token });
+    const result = await sessions.findOne({ "username": username }, { projection: { _id: 1 } });
     return token;
 }
-async function checkSessionCookie(username, sessionToken){
-    if(username === undefined || sessionToken === undefined) return false;
+
+async function checkSessionCookie(username, sessionToken) {
+    if (username === undefined || sessionToken === undefined) return false;
     // const result = await sessions.findOne({ "username": username, "token":sessionToken}, { projection: { _id: 1 } });
-    const result = await sessions.findOne({ "username": username.toLowerCase()}, { projection: { _id: 1 } });
+    const result = await sessions.findOne({ "username": username.toLowerCase() }, { projection: { _id: 1 } });
     return !!result;
 }
 
@@ -78,10 +80,10 @@ async function validateUser(username, password) {
         return false;
     }
     username = username.toLowerCase();
-    const pwdObject = await user.findOne({"username": username}, {projection:{password:1, salt:1, _id:0}});
+    const pwdObject = await user.findOne({ "username": username }, { projection: { password: 1, salt: 1, _id: 0 } });
     if (!pwdObject) return;
     const result = validatePassword(password, pwdObject);
-    if(result) return storeSessionCookie(username);
+    if (result) return storeSessionCookie(username);
     return false;
 }
 
@@ -90,7 +92,12 @@ async function createUser(username, password) {
         return false;
     } else {
         let pwObject = await createPasswordHash(password);
-        let res = await user.insertOne({ "username": username, "password": pwObject.hash, "salt": pwObject.salt, chats: [] });
+        let res = await user.insertOne({
+            "username": username,
+            "password": pwObject.hash,
+            "salt": pwObject.salt,
+            chats: []
+        });
         if (!res.acknowledged) console.error("Creation of user went wrong!", pwObject, res, username);
         return storeSessionCookie(username);
     }
@@ -129,7 +136,14 @@ async function getAllChatIDs(username) {
 }
 
 async function getChatDetails(chatID) {
-    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, name: 1, type: 1, members: 1 } });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
+        projection: {
+            _id: 0,
+            name: 1,
+            type: 1,
+            members: 1
+        }
+    });
     if (result) {
         return result;
     } else {
@@ -152,7 +166,12 @@ async function fetchChats(username) {
                         detail.name = otherUsername;
                     }
                 }
-                chats.push({ "chatID": id.chatID, "name": detail.name, "type": detail.type, "unreadMessages": unreadMessages });
+                chats.push({
+                    "chatID": id.chatID,
+                    "name": detail.name,
+                    "type": detail.type,
+                    "unreadMessages": unreadMessages
+                });
             }
         }
     } else {
@@ -176,7 +195,12 @@ async function createChat(name, type, members) {
 }
 
 async function fetchMessages(chatID, start, amount) {
-    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, messages: 1 } });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
+        projection: {
+            _id: 0,
+            messages: 1
+        }
+    });
     if (result) {
         let ret;
         try {
@@ -261,16 +285,26 @@ async function chatExists(chatID) {
 }
 
 async function fetchGroupUsers(chatID) {
-    const members = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID)  }, { projection: { _id: 0, members: 1 } });
-    if(members){
+    const members = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
+        projection: {
+            _id: 0,
+            members: 1
+        }
+    });
+    if (members) {
         return members;
-    }else{
+    } else {
         return false;
     }
 }
 
 async function removeUser(chatID, username) {
-    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 0, members: 1 } });
+    const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
+        projection: {
+            _id: 0,
+            members: 1
+        }
+    });
     if (result && result.members) {
         const index = result.members.indexOf(username);
         result.members.splice(index, 1);
