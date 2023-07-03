@@ -1,9 +1,15 @@
-<div class="chat-contact">
+<div class="chat-contact" onclick="toggleChatOverview(event)">
 	<i class="fas fa-user"></i>
-	<p id="chat-name">Some user</p>
+	<p id="chat-name">Loading...</p>
 	<i class="fas fa-bars menu-open"
 	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 	<div style="position: absolute; right: var(--spacing); white-space: nowrap; color: red;"><p>Delete Chat</p></div>
+</div>
+<div class="chat-overview-wrapper" data-overview-open="false">
+	<div class="overview-container">
+		<button>Leave chat</button>
+	</div>
+	<hr>
 </div>
 
 <div id="chat-box">

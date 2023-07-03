@@ -41,10 +41,32 @@ async function sendPublicKey(socket){
     socket.send(message);
     return keyPair.privateKey;
 }
+async function createPasswordHash(password) {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.pbkdf2Sync(password, salt,
+        1000, 64, 'sha512').toString('hex');
+    return { salt: salt, hash: hash };
+}
+
+function validatePassword(passwordToCheck, passwordObject) {
+    const passwordHash = crypto.pbkdf2Sync(passwordToCheck, passwordObject.salt,
+        1000, 64, 'sha512').toString('hex');
+    return passwordHash === passwordObject.password;
+}
+
+function createSessionToken(username) {
+    let key = Date.now().toString() + username;
+    const salt = crypto.randomBytes(16).toString('hex');
+    return crypto.pbkdf2Sync(key, salt,
+        10, 30, 'sha512').toString('hex');
+}
 
 module.exports = {
     generateKeyPair,
     decryptMessage,
     getPublicWebKey,
-    sendPublicKey
+    sendPublicKey,
+    createPasswordHash,
+    validatePassword,
+    createSessionToken
 }

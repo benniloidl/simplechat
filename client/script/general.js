@@ -13,7 +13,7 @@ function detectColorScheme() {
             theme = "high-contrast";
         }
     } else if (!window.matchMedia) {
-        //matchMedia method not supported
+        //matchMedia method isn't supported
         return false;
     } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         //OS theme setting detected as dark
@@ -137,5 +137,26 @@ function encryptionAvailable(){
         setSocketEncryption(true);
     } else{
         setSocketEncryption(false);
+    }
+}
+
+/**
+ * Show or hide error messages in element id: "dashboardError"
+ * @param message
+ */
+function showError(message){
+    //* reset error message if a message is empty: ""*//
+    const messageboxList = document.querySelectorAll(".error");
+    for (const messagebox of messageboxList) {
+        if (!messagebox) {
+            console.error("Error thrown by handling another Error: " +
+                "Messagebox to inject message is not defined, " +
+                "Errormessage to print: ", message);
+            return;
+        }
+        messagebox.innerHTML = message;
+    }
+    if(message){
+        console.warn(message);
     }
 }

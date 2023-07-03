@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 
 const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}\n`);
-    dbFunctions.connectToDB();
+    dbFunctions.connectToDB().then();
 });
 const wsSrv = new ws.Server({ server });
 
@@ -110,43 +110,43 @@ wsSrv.on('connection', (socket, req) => {
         const sessionToken = JSONCookie.sessionToken;
 
         if (event.event === "login") {
-            eventFunctions.login(socket, event.data, sockets, "login");
+            eventFunctions.login(socket, event.data, sockets, "login").then();
             return;
         }
         if (event.event === "register") {
-            eventFunctions.login(socket, event.data, sockets, "register");
+            eventFunctions.login(socket, event.data, sockets, "register").then();
             return;
         }
-        if (!eventFunctions.validate(username, sessionToken)) {
+        if (!eventFunctions.validate(username, sessionToken).then()) {
             return "Username/Password incorrect";
         }
         switch (event.event) {
             case 'fetchChats':
-                eventFunctions.fetchchats(socket, username);
+                eventFunctions.fetchchats(socket, username).then();
                 break;
             case 'sendMessage':
-                eventFunctions.sendMessage(socket, event.data, username, sockets);
+                eventFunctions.sendMessage(socket, event.data, username, sockets).then();
                 break;
             case 'fetchMessages':
-                eventFunctions.fetchMessages(socket, event.data, username);
+                eventFunctions.fetchMessages(socket, event.data, username).then();
                 break;
             case 'createChat':
-                eventFunctions.createChat(socket, event.data, username);
+                eventFunctions.createChat(socket, event.data, username).then();
                 break;
             case 'readChat':
-                eventFunctions.readChat(socket, event.data, username, sockets);
+                eventFunctions.readChat(socket, event.data, username, sockets).then();
                 break;
             case 'fetchGroupUsers':
-                eventFunctions.fetchGroupUsers(socket, event.data);
+                eventFunctions.fetchGroupUsers(socket, event.data).then();
                 break;
             case 'removeUser':
-                eventFunctions.removeUser(socket, event.data);
+                eventFunctions.removeUser(socket, event.data).then();
                 break;
             case 'addUser':
-                eventFunctions.addUser(socket, event.data);
+                eventFunctions.addUser(socket, event.data).then();
                 break;
             case 'deleteAccount':
-                eventFunctions.deleteAccount(socket, username);
+                eventFunctions.deleteAccount(socket, username).then();
                 break;
             default: {
                 eventFunctions.sendError(socket, `unknown event: ${event.event}`);

@@ -61,10 +61,10 @@ socket.onmessage = function (event) {
 
             break;
         case 'login':
-            loginUser(data);
+            loginUser(data).then(null);
             break;
         case 'register':
-            loginUser(data);
+            loginUser(data).then(null);
             break;
         case 'fetchChats':
             try {
@@ -97,8 +97,8 @@ socket.onmessage = function (event) {
                 sessionStorage.clear();
                 localStorage.clear();
                 logout();
-                break;
             }
+            break;
         }
         case 'addUser':{
             if(data.status){
@@ -165,7 +165,7 @@ function errorEvent(message) {
 }
 
 /**
- * User-event: send message to server
+ * User-event: send a message to server
  * @param chatID
  */
 function sendMessage(chatID) {
@@ -197,12 +197,12 @@ function loginRequest(type) {
         socket.sendEvent('login', {
             username: result.username,
             password: result.password,
-        });
+        }).then(null);
     } else {
         socket.sendEvent('register', {
             username: result.username,
             password: result.password,
-        });
+        }).then(null);
     }
     
     return false;
@@ -243,7 +243,7 @@ function removeUser(username) {
     socket.sendEvent('removeUser', {
         chatID: chatID,
         username: username
-    });
+    }).then(null);
 }
 
 function chat_addUser(username){
@@ -252,7 +252,7 @@ function chat_addUser(username){
     socket.sendEvent('addUser', {
         chatID: chatID,
         username: username
-    });
+    }).then(null);
 }
 
 function chat_fetchMessage(socket, chatId) {
@@ -276,7 +276,7 @@ function chat_send_message(socket, chatId, message) {
     socket.sendEvent('sendMessage', {
         message: message,
         chatID: chatId,
-        // timeStamp, author, read are injected by Server
+        // Server injects "timeStamp," "author" and "read"
     });
 }
 

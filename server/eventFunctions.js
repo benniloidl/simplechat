@@ -11,8 +11,6 @@ async function validate(username, sessionToken /*password*/) {
 
 async function fetchchats(socket, username) {
     const chats = await dbFunctions.fetchChats(username);
-    const remainingMessages = 0; // TODO
-    // socket.send(JSON.stringify({ event: 'fetchChats', "chats": chats }));
     sendEvent(socket, 'fetchChats', {
         chats: chats,
     });
@@ -60,7 +58,7 @@ async function login(socket, data, sockets, type) {
 
     if (loginToken) {
         for (const s of sockets) {
-            if (s.socket == socket) {
+            if (s.socket === socket) {
                 s.username = data.username;
                 break;
             }
@@ -87,12 +85,12 @@ async function createChat(socket, data, username) {
 
     }
     data.users.push(username);
-    if (data.type == "user") {
+    if (data.type === "user") {
         if (!await dbFunctions.userExists(data.users[0])) {
             sendError(socket, "User does not exist.");
             return false;
         }
-        if (data.users.length != 2) {
+        if (data.users.length !== 2) {
             sendError(socket, "Exactly one other user is needed to create a user chat");
             return false;
         }
@@ -146,7 +144,7 @@ async function sendMessage(socket, data, username, sockets) {
 async function readChat(socket, data, username, sockets) {
     await dbFunctions.resetUnreadMessages(username, data.chatID);
     for (const s of sockets) {
-        if (s.socket != socket && await dbFunctions.hasChat(s.username, data.chatID)) {
+        if (s.socket !== socket && await dbFunctions.hasChat(s.username, data.chatID)) {
             // s.socket.send(JSON.stringify({ event: "messagesRead", chatID: data.chatID }));
             sendEvent(s.socket, 'messagesRead', {
                 chatID: data.chatID
@@ -157,14 +155,14 @@ async function readChat(socket, data, username, sockets) {
 
 async function fetchMessages(socket, data, username) {
     const messages = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
-    let next = 0; //TODO
+    let remainingMessages = 0; //TODO
     if (messages) {
         // socket.send(JSON.stringify({ event: "fetchMessages", data: { "username": username, "chatID": data.chatID, "messages": messages } }));
         sendEvent(socket, 'fetchMessages', {
             "username": username,
             "chatID": data.chatID,
             "messages": messages,
-            next: next
+            "next": remainingMessages
         });
     } else {
         sendError(socket, "Cannot fetch messages");

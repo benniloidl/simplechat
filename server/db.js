@@ -1,5 +1,4 @@
 const mongo = require('mongodb');
-const crypto = require('crypto');
 const encryption = require('./encryption');
 const { MongoClient } = mongo;
 const uri = "mongodb://127.0.0.1:27017/SimpleChat";
@@ -17,8 +16,9 @@ async function connectToDB() {
         user = db.collection("user");
         chatHistory = db.collection("chatHistory");
         sessions = db.collection("sessions");
-    } catch {
+    } catch (e){
         console.error("connecting to db failed");
+        console.info(e);
         process.exit(42);
     }
     
@@ -33,29 +33,10 @@ async function connectToDB() {
 }
 
 
-async function createPasswordHash(password) {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.pbkdf2Sync(password, salt,
-        1000, 64, 'sha512').toString('hex');
-    return { salt: salt, hash: hash };
-}
 
-function validatePassword(passwordToCheck, passwordObject) {
-    const passwordHash = crypto.pbkdf2Sync(passwordToCheck, passwordObject.salt,
-        1000, 64, 'sha512').toString('hex');
-    return passwordHash === passwordObject.password;
-}
-
-function createSessionToken(username) {
-    let key = Date.now().toString() + username;
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.pbkdf2Sync(key, salt,
-        10, 30, 'sha512').toString('hex');
-    return hash;
-}
 
 async function storeSessionCookie(username) {
-    const token = createSessionToken(username);
+    const token = encryption.createSessionToken(username);
     const keyObject = await encryption.generateKeyPair();
     const publicKey = await encryption.getPublicWebKey(keyObject.publicKey);
     try {
@@ -64,8 +45,8 @@ async function storeSessionCookie(username) {
     } catch (e) {
         console.warn(e)
     }
-    let res = await sessions.insertOne({ "username": username, "token": token, "privateKey": keyObject.privateKey });
-    const result = await sessions.findOne({ "username": username }, { projection: { _id: 1 } });
+    await sessions.insertOne({ "username": username, "token": token, "privateKey": keyObject.privateKey });
+    // const result = await sessions.findOne({ "username": username }, { projection: { _id: 1 } });
     return {
         token: token,
         publicKey: publicKey
@@ -86,7 +67,7 @@ async function validateUser(username, password) {
     username = username.toLowerCase();
     const pwdObject = await user.findOne({ "username": username }, { projection: { password: 1, salt: 1, _id: 0 } });
     if (!pwdObject) return;
-    const result = validatePassword(password, pwdObject);
+    const result = encryption.validatePassword(password, pwdObject);
     if (result) return storeSessionCookie(username);
     return false;
 }
@@ -95,7 +76,7 @@ async function createUser(username, password) {
     if (await userExists(username)) {
         return false;
     } else {
-        let pwObject = await createPasswordHash(password);
+        let pwObject = await encryption.createPasswordHash(password);
         let res = await user.insertOne({
             "username": username,
             "password": pwObject.hash,
@@ -109,11 +90,7 @@ async function createUser(username, password) {
 
 async function userExists(username) {
     const result = await user.findOne({ "username": username }, { projection: { _id: 1 } });
-    if (result) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!result;
 }
 
 
@@ -246,7 +223,7 @@ async function resetUnreadMessages(username, chatID) {
 async function getUnreadMessages(username, chatID) {
     const result = await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
     for (const chat of result.chats) {
-        if (chat.chatID == chatID) {
+        if (chat.chatID === chatID) {
             return chat.unreadMessages;
         }
     }
@@ -254,11 +231,7 @@ async function getUnreadMessages(username, chatID) {
 
 async function hasChat(username, chatID) {
     const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
-    if (result) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!result;
 }
 
 async function userChatExists(users) {
@@ -282,11 +255,7 @@ async function userChatExists(users) {
 
 async function chatExists(chatID) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 1 } });
-    if (result) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!result;
 }
 
 async function fetchGroupUsers(chatID) {
@@ -319,11 +288,7 @@ async function removeUser(chatID, username) {
         }
         await removeChat(username, chatID);
         if (result.members.length === 0) {
-            if (await deleteChat(chatID)) {
-                return true;
-            } else {
-                return false;
-            }
+            return await deleteChat(chatID);
         }
         return true;
     } else {
@@ -333,11 +298,7 @@ async function removeUser(chatID, username) {
 
 async function deleteChat(chatID) {
     const result = await chatHistory.deleteOne({ "_id": new mongo.ObjectId(chatID) });
-    if (result && result.deletedCount === 1) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!(result && result.deletedCount === 1);
 }
 
 async function addUser(chatID, username) {
@@ -354,7 +315,7 @@ async function userAlreadyInGroup(chatID, username) {
     const result = await fetchGroupUsers(chatID);
     if (result && result.members) {
         for (const member of result.members) {
-            if (member == username) {
+            if (member === username) {
                 return true;
             }
         }
@@ -370,11 +331,7 @@ async function deleteAccount(username) {
         }
     }
     const result = await user.deleteOne({ "username": username });
-    if (result && result.deletedCount === 1) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!(result && result.deletedCount === 1);
 }
 
 module.exports = {
@@ -383,16 +340,13 @@ module.exports = {
     createUser,
     addChat,
     userExists,
-    removeChat,
     fetchChats,
     createChat,
     fetchMessages,
     addMessage,
     hasChat,
-    getUnreadMessages,
     incrementUnreadMessages,
     resetUnreadMessages,
-    chatExists,
     fetchGroupUsers,
     removeUser,
     addUser,
