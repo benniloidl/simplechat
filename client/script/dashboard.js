@@ -12,12 +12,14 @@ function createViewContainer(users) {
     }
     
     document.querySelector(".overview-container ul").replaceWith(ul);
-    document.querySelector(".overview-container button").addEventListener("click", () => {
-        let username = getCookie("username");
-        removeUser(username);
-    });
+
+
     
-    
+}
+
+function overviewContainerAction(){
+    let username = getCookie("username");
+    removeUser(username);
 }
 
 /**
