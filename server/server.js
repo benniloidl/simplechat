@@ -69,7 +69,7 @@ wsSrv.on('connection', (socket, req) => {
         }
         // console.log(event)
         if(event.data && event.event === "secretKey"){
-            console.log("event SecretKey")
+            console.log("event SecretKey");
                 handleKey(event.data, socket.privateKey, socket);
 
             return 1;
@@ -99,7 +99,7 @@ wsSrv.on('connection', (socket, req) => {
         }
         try {
             if (event.encryptedData) {
-                let privateKey2 = socket.privateKey;
+                // let privateKey2 = socket.privateKey;
                 // let data = await decryptMessage(event.encryptedData, privateKey2);
                 console.log("asdfasdf", event.encryptedData, socket.secretKey, socket.iv)
                 let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);

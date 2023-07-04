@@ -154,7 +154,20 @@ async function encryptMessageAES(aesKey, iv, message){
         )
     return bytesToBase64(new Uint8Array(cipherText));
 }
-
+async function decryptMessageAES(encryptedMessage, aesKey, iv) {
+    console.log("decryptMessage", aesKey, iv, encryptedMessage);
+    let decoder = new TextDecoder("utf-8");
+    console.log("AESencryptedMessage", encryptedMessage)
+    let decrypted = await window.crypto.subtle.decrypt({
+            name: "AES-CTR",
+            counter: iv,
+            length: 128
+        },
+        aesKey,
+        base64ToBytes(encryptedMessage)
+    );
+    return decoder.decode(decrypted);
+}
 async function exportKeyAES(aesKey){
     return window.crypto.subtle.exportKey("jwk", aesKey);
 }

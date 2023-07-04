@@ -21,6 +21,11 @@ function base64ToBytes(base64) {
     const binString = atob(base64);
     return Uint8Array.from(binString, (m) => m.codePointAt(0));
 }
+
+function bytesToBase64(bytes){
+    const binString = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
+    return btoa(binString);
+}
 async function decryptMessage(encryptedMessage, privateKey){
     let decoder = new TextDecoder("utf-8");
     // console.log("encryptedMessage", encryptedMessage)
@@ -103,11 +108,11 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv){
     return decoder.decode(decrypted);
 }
 
-async function encryptMessageAESServer(aesKey, iv, message){
-    console.log("encyptMessage", aesKey, iv, message);
+async function encryptMessageAESServer(message, aesKey, iv){
+    console.log("encyptMessageServer", aesKey, iv, message);
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
-    return crypto.subtle.encrypt({
+    const cipherText = await crypto.subtle.encrypt({
             name: "AES-CTR",
             counter: iv,
             length: 128
@@ -115,6 +120,7 @@ async function encryptMessageAESServer(aesKey, iv, message){
         aesKey,
         encoded
     )
+    return bytesToBase64(new Uint8Array(cipherText));
 }
 
 module.exports = {
@@ -127,5 +133,6 @@ module.exports = {
     createSessionToken,
     loadAESKey,
     handleKey,
-    decryptMessageAES
+    decryptMessageAES,
+    encryptMessageAESServer
 }
