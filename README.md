@@ -1,6 +1,16 @@
 # SimpleChat
 This is a simple responsive student project featuring basic chat functionality. It is meant to be as lightweight as possible, therefore it only relies on plain **HTML**, **CSS**, **JavaScript** and **NodeJS**.
 
+#### Installing the dependencies
+```
+npm i
+```
+
+#### Starting up SimpleChat
+```
+npm start
+```
+
 ![image](https://github.com/altetaube/simplechat/assets/116595379/1628ecdb-9205-480f-84f2-c93965dd3bb2)
 
 # API Data Structure
