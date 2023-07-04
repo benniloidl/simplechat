@@ -45,7 +45,8 @@ body {
     background-color: var(--color-background);
 }
 
-body, article {
+body,
+article {
     transition: all 500ms;
     transition-delay: 0ms;
 }
@@ -94,14 +95,15 @@ footer .appearanceMode {
 }
 
 .chat-overview-wrapper {
+    position: absolute;
     z-index: 1;
-    overflow: scroll;
-    height: 60%;
-    max-height: 60%;
-    margin-top: calc(var(--spacing) * -1 - var(--border-radius));
+    overflow: hidden auto;
+    width: calc(100% - var(--spacing));
+    height: calc(100% - var(--spacing) * 2);
     transition: all 250ms ease;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-radius: var(--border-radius);
     background: var(--color-secondary);
+    padding-block: calc(var(--spacing) * 2) var(--spacing);
 }
 
 .chat-overview-wrapper[data-overview-open="false"] {

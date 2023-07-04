@@ -87,6 +87,7 @@ main #sidebar .sidebar-callout {
 }
 
 main #chat {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
