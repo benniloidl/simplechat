@@ -298,7 +298,7 @@ async function removeUser(chatID, username) {
 
 async function deleteChat(chatID) {
     const result = await chatHistory.deleteOne({ "_id": new mongo.ObjectId(chatID) });
-    return !!(result && result.deletedCount === 1);
+    return result && result.deletedCount === 1;
 }
 
 async function addUser(chatID, username) {
@@ -325,8 +325,8 @@ async function userAlreadyInGroup(chatID, username) {
 
 async function deleteAccount(username) {
     const chatIDs = await getAllChatIDs(username);
-    if (chatIDs.length > 0) {
-        for (const id of chatIDs) {
+    if (chatIDs.chats.length > 0) {
+        for (const id of chatIDs.chats) {
             await removeUser(id.chatID);
         }
     }

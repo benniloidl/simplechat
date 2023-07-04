@@ -3,7 +3,7 @@ const dbFunctions = require('./db');
 async function validate(username, sessionToken /*password*/) {
     // return await dbFunctions.validateUser(username, password);
     const result = await dbFunctions.checkSessionCookie(username, sessionToken);
-    if(!result){
+    if (!result) {
         // redirect to log in
     }
     return result;
@@ -48,7 +48,7 @@ async function login(socket, data, sockets, type) {
     } else {
         loginObject = await dbFunctions.createUser(data.username, data.password);
     }
-    if (!loginObject){
+    if (!loginObject) {
         // Probably user does not exist
         sendError(socket, "FATAL ERROR during login!");
         return -1;
@@ -98,7 +98,7 @@ async function createChat(socket, data, username) {
             sendError(socket, "Chat already exists.");
             return false;
         }
-    }else if(data.name && (data.name.length<=0 || data.name.length > 16)){
+    } else if (data.name && (data.name.length <= 0 || data.name.length > 16)) {
         sendError(socket, "Length of group name must be between 0 and 16");
     }
     const chatID = await dbFunctions.createChat(data.type === "user" ? "userChat" : data.name, data.type, data.users);
@@ -118,7 +118,7 @@ async function sendMessage(socket, data, username, sockets) {
     if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() })) {
         const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
         for (const groupMember of groupMembers) {
-            if(groupMember !== username){
+            if (groupMember !== username) {
                 await dbFunctions.incrementUnreadMessages(groupMember, data.chatID);
             }
         }
@@ -183,38 +183,21 @@ async function fetchGroupUsers(socket, data) {
 
 async function removeUser(socket, data) {
     const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
-    if (result) {
-        // socket.send(JSON.stringify({ event: "removeUser", data: { "status": true, "chatID": data.chatID } }));
-        sendEvent(socket, 'removeUser', {
-            status: true,
-            chatID: data.chatID,
-            username: data.username
-        });
-    } else {
-        // socket.send(JSON.stringify({ event: "removeUser", data: { "status": false, "chatID": data.chatID  } }));
-        sendEvent(socket, 'removeUser', {
-            status: false,
-            chatID: data.chatID,
-            username: data.username
-        });
-    }
+    // socket.send(JSON.stringify({ event: "removeUser", data: { "status": true, "chatID": data.chatID } }));
+    sendEvent(socket, 'removeUser', {
+        status: result ? true : false,
+        chatID: data.chatID,
+        username: data.username
+    });
 }
 
 async function addUser(socket, data) {
     const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
-    if (result) {
         // socket.send(JSON.stringify({ event: "addUser", data: { "status": true, "chatID": data.chatID  } }));
         sendEvent(socket, 'addUser', {
-            status: true,
+            status: result?true:false,
             chatID: data.chatID
         });
-    } else {
-        // socket.send(JSON.stringify({ event: "addUser", data: { "status": false, "chatID": data.chatID  } }));
-        sendEvent(socket, 'addUser', {
-            status: false,
-            chatID: data.chatID
-        });
-    }
 }
 
 async function deleteAccount(socket, username) {
@@ -236,8 +219,8 @@ function sendError(socket, message) {
     });
 }
 
-function sendEvent(socket, event, data){
-    socket.send(JSON.stringify({event: event, data:data}));
+function sendEvent(socket, event, data) {
+    socket.send(JSON.stringify({ event: event, data: data }));
 }
 
 module.exports = {
