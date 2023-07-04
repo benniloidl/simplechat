@@ -15,12 +15,9 @@ function createViewContainer(users) {
     }
 
     document.querySelector(".overview-container ul").replaceWith(ul);
-
-
-
 }
 
-function overviewContainerAction(){
+function overviewContainerAction() {
     let username = getCookie("username");
     removeUser(username);
 }
@@ -39,7 +36,7 @@ function generateUsers(username) {
     minus.classList.add("fas", "fa-minus");
 
     element.appendChild(user);
-    element.innerHTML = username;
+    element.appendChild(document.createTextNode(username));
     element.appendChild(minus);
 
     minus.addEventListener("click", () => {
@@ -166,6 +163,9 @@ function buildChatMessages(chatData) {
             sendMessage(chatData.chatID);
         }
     });
+
+    document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+    document.querySelector("#chat-actions div textarea").focus();
 }
 
 /**
@@ -256,7 +256,9 @@ function readMessage(element) {
 
 function injectMessage(messageObject, username, type) {
     let chatObject = buildMessageObject(messageObject, username, type);
-    document.getElementById("chat-box").appendChild(chatObject);
+    const chatBox = document.getElementById("chat-box");
+    chatBox.appendChild(chatObject);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 /**
@@ -418,5 +420,16 @@ function serverConnectionLost() {
 
     button.addEventListener("click", () => window.location.reload());
     timer();
+}
 
+function focusTextArea() {
+    document.getElementById('chat-box').style.marginBottom = 'calc(8 * var(--spacing))';
+
+    const interval = setInterval(() => {
+        document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+    }, 10);
+
+    setTimeout(function () {
+        clearInterval(interval);
+    }, 250);
 }

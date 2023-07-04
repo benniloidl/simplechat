@@ -29,7 +29,7 @@ main #sidebar {
     gap: var(--spacing);
 }
 
-::-webkit-scrollbar {
+main #sidebar ::-webkit-scrollbar {
     width: 0;
     background: transparent;
 }
@@ -87,6 +87,7 @@ main #sidebar .sidebar-callout {
 }
 
 main #chat {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;

@@ -1,8 +1,8 @@
 const mongo = require('mongodb');
 const encryption = require('./encryption');
 const { MongoClient } = mongo;
-const uri = "mongodb://127.0.0.1:27017/SimpleChat";
-// const uri = "mongodb+srv://benni:84MnGSHcg3GiqKmb@simplechat.xc7or0f.mongodb.net/?retryWrites=true&w=majority";
+// const uri = "mongodb://127.0.0.1:27017/SimpleChat";
+const uri = "mongodb+srv://benni:7Mi2duv15aMJeTT4@simplechat.pr3gx85.mongodb.net/";
 const dbClient = new MongoClient(uri);
 let db, user, chatHistory, sessions;
 
@@ -16,7 +16,7 @@ async function connectToDB() {
         user = db.collection("user");
         chatHistory = db.collection("chatHistory");
         sessions = db.collection("sessions");
-    } catch (e){
+    } catch (e) {
         console.error("connecting to db failed");
         console.info(e);
         process.exit(42);
@@ -31,8 +31,6 @@ async function connectToDB() {
     //     readConfirmation: false
     // }));
 }
-
-
 
 
 async function storeSessionCookie(username) {
@@ -56,9 +54,9 @@ async function storeSessionCookie(username) {
 
 async function checkSessionCookie(username, sessionToken) {
     if (username === undefined || sessionToken === undefined) return false;
-    const result = await sessions.findOne({ "username": username, "token":sessionToken}, { projection: { _id: 1 } });
+    const result = await sessions.findOne({ "username": username, "token": sessionToken }, { projection: { _id: 1 } });
     //const result = await sessions.findOne({ "username": username.toLowerCase() }, { projection: { _id: 1 } });
-    return result?true:false;
+    return result ? true : false;
 }
 
 async function validateUser(username, password) {
@@ -278,7 +276,7 @@ async function removeUser(chatID, username) {
         projection: {
             _id: 0,
             members: 1,
-            type:1
+            type: 1
         }
     });
     if (result && result.members) {
@@ -291,7 +289,7 @@ async function removeUser(chatID, username) {
         await removeChat(username, chatID);
         if (result.members.length === 0) {
             return await deleteChat(chatID);
-        }else if (result.type==="user"){
+        } else if (result.type === "user") {
             await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": await getOtherUsername(username, chatID) } });
         }
         return true;
