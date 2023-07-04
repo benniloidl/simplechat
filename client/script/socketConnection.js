@@ -50,15 +50,15 @@ socket.onopen = function () {
 socket.onmessage = async function (event) {
     let parsedEvent = JSON.parse(event.data);
     if(parsedEvent.encryptedData){
-        console.log("enrypted Data");
+        // console.log("enrypted Data", parsedEvent.encryptedData);
         let data = await decryptMessageAES(parsedEvent.encryptedData, socket.secretKey, socket.iv);
-        console.log("requested data:", data);
         parsedEvent = JSON.parse(data);
-        console.log(parsedEvent)
+        console.log("encrypted data received")
+    } else {
+        console.log("not encrypted data received:", parsedEvent)
     }
-
     const data = parsedEvent.data;
-    console.log("onMessage", parsedEvent.event, data)
+
     switch (parsedEvent.event) {
         case 'publicKey':
             const key = JSON.stringify(data)

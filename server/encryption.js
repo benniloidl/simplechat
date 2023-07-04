@@ -82,21 +82,17 @@ async function loadAESKey(jwk){
 async function handleKey(data, privateKey, socket){
     const encryptedJwk = data.key;
     const iv = base64ToBytes(data.iv);
-    console.log("myIV", iv);
-    // console.log("handle Key", encryptedJwk, privateKey);
     const jwkRaw = await decryptMessage(encryptedJwk, privateKey);
-    // console.log("parseKey", jwkRaw);
     const jwk = JSON.parse(jwkRaw);
     const key = await loadAESKey(jwk);
-    console.log("imported private key", key);
+    console.log("sucessfully imported secret key from client");
     socket.secretKey = key;
     socket.iv = iv;
 }
 
 async function decryptMessageAES(encryptedMessage, aesKey, iv){
-    console.log("decryptMessage", aesKey, iv, encryptedMessage);
+    // console.log("decryptMessage", aesKey, iv, encryptedMessage);
     let decoder = new TextDecoder("utf-8");
-    console.log("AESencryptedMessage", encryptedMessage)
     let decrypted = await crypto.subtle.decrypt({
         name: "AES-CTR",
         counter: iv,
@@ -109,7 +105,7 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv){
 }
 
 async function encryptMessageAESServer(message, aesKey, iv){
-    console.log("encyptMessageServer", aesKey, iv, message);
+    // console.log("encyptMessageServer", aesKey, iv, message);
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
     const cipherText = await crypto.subtle.encrypt({

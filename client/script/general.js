@@ -115,9 +115,7 @@ async function importPublicKey(jwk){
 
 async function encryptMessage(message, publicKey){
     let enc = new TextEncoder();
-    console.log("KEY", publicKey);
     let key = await importPublicKey(publicKey)
-    console.log("imported", enc, key);
     const cipherText = await window.crypto.subtle.encrypt({name: "RSA-OAEP", }, key, enc.encode(message));
     return bytesToBase64(new Uint8Array(cipherText));
 }
@@ -141,7 +139,7 @@ async function generateAESKey(buffer){
 }
 
 async function encryptMessageAES(aesKey, iv, message){
-    console.log("encyptMessage", aesKey, iv, message);
+    // console.log("encyptMessage", aesKey, iv, message);
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
     const cipherText = await window.crypto.subtle.encrypt({
@@ -155,9 +153,8 @@ async function encryptMessageAES(aesKey, iv, message){
     return bytesToBase64(new Uint8Array(cipherText));
 }
 async function decryptMessageAES(encryptedMessage, aesKey, iv) {
-    console.log("decryptMessage", aesKey, iv, encryptedMessage);
+    // console.log("decryptMessage", aesKey, iv, encryptedMessage);
     let decoder = new TextDecoder("utf-8");
-    console.log("AESencryptedMessage", encryptedMessage)
     let decrypted = await window.crypto.subtle.decrypt({
             name: "AES-CTR",
             counter: iv,
@@ -180,13 +177,10 @@ async function handleKeyAES(publicKeyJwk, socket){
     socket.secretKey = aesKey;
     socket.iv = iv;
     const aesJWK = await exportKeyAES(aesKey);
-    console.log("aeskey: JWK", aesJWK);
     const aesString = JSON.stringify(aesJWK);
-    console.log("aesString: JWK", aesString);
     // let parsedPublicKey = JSON.parse(localStorage.getItem("publicKey"));
     const message = await encryptMessage(aesString, publicKeyJwk);
-    console.log("message", message);
-    console.log("send secret Key")
+    console.log("send secret Key (AES) from client to server")
     const ivString = bytesToBase64(iv);
     socket.send(JSON.stringify({event:"secretKey", data:{key:message, buffer:key.buffer, iv: ivString}}));
 }
