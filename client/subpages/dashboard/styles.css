@@ -1,22 +1,3 @@
-:root {
-    /*--spacing: 1rem;*/
-    /*--sidebar-width: 300px;*/
-
-    /*--color-primary: #4e90e1;*/
-    /*--color-secondary: #f1f3f4;*/
-    /*--color-text: #202124;*/
-
-    /*--color-primary: var(--background-color);*/
-    /*--color-primary: hsl(213deg, 71%, 59%);*/
-    /*--color-primary: var(--color-primary);*/
-    --color-secondary: var(--background-color-accent);
-    --color-text: var(--text-color-normal);
-
-    /*--border-radius: 16px;*/
-
-    /*--font-size: 14px;*/
-}
-
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
     font-size: var(--font-size);
