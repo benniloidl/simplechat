@@ -1,3 +1,6 @@
+let lastTimeElement;
+let lastMessageElement;
+
 /**
  * Overwrites and generate the overview header for groups
  * @param users
@@ -5,12 +8,12 @@
 function createViewContainer(users) {
     console.log("users", users)
     const ul = document.createElement("ul");
-    
+
     for (const user of users) {
         let userObject = generateUsers(user);
         ul.appendChild(userObject);
     }
-    
+
     document.querySelector(".overview-container ul").replaceWith(ul);
 }
 
@@ -28,18 +31,18 @@ function generateUsers(username) {
     const element = document.createElement("li");
     const user = document.createElement("i");
     const minus = document.createElement("i");
-    
+
     user.classList.add("fas", "fa-user");
     minus.classList.add("fas", "fa-minus");
-    
+
     element.appendChild(user);
     element.appendChild(document.createTextNode(username));
     element.appendChild(minus);
-    
+
     minus.addEventListener("click", () => {
         removeUser(username)
     })
-    
+
     return element;
 }
 
@@ -60,27 +63,27 @@ function buildChatOverview(data) {
         navigator.classList.add("chat-contact");
         navigator.setAttribute("data-chat-id", data.chatID);
         navigator.setAttribute("chatType", data.type);
-        
+
         // notification
         if (unreadMessages > 0) {
             navigator.classList.add("notification");
         }
-        
+
         // events
         navigator.onclick = () => {
             loadChat(data, navigator);
         }
-        
+
         // icon
         const icon = document.createElement("i");
         icon.classList.add("fas", data.type === "user" ? "fa-user" : "fa-users");
         navigator.appendChild(icon);
-        
+
         // chat name
         const name = document.createElement("p");
         name.innerHTML = data.name;
         navigator.appendChild(name);
-        
+
         document.getElementById("chats").appendChild(navigator);
     });
 }
@@ -96,12 +99,12 @@ function loadChat(data, navigator) {
     /* Workaround: If template has to load, execution has to wait till elements are loaded.
     Otherwise, Script tries to access not existing element
      */
-    
+
     const path = (data.type === "user") ? "../subpages/dashboard/chat.html" : "../subpages/dashboard/group.html";
     injectPageAsync(path, () => {
         sessionStorage.setItem("openedChat", data.chatID.toString())
         chat_fetchMessage(socket, data.chatID);
-        
+
         if (elementHasNotification(navigator)) {
             chat_read_event(socket, data.chatID);
             navigator.classList.remove("notification");
@@ -129,13 +132,15 @@ function buildChatMessages(chatData) {
     const chatBox = document.createElement("div");
     chatBox.id = "chat-box";
     sessionStorage.setItem("lastAuthor", null);
-    
+    lastTimeElement = null;
+    lastMessageElement = null;
+    chatData.messages.sort((a, b) => (a.timeStamp - b.timeStamp));
     // build chat messages
     chatData.messages.forEach(data => {
         let chatElement = buildMessageObject(data, chatData.username, type);
         chatBox.appendChild(chatElement);
     });
-    
+
     // Arrange Items in Container
     if (type === "group") {
         chat_get_group_users(socket, chatData.chatID);
@@ -147,7 +152,7 @@ function buildChatMessages(chatData) {
     }
     document.getElementById("chat-box").replaceWith(chatBox);
     document.getElementById("chat-name").innerHTML = name;
-    
+
     // EventListener
     document.getElementById("submit-message").onclick = () => {
         sendMessage(chatData.chatID);
@@ -158,7 +163,7 @@ function buildChatMessages(chatData) {
             sendMessage(chatData.chatID);
         }
     });
-    
+
     document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
     document.querySelector("#chat-actions div textarea").focus();
 }
@@ -175,7 +180,7 @@ function buildMessageObject(messageObject, username, type) {
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
     chatElement.classList.add(messageObject.author === username ? "chat-element-right" : "chat-element-left");
-    
+
     // Sender information (only relevant in groups)
     if (type === 'group' && lastAuthor !== messageObject.author) {
         if (messageObject.author !== username) {
@@ -186,24 +191,34 @@ function buildMessageObject(messageObject, username, type) {
         }
         sessionStorage.setItem("lastAuthor", messageObject.author);
     }
-    
+
     // message
     const messageElement = document.createElement("p");
-    messageElement.innerHTML = messageObject.message;
+    messageElement.textContent = messageObject.message;
     chatElement.appendChild(messageElement);
-    
+
     // timestamp
     const timeElement = document.createElement("span");
     let messageDate = new Date(messageObject.timeStamp); // eg: "28 Jun 2023 18:50:59"
     let timeDifference = Math.floor((Date.now() - messageDate.valueOf()) / 1000 / 60)
     if (timeDifference < 60 * 24) {
-        timeElement.innerHTML = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        timeElement.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else {
-        timeElement.innerHTML = messageDate.toLocaleDateString([], {});
+        timeElement.textContent = messageDate.toLocaleDateString([], {});
     }
     timeElement.classList.add("subtitle");
     chatElement.appendChild(timeElement);
-    
+    console.log("time", messageElement);
+    if(lastTimeElement && lastTimeElement.textContent === timeElement.textContent){
+        console.log("rem", lastMessageElement)
+        lastTimeElement.remove();
+        if (lastMessageElement){
+            lastMessageElement.style.marginBottom = "0";
+        }
+    }
+    lastTimeElement = timeElement;
+    lastMessageElement = chatElement;
+
     /** time calculation to get order
      issue: order has max value of 2147483647
      calculations to fit datetime into this size:
@@ -214,7 +229,7 @@ function buildMessageObject(messageObject, username, type) {
     let modifiedTime1 = Math.round((messageDate.valueOf() / 100) - 10000000000 - 6880000000);
     chatElement.style.order = modifiedTime1.toString();
     // console.log(messageDate.valueOf(),modifiedTime, modifiedTime1 , chatElement.style.order);
-    
+
     // read confirmation
     if (messageObject.readConfirmation === true && messageObject.author === username) {
         readMessage(chatElement);
@@ -274,7 +289,7 @@ function notificationHandler(notification) {
         chat_read_event(socket, notification.chatID);
         return;
     }
-    
+
     // Notification style
     if (chatNode) {
         chatNode.classList.remove("notification");
@@ -283,7 +298,7 @@ function notificationHandler(notification) {
         chatNode.classList.add("notification");
         // console.log(chatNode);
     }
-    
+
 }
 
 /**
@@ -307,17 +322,17 @@ function elementHasNotification(element) {
 function injectPageAsync(url, execution) {
     const main = document.querySelector('main');
     if (main !== undefined) main.setAttribute('data-menu-open', 'false');
-    
+
     const chatDiv = document.getElementById("chat");
     const xhr = new XMLHttpRequest();
-    
+
     xhr.open("GET", "dashboard/" + url, true);
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
             chatDiv.innerHTML = xhr.responseText;
-            
+
             execution();
-            
+
             document.querySelectorAll(".username").forEach(function (element) {
                 element.innerHTML = getCookie("username");
             });
@@ -336,7 +351,7 @@ function addUserToGroup() {
     if (!field) return false;
     let chatID = sessionStorage.getItem("openedChat");
     if (getChatNodeById(chatID).getAttribute("chatType") !== "group") return false;
-    
+
     let username = field.value.trim();
     console.log(username)
     if (!checkUsernameSemantic(username)) {
@@ -348,7 +363,7 @@ function addUserToGroup() {
         showError("");
         field.value = "";
     }
-    
+
     chat_addUser(username);
     return false;
 }
@@ -382,19 +397,19 @@ function serverConnectionLost() {
     heading.textContent = "You lost connection with our server!";
     button.textContent = "Reload";
     text.textContent = "Reconnect will be attempted in 5 seconds."
-    
+
     wrapper.appendChild(heading);
     wrapper.appendChild(text);
     wrapper.appendChild(button);
-    
+
     // wrapper.innerHTML = "some Text ";
     element.classList.add("missingConnection");
-    
+
     element.appendChild(wrapper);
     document.body.appendChild(element);
-    
+
     // document.body.replaceWith(element)
-    
+
     function timer() {
         setTimeout(() => {
             console.log("timer");
@@ -402,18 +417,18 @@ function serverConnectionLost() {
             timer();
         }, 5000);
     }
-    
+
     button.addEventListener("click", () => window.location.reload());
     timer();
 }
 
 function focusTextArea() {
     document.getElementById('chat-box').style.marginBottom = 'calc(8 * var(--spacing))';
-    
+
     const interval = setInterval(() => {
         document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
     }, 10);
-    
+
     setTimeout(function () {
         clearInterval(interval);
     }, 250);
