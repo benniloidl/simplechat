@@ -16,8 +16,6 @@ function createViewContainer(users) {
         let username = getCookie("username");
         removeUser(username);
     });
-    
-    
 }
 
 /**
@@ -34,7 +32,7 @@ function generateUsers(username) {
     minus.classList.add("fas", "fa-minus");
     
     element.appendChild(user);
-    element.innerHTML = username;
+    element.appendChild(document.createTextNode(username));
     element.appendChild(minus);
     
     minus.addEventListener("click", () => {
