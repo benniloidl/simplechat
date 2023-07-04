@@ -11,8 +11,8 @@
     --text-color-light: hsl(217deg, 9%, 9%);
 
     --color-primary: hsl(213deg, 71%, 59%);
-    --color-secondary: hsl(0deg, 12%, 95%);
-    --color-background: hsl(0deg, 0%, 100%);
+    --color-secondary: hsl(0deg, 0%, 100%);
+    --color-background: hsl(0deg, 12%, 95%);
 
     --appearance-switch: '\263E';
 
@@ -77,7 +77,7 @@ footer .footerLink {
     color: var(--text-color-normal);
 }
 
-footer .footerLink:last-child {
+footer :last-child {
     margin-right: 2em;
 }
 
