@@ -21,9 +21,14 @@ function base64ToBytes(base64) {
     const binString = atob(base64);
     return Uint8Array.from(binString, (m) => m.codePointAt(0));
 }
+
+function bytesToBase64(bytes){
+    const binString = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
+    return btoa(binString);
+}
 async function decryptMessage(encryptedMessage, privateKey){
     let decoder = new TextDecoder("utf-8");
-    // console.log(encryptedMessage)
+    // console.log("encryptedMessage", encryptedMessage)
     let decrypted = await crypto.subtle.decrypt({name:"RSA-OAEP"}, privateKey, base64ToBytes(encryptedMessage));
     return decoder.decode(decrypted);
 
@@ -61,6 +66,59 @@ function createSessionToken(username) {
         10, 30, 'sha512').toString('hex');
 }
 
+async function loadAESKey(jwk){
+    return crypto.subtle.importKey(
+        "jwk",
+        jwk,
+        {
+            name: "AES-CTR",
+            length: 256,
+        },
+        true,
+        ["encrypt", "decrypt"]
+    );
+}
+
+async function handleKey(data, privateKey, socket){
+    const encryptedJwk = data.key;
+    const iv = base64ToBytes(data.iv);
+    const jwkRaw = await decryptMessage(encryptedJwk, privateKey);
+    const jwk = JSON.parse(jwkRaw);
+    const key = await loadAESKey(jwk);
+    console.log("sucessfully imported secret key from client");
+    socket.secretKey = key;
+    socket.iv = iv;
+}
+
+async function decryptMessageAES(encryptedMessage, aesKey, iv){
+    // console.log("decryptMessage", aesKey, iv, encryptedMessage);
+    let decoder = new TextDecoder("utf-8");
+    let decrypted = await crypto.subtle.decrypt({
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },
+        aesKey,
+        base64ToBytes(encryptedMessage)
+    );
+    return decoder.decode(decrypted);
+}
+
+async function encryptMessageAESServer(message, aesKey, iv){
+    // console.log("encyptMessageServer", aesKey, iv, message);
+    let encoder = new TextEncoder()
+    let encoded = encoder.encode(message);
+    const cipherText = await crypto.subtle.encrypt({
+            name: "AES-CTR",
+            counter: iv,
+            length: 128
+        },
+        aesKey,
+        encoded
+    )
+    return bytesToBase64(new Uint8Array(cipherText));
+}
+
 module.exports = {
     generateKeyPair,
     decryptMessage,
@@ -68,5 +126,9 @@ module.exports = {
     sendPublicKey,
     createPasswordHash,
     validatePassword,
-    createSessionToken
+    createSessionToken,
+    loadAESKey,
+    handleKey,
+    decryptMessageAES,
+    encryptMessageAESServer
 }

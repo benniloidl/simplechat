@@ -5,7 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
 const eventFunctions = require('./eventFunctions');
-const {decryptMessage, sendPublicKey} = require("./encryption");
+const {decryptMessage, sendPublicKey, loadAESKey, handleKey, decryptMessageAES} = require("./encryption");
 
 let sockets = [];
 const PORT = 80;
@@ -68,6 +68,13 @@ wsSrv.on('connection', async (socket, req) => {
         } catch {
             return -1;
         }
+        // console.log(event)
+        if(event.data && event.event === "secretKey"){
+            console.log("event SecretKey");
+                handleKey(event.data, socket.privateKey, socket);
+
+            return 1;
+        }
 
         const cookie = req.headers.cookie;
         let JSONCookie = {};
@@ -93,10 +100,13 @@ wsSrv.on('connection', async (socket, req) => {
         }
         try {
             if (event.encryptedData) {
-                let privateKey2 = socket.privateKey;
-                let data = await decryptMessage(event.encryptedData, privateKey2);
+                // let privateKey2 = socket.privateKey;
+                // let data = await decryptMessage(event.encryptedData, privateKey2);
+                console.log("asdfasdf", event.encryptedData, socket.secretKey, socket.iv)
+                let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);
                 event = JSON.parse(data);
-                // console.log("Decrypted event:",event.event, event.data);
+                console.log("Decrypted event:",event.event, event.data);
+
             } else {
                 console.log("not encrypted Data")
             }
