@@ -160,6 +160,7 @@ function buildChatMessages(chatData) {
     });
     
     document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+    document.querySelector("#chat-actions div textarea").focus();
 }
 
 /**
