@@ -5,7 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
 const eventFunctions = require('./eventFunctions');
-const {decryptMessage, sendPublicKey, loadAESKey, handleKey, decryptMessageAES} = require("./encryption");
+const { decryptMessage, sendPublicKey, loadAESKey, handleKey, decryptMessageAES } = require("./encryption");
 
 let sockets = [];
 const PORT = 80;
@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 });
 
 const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}\n`);
+    console.log(`Server is running on port ${ PORT }\n`);
     dbFunctions.connectToDB().then();
 });
 const wsSrv = new ws.Server({ server });
@@ -69,13 +69,13 @@ wsSrv.on('connection', async (socket, req) => {
             return -1;
         }
         // console.log(event)
-        if(event.data && event.event === "secretKey"){
+        if (event.data && event.event === "secretKey") {
             console.log("event SecretKey");
-                handleKey(event.data, socket.privateKey, socket);
-
+            handleKey(event.data, socket.privateKey, socket);
+            
             return 1;
         }
-
+        
         const cookie = req.headers.cookie;
         let JSONCookie = {};
         if (cookie) {
@@ -90,12 +90,12 @@ wsSrv.on('connection', async (socket, req) => {
             let socketExists = false;
             for (let i = 0; i < sockets.length; i++) {
                 if (sockets[i].username === username) {
-                    sockets[i] = { socket: socket, "username": username.toLowerCase()};
+                    sockets[i] = { socket: socket, "username": username.toLowerCase() };
                     socketExists = true;
                 }
             }
             if (!socketExists) {
-                sockets.push({ socket: socket, "username": username.toLowerCase()});
+                sockets.push({ socket: socket, "username": username.toLowerCase() });
             }
         }
         try {
@@ -105,21 +105,21 @@ wsSrv.on('connection', async (socket, req) => {
                 console.log("asdfasdf", event.encryptedData, socket.secretKey, socket.iv)
                 let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);
                 event = JSON.parse(data);
-                console.log("Decrypted event:",event.event, event.data);
-
+                console.log("Decrypted event:", event.event, event.data);
+                
             } else {
                 console.log("not encrypted Data")
             }
-        } catch (e){
+        } catch (e) {
             console.warn("Something wrong with encryption");
             console.log(e);
             // console.log("event", event);
             return -1;
         }
-
+        
         // const sessionToken = JSONCookie.password;
         const sessionToken = JSONCookie.sessionToken;
-
+        
         if (event.event === "login") {
             eventFunctions.login(socket, event.data, sockets, "login").then();
             return;
@@ -160,7 +160,7 @@ wsSrv.on('connection', async (socket, req) => {
                 eventFunctions.deleteAccount(socket, username).then();
                 break;
             default: {
-                eventFunctions.sendError(socket, `unknown event: ${event.event}`);
+                eventFunctions.sendError(socket, `unknown event: ${ event.event }`);
                 return -1;
             }
         }
@@ -170,3 +170,5 @@ wsSrv.on('connection', async (socket, req) => {
 server.on('close', () => {
     console.log('Server closed');
 });
+
+module.exports = app;
