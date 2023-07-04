@@ -54,7 +54,7 @@ socket.onopen = function () {
     // if (fileName[0] === "dashboard") {
     //     chat_fetch_overview(socket)
     // }
-    localStorage.setItem("publicKey", null);
+    localStorage.setItem("publicKey", "null");
 };
 
 socket.onmessage = function (event) {
@@ -214,12 +214,12 @@ function loginRequest(type) {
         socket.sendEvent('login', {
             username: result.username,
             password: result.password,
-        }).then(null);
+        });
     } else {
         socket.sendEvent('register', {
             username: result.username,
             password: result.password,
-        }).then(null);
+        });
     }
     
     return false;
