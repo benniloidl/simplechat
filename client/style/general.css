@@ -1,5 +1,4 @@
-:root {
-    /*Initialize CSS-Variables*/
+:root { /* Initializing Variables */
     --width: 100%;
     --max-width: 1000px;
     --spacing: 1rem;
@@ -11,18 +10,9 @@
     --text-color-normal: hsl(217deg, 77%, 17%);
     --text-color-light: hsl(217deg, 9%, 9%);
 
-    --background-color: hsl(0deg, 0%, 100%);
-    --background-color-accent: hsl(0deg, 12%, 95%);
-
     --color-primary: hsl(213deg, 71%, 59%);
-    --color-secondary: var(--background-color-accent);
-
-    --link-color-normal: var(--text-color-normal);
-    --link-color-active: var(--text-color-normal);
-    --link-color-used: var(--text-color-normal);
-
-    --footer-color: hsl(217deg, 9%, 50%);
-    --footer-background-color: hsl(0deg, 0%, 13%);
+    --color-secondary: hsl(0deg, 12%, 95%);
+    --color-background: hsl(0deg, 0%, 100%);
 
     --appearance-switch: '\263E';
 
@@ -34,15 +24,9 @@
     --text-color-normal: hsl(0deg, 0%, 85%);
     --text-color-light: hsl(0deg, 100%, 85%);
 
-    --background-color: hsl(0deg, 0%, 5%);
-    --background-color-accent: hsl(0deg, 12%, 15%);
-    /*--background-color-accent: hsl(0deg, 0%, 13%);*/
+    --color-background: hsl(0deg, 0%, 5%);
+    --color-secondary: hsl(0deg, 12%, 15%);
 
-    --link-color-normal: hsl(237deg, 68%, 70%);
-    --link-color-active: hsl(237deg, 68%, 60%);
-    --link-color-used: hsl(237deg, 68%, 65%);
-
-    /*--appearance-switch: '\263C';*/
     --appearance-switch: '\2600';
 }
 
@@ -54,11 +38,11 @@ body {
     font-family: var(--font-family);
     font-size: var(--font-size);
     line-height: 1.6;
+    overflow: hidden;
     margin: 0;
     padding: 0;
-    /*overflow: hidden;*/
     color: var(--text-color-normal);
-    background-color: var(--background-color);
+    background-color: var(--color-background);
 }
 
 body, article {
@@ -67,19 +51,11 @@ body, article {
 }
 
 a {
-    color: var(--link-color-used);
-}
-
-a:hover, a:focus {
-    color: var(--link-color-active);
-}
-
-a:visited {
-    color: var(--link-color-used);
+    color: var(--text-color-normal);
 }
 
 article {
-    background-color: var(--background-color-accent);
+    background-color: var(--color-secondary);
 }
 
 footer {
@@ -87,22 +63,18 @@ footer {
     position: fixed;
     z-index: 100;
     bottom: 0;
-    /*height: 100vh;*/
     display: flex;
     align-items: center;
     flex-flow: row nowrap;
     justify-content: flex-end;
-    /*justify-content: space-evenly;*/
     width: 100vw;
     height: 3rem;
-    background-color: var(--footer-background-color);
-
+    background-color: var(--color-secondary);
     gap: 1rem;
-
 }
 
 footer .footerLink {
-    color: var(--footer-color);
+    color: var(--text-color-normal);
 }
 
 footer .footerLink:last-child {
@@ -117,20 +89,19 @@ footer .appearanceMode {
 .appearanceMode:after {
     font-size: calc(2 * var(--font-size));
     content: var(--appearance-switch);
-    color: white;
+    transition: color 0.2s ease-in-out;
+    color: var(--text-color-normal);
 }
 
 .chat-overview-wrapper {
     z-index: 1;
     overflow: scroll;
-    /*height: 200px;*/
-    /*max-height: 200px;*/
     height: 60%;
     max-height: 60%;
     margin-top: calc(var(--spacing) * -1 - var(--border-radius));
     transition: all 250ms ease;
     border-radius: 0 0 var(--border-radius) var(--border-radius);
-    background: var(--background-color-accent);
+    background: var(--color-secondary);
 }
 
 .chat-overview-wrapper[data-overview-open="false"] {
@@ -210,12 +181,11 @@ footer .appearanceMode {
     padding: var(--spacing);
     color: red;
     border: solid;
-    background-color: var(--background-color-accent);
+    background-color: var(--color-secondary);
 }
 
 .error {
     color: var(--color-error);
-    /*padding-left: var(--spacing);*/
 }
 
 .missingConnection {
@@ -235,7 +205,6 @@ footer .appearanceMode {
 }
 
 .missingConnection div {
-
     box-sizing: border-box;
     margin: 0 auto;
     padding: var(--spacing);
@@ -243,19 +212,17 @@ footer .appearanceMode {
     border: none;
     border-radius: var(--border-radius) var(--border-radius) var(--border-radius) 0;
     background-color: var(--color-secondary);
-    /*padding: 2em;*/
 }
 
-.missingConnection div button{
+.missingConnection div button {
     font-weight: 600;
-    border: 2px solid transparent;
     padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 2);
+    border: 2px solid transparent;
     border-radius: var(--border-radius);
     background-color: var(--color-primary);
     margin-block: var(--spacing);
-
 }
 
-.missingConnection div button:hover, .missingConnection div button:focus{
+.missingConnection div button:hover, .missingConnection div button:focus {
     border-color: var(--text-color-normal);
 }

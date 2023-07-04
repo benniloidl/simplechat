@@ -69,7 +69,7 @@
     border: none;
     border-radius: var(--border-radius);
     outline: none;
-    background-color: var(--background-color);
+    background-color: var(--color-background);
 }
 
 .input-label {
@@ -92,7 +92,7 @@
     top: 0;
     visibility: visible;
     padding: 0 var(--spacing);
-    background-color: var(--background-color);
+    background-color: var(--color-background);
 }
 
 #submit {
