@@ -170,3 +170,5 @@ wsSrv.on('connection', async (socket, req) => {
 server.on('close', () => {
     console.log('Server closed');
 });
+
+module.exports = app;
