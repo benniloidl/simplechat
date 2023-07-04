@@ -17,10 +17,6 @@
     --color-primary: hsl(213deg, 71%, 59%);
     --color-secondary: var(--background-color-accent);
 
-    --link-color-normal: var(--text-color-normal);
-    --link-color-active: var(--text-color-normal);
-    --link-color-used: var(--text-color-normal);
-
     --footer-color: hsl(217deg, 9%, 50%);
     --footer-background-color: hsl(0deg, 0%, 13%);
 
@@ -36,13 +32,7 @@
 
     --background-color: hsl(0deg, 0%, 5%);
     --background-color-accent: hsl(0deg, 12%, 15%);
-    /*--background-color-accent: hsl(0deg, 0%, 13%);*/
 
-    --link-color-normal: hsl(237deg, 68%, 70%);
-    --link-color-active: hsl(237deg, 68%, 60%);
-    --link-color-used: hsl(237deg, 68%, 65%);
-
-    /*--appearance-switch: '\263C';*/
     --appearance-switch: '\2600';
 }
 
@@ -67,15 +57,7 @@ body, article {
 }
 
 a {
-    color: var(--link-color-used);
-}
-
-a:hover, a:focus {
-    color: var(--link-color-active);
-}
-
-a:visited {
-    color: var(--link-color-used);
+    color: var(--text-color-normal);
 }
 
 article {
@@ -246,16 +228,16 @@ footer .appearanceMode {
     /*padding: 2em;*/
 }
 
-.missingConnection div button{
+.missingConnection div button {
     font-weight: 600;
-    border: 2px solid transparent;
     padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 2);
+    border: 2px solid transparent;
     border-radius: var(--border-radius);
     background-color: var(--color-primary);
     margin-block: var(--spacing);
 
 }
 
-.missingConnection div button:hover, .missingConnection div button:focus{
+.missingConnection div button:hover, .missingConnection div button:focus {
     border-color: var(--text-color-normal);
 }
