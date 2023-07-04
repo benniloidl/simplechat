@@ -23,7 +23,7 @@ function base64ToBytes(base64) {
 }
 async function decryptMessage(encryptedMessage, privateKey){
     let decoder = new TextDecoder("utf-8");
-    // console.log(encryptedMessage)
+    // console.log("encryptedMessage", encryptedMessage)
     let decrypted = await crypto.subtle.decrypt({name:"RSA-OAEP"}, privateKey, base64ToBytes(encryptedMessage));
     return decoder.decode(decrypted);
 
@@ -62,19 +62,30 @@ function createSessionToken(username) {
 }
 
 async function loadAESKey(jwk){
-    return crypto.subtle.importKey("jwk",{
-        name: "AES-CTR",
-        counter: iv,
-        length: 128
-    },);
+    return crypto.subtle.importKey(
+        "jwk",
+        jwk,
+        {
+            name: "AES-GCM",
+            length: 256,
+        },
+        true,
+        ["encrypt", "decrypt"]
+    );
 }
 
-async function handleKey(encryptedJwk, privateKey){
+async function handleKey(data, privateKey, socket){
+    const encryptedJwk = data.key;
+    const iv = base64ToBytes(data.iv);
+    console.log("myIV", iv);
+    // console.log("handle Key", encryptedJwk, privateKey);
     const jwkRaw = await decryptMessage(encryptedJwk, privateKey);
+    // console.log("parseKey", jwkRaw);
     const jwk = JSON.parse(jwkRaw);
     const key = await loadAESKey(jwk);
     console.log("imported private key", key);
     socket.key = key;
+    socket.iv = iv;
 }
 
 module.exports = {

@@ -17,12 +17,13 @@ socket.sendEvent = async (eventName, eventData) => {
         data: eventData,
     };
 
-    if (publicKey && encryption==="true") {
+    if (socket.secretKey && encryption==="true") {
         //* Encryption *//
         let parsedPublicKey = JSON.parse(publicKey);
         let parsedEventData = JSON.stringify(message);
 
         const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
+        // const encryptedData = await encryptMessageAES(socket.secretKey, socket.iv, parsedEventData);
         console.log("encryptedMessage", encryptedData)
         console.log("encryptedFetch: ", parsedEventData);
         // let username = getCookie("username");

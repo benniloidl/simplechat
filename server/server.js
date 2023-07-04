@@ -67,8 +67,10 @@ wsSrv.on('connection', (socket, req) => {
         } catch {
             return -1;
         }
+        // console.log(event)
         if(event.data && event.event === "secretKey"){
-                handleKey(event.data, socket.privateKey);
+            console.log("event SecretKey")
+                handleKey(event.data, socket.privateKey, socket);
 
             return 1;
         }
