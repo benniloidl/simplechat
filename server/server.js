@@ -13,6 +13,7 @@ const PORT = 80;
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
+    console.log(req.cookies.sessionToken);
     dbFunctions.checkSessionCookie(req.cookies.username, req.cookies.sessionToken).then((result) => {
         if (result) {
             if (req.path === '/login') {
@@ -57,7 +58,7 @@ app.get('*', (req, res) => {
 
 //receive message
 wsSrv.on('connection', async (socket, req) => {
-    await sendPublicKey(socket);
+    sendPublicKey(socket);
     socket.on('message', async (data) => {
         let event;
         try {
