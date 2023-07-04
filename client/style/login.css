@@ -17,7 +17,7 @@
 
     box-sizing: border-box;
     max-width: 400px;
-    margin: calc(50vh - 200px) auto;
+    margin: calc(var(--spacing) * 2) auto;
 
     padding: 2em;
     border: none;
@@ -32,6 +32,7 @@
     width: 0;
     height: 0;
     content: '';
+    transition: all .2s ease-in-out;
     border-width: 0 0 60px 60px;
     border-style: solid;
     border-color: transparent transparent var(--color-secondary) transparent;
