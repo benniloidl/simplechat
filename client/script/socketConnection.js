@@ -8,8 +8,12 @@ const chatMessageAmount = 10;
  * @param eventData
  */
 socket.sendEvent = async (eventName, eventData) => {
-    console.log("event: " + eventName, eventData);
     let publicKey = localStorage.getItem("publicKey");
+    while(publicKey=="null"){
+        publicKey=localStorage.getItem("publicKey");
+        await new Promise(r => setTimeout(r, 20));
+    };
+    console.log("event: " + eventName, eventData);
     let encryption = localStorage.getItem("socketEncryption");
 
     const message = {
@@ -44,6 +48,7 @@ socket.onopen = function () {
     // if (fileName[0] === "dashboard") {
     //     chat_fetch_overview(socket)
     // }
+    localStorage.setItem("publicKey", null);
 };
 
 socket.onmessage = function (event) {
@@ -61,10 +66,10 @@ socket.onmessage = function (event) {
 
             break;
         case 'login':
-            loginUser(data).then(null);
+            loginUser(data);
             break;
         case 'register':
-            loginUser(data).then(null);
+            loginUser(data);
             break;
         case 'fetchChats':
             try {
@@ -139,7 +144,7 @@ socket.onclose = function () {
  * data = { event: 'login', status: true, sessionToken: loginToken}
  * @param data {event: string, status: boolean, sessionToken: String}
  */
-async function loginUser(data) {
+function loginUser(data) {
     if (data.status) {
         const result = getValues()
         // const maxAge = 5184000; // 2 months (60 sec * 60 min * 24h * 30d * 2)
