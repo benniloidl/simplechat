@@ -239,7 +239,7 @@ function sendError(socket, message) {
 
 async function sendEvent(socket, event, data){
     const message = JSON.stringify({event: event, data:data});
-    if(socket.privateKey){
+    if(socket.secretKey){
         const encryptedMessage = await encryption.encryptMessageAESServer(message, socket.secretKey, socket.iv);
         console.log("fetchEncrypted", message);
         socket.send(JSON.stringify({
