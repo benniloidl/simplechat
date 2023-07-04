@@ -1,3 +1,6 @@
+let lastTimeElement;
+let lastMessageElement;
+
 /**
  * Overwrites and generate the overview header for groups
  * @param users
@@ -132,7 +135,9 @@ function buildChatMessages(chatData) {
     const chatBox = document.createElement("div");
     chatBox.id = "chat-box";
     sessionStorage.setItem("lastAuthor", null);
-
+    lastTimeElement = null;
+    lastMessageElement = null;
+    chatData.messages.sort((a, b) => (a.timeStamp - b.timeStamp));
     // build chat messages
     chatData.messages.forEach(data => {
         let chatElement = buildMessageObject(data, chatData.username, type);
@@ -189,7 +194,7 @@ function buildMessageObject(messageObject, username, type) {
 
     // message
     const messageElement = document.createElement("p");
-    messageElement.innerHTML = messageObject.message;
+    messageElement.textContent = messageObject.message;
     chatElement.appendChild(messageElement);
 
     // timestamp
@@ -197,12 +202,22 @@ function buildMessageObject(messageObject, username, type) {
     let messageDate = new Date(messageObject.timeStamp); // eg: "28 Jun 2023 18:50:59"
     let timeDifference = Math.floor((Date.now() - messageDate.valueOf()) / 1000 / 60)
     if (timeDifference < 60 * 24) {
-        timeElement.innerHTML = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        timeElement.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else {
-        timeElement.innerHTML = messageDate.toLocaleDateString([], {});
+        timeElement.textContent = messageDate.toLocaleDateString([], {});
     }
     timeElement.classList.add("subtitle");
     chatElement.appendChild(timeElement);
+    console.log("time", messageElement);
+    if(lastTimeElement && lastTimeElement.textContent === timeElement.textContent){
+        console.log("rem", lastMessageElement)
+        lastTimeElement.remove();
+        if (lastMessageElement){
+            lastMessageElement.style.marginBottom = "0";
+        }
+    }
+    lastTimeElement = timeElement;
+    lastMessageElement = chatElement;
 
     /** time calculation to get order
      issue: order has max value of 2147483647
