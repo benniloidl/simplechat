@@ -360,16 +360,8 @@ main #chat form input[type="submit"]:hover {
     }
 }
 
-.read-confirmation{
-    position: relative;
-}
-
-.read-confirmation::before{
+.read-confirmation-icon {
     position: absolute;
-    right: calc(var(--spacing) * 0.25);
-    bottom: calc(var(--spacing) * 0);
-    padding: 0 1px;
-    content: "r";
-    color: var(--color-secondary);
-    border-radius: 50%;
+    right: 8px;
+    bottom: -20px;
 }
