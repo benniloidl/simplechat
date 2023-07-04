@@ -9,9 +9,15 @@ const chatMessageAmount = 10;
  */
 socket.sendEvent = async (eventName, eventData) => {
     let publicKey = localStorage.getItem("publicKey");
+    let i = 0;
     while(publicKey=="null"){
+        i++;
         publicKey=localStorage.getItem("publicKey");
         await new Promise(r => setTimeout(r, 20));
+        if(i===100){
+            console.warn("Encryption timeout");
+            encryption = false;
+        }
     };
     console.log("event: " + eventName, eventData);
     let encryption = localStorage.getItem("socketEncryption");
