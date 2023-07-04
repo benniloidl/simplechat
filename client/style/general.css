@@ -96,7 +96,7 @@ footer .appearanceMode {
 .chat-overview-wrapper {
     z-index: 1;
     overflow: scroll;
-    height: 60%;
+    min-height: 11%;
     max-height: 60%;
     margin-top: calc(var(--spacing) * -1 - var(--border-radius));
     transition: all 250ms ease;

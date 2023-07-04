@@ -216,8 +216,7 @@ function buildMessageObject(messageObject, username, type) {
     // console.log(messageDate.valueOf(),modifiedTime, modifiedTime1 , chatElement.style.order);
     
     // read confirmation
-    // TODO reading confirmation style should be done by @Benni
-    if (messageObject.readConfirmation === true) {
+    if (messageObject.readConfirmation === true && messageObject.author === username) {
         readMessage(chatElement);
     }
     return chatElement;
