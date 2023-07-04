@@ -160,13 +160,14 @@ async function exportKeyAES(aesKey){
 async function handleKeyAES(publicKeyJwk, socket){
     let key = window.crypto.getRandomValues(new Uint8Array(16));
     let iv = window.crypto.getRandomValues(new Uint8Array(16));
-    const publicKey = await importPublicKey(publicKeyJwk);
+    // const publicKey = await importPublicKey(publicKeyJwk);
     const aesKey = await generateAESKey(key.buffer);
     socket.secretKey = aesKey;
     socket.iv = iv;
     const aesJWK = await exportKeyAES(aesKey);
-    console.log("aesJWK", publicKey, aesJWK);
-    const message = await encryptMessage(aesJWK, publicKey);
+    console.log("aeskey: JWK", aesJWK);
+    // let parsedPublicKey = JSON.parse(localStorage.getItem("publicKey"));
+    const message = await encryptMessage(aesJWK, publicKeyJwk);
     console.log("message", message);
     socket.sendEvent("secretKey", {key:message, buffer:key.buffer, iv: iv});
 }
