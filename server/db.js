@@ -276,7 +276,8 @@ async function removeUser(chatID, username) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
             _id: 0,
-            members: 1
+            members: 1,
+            type:1
         }
     });
     if (result && result.members) {
@@ -289,6 +290,8 @@ async function removeUser(chatID, username) {
         await removeChat(username, chatID);
         if (result.members.length === 0) {
             return await deleteChat(chatID);
+        }else if (result.type==="user"){
+            await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": await getOtherUsername(username, chatID) } });
         }
         return true;
     } else {
