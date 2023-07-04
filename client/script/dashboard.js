@@ -141,7 +141,7 @@ function buildChatMessages(chatData) {
     if (type === "group") {
         chat_get_group_users(socket, chatData.chatID);
     } else {
-        document.querySelector(".chat-contact div").addEventListener("click", () => {
+        document.querySelector(".chat-contact").addEventListener("click", () => {
             let username = getCookie("username");
             removeUser(username);
         });
