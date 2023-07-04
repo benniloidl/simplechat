@@ -56,8 +56,8 @@ app.get('*', (req, res) => {
 
 
 //receive message
-wsSrv.on('connection', (socket, req) => {
-    sendPublicKey(socket).then(() => null);
+wsSrv.on('connection', async (socket, req) => {
+    await sendPublicKey(socket);
     socket.on('message', async (data) => {
         let event;
         try {
