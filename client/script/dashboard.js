@@ -14,7 +14,7 @@ function createViewContainer(users) {
     document.querySelector(".overview-container ul").replaceWith(ul);
 }
 
-function overviewContainerAction(){
+function overviewContainerAction() {
     let username = getCookie("username");
     removeUser(username);
 }
@@ -33,7 +33,7 @@ function generateUsers(username) {
     minus.classList.add("fas", "fa-minus");
     
     element.appendChild(user);
-    element.innerHTML = username;
+    element.appendChild(document.createTextNode(username));
     element.appendChild(minus);
     
     minus.addEventListener("click", () => {
@@ -213,7 +213,7 @@ function buildMessageObject(messageObject, username, type) {
     let modifiedTime1 = Math.round((messageDate.valueOf() / 100) - 10000000000 - 6880000000);
     chatElement.style.order = modifiedTime1.toString();
     // console.log(messageDate.valueOf(),modifiedTime, modifiedTime1 , chatElement.style.order);
-
+    
     // read confirmation
     if (messageObject.readConfirmation === true && messageObject.author === username) {
         readMessage(chatElement);
@@ -273,7 +273,7 @@ function notificationHandler(notification) {
         chat_read_event(socket, notification.chatID);
         return;
     }
-
+    
     // Notification style
     if (chatNode) {
         chatNode.classList.remove("notification");
@@ -314,9 +314,9 @@ function injectPageAsync(url, execution) {
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
             chatDiv.innerHTML = xhr.responseText;
-
+            
             execution();
-
+            
             document.querySelectorAll(".username").forEach(function (element) {
                 element.innerHTML = getCookie("username");
             });
