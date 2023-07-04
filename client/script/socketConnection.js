@@ -18,7 +18,7 @@ socket.sendEvent = async (eventName, eventData) => {
             console.warn("Encryption timeout");
             encryption = false;
         }
-    };
+    }
     console.log("event: " + eventName, eventData);
     let encryption = localStorage.getItem("socketEncryption");
 
@@ -29,7 +29,6 @@ socket.sendEvent = async (eventName, eventData) => {
 
     if (socket.secretKey && encryption==="true") {
         //* Encryption *//
-        let parsedPublicKey = JSON.parse(publicKey);
         let parsedEventData = JSON.stringify(message);
 
         // const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
@@ -74,8 +73,10 @@ socket.onmessage = async function (event) {
         case 'publicKey':
             const key = JSON.stringify(data)
             localStorage.setItem("publicKey", key);
-            const jwk = JSON.parse(key);
-            handleKeyAES(jwk, socket).then(null);
+            if(isEncryptionEnabled()) {
+                const jwk = JSON.parse(key);
+                handleKeyAES(jwk, socket).then(null);
+            }
             if (fileName[0] === "dashboard") {
                 chat_fetch_overview(socket)
             }

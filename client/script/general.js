@@ -128,7 +128,7 @@ function base64ToBytes(base64) {
     return Uint8Array.from(binString, (m) => m.codePointAt(0));
 }
 
-async function generateAESKey(buffer){
+async function generateAESKey(){
     return window.crypto.subtle.generateKey({
         name: "AES-CTR",
         length: 256,
@@ -187,6 +187,10 @@ async function handleKeyAES(publicKeyJwk, socket){
 
 function setSocketEncryption(boolean){
     localStorage.setItem("socketEncryption", boolean);
+}
+
+function isEncryptionEnabled(){
+    return localStorage.getItem("socketEncryption") === "true";
 }
 
 function encryptionAvailable(){
