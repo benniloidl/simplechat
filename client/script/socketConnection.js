@@ -14,7 +14,7 @@ socket.sendEvent = async (eventName, eventData) => {
         i++;
         publicKey=localStorage.getItem("publicKey");
         await new Promise(r => setTimeout(r, 20));
-        if(i===100){
+        if(i===500){
             console.warn("Encryption timeout");
             encryption = false;
         }

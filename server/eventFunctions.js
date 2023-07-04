@@ -171,7 +171,7 @@ async function fetchMessages(socket, data, username) {
 
 async function fetchGroupUsers(socket, data) {
     const users = await dbFunctions.fetchGroupUsers(data.chatID);
-    if (users.members.length > 0) {
+    if (users.members && users.members.length > 0) {
         // socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users.members } }));
         sendEvent(socket, 'fetchGroupUsers', {
             users: users.members
