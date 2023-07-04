@@ -5,7 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
 const eventFunctions = require('./eventFunctions');
-const {decryptMessage, sendPublicKey} = require("./encryption");
+const {decryptMessage, sendPublicKey, loadAESKey, handleKey} = require("./encryption");
 
 let sockets = [];
 const PORT = 80;
@@ -66,6 +66,11 @@ wsSrv.on('connection', (socket, req) => {
             event = JSON.parse(message);
         } catch {
             return -1;
+        }
+        if(event.data && event.event === "secretKey"){
+                handleKey(event.data, socket.privateKey);
+
+            return 1;
         }
 
         const cookie = req.headers.cookie;

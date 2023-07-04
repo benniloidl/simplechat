@@ -115,7 +115,9 @@ async function importPublicKey(jwk){
 
 async function encryptMessage(message, publicKey){
     let enc = new TextEncoder();
+    console.log("KEY", publicKey);
     let key = await importPublicKey(publicKey)
+    console.log("imported", enc, key);
     const cipherText = await window.crypto.subtle.encrypt({name: "RSA-OAEP", }, key, enc.encode(message));
     return bytesToBase64(new Uint8Array(cipherText));
 }
@@ -128,12 +130,53 @@ function base64ToBytes(base64) {
     return Uint8Array.from(binString, (m) => m.codePointAt(0));
 }
 
+async function generateAESKey(buffer){
+    return window.crypto.subtle.generateKey({
+        name: "AES-GCM",
+        length: 256,
+    },
+        true,
+        ["encrypt", "decrypt"]
+    );
+}
+
+async function encryptMessageAES(aesKey, iv, message){
+    let encoder = new TextEncoder()
+    let encoded = encoder.encode(message);
+    return window.crypto.subtle.encrypt({
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },
+        aesKey,
+        encoded
+        )
+}
+
+async function exportKeyAES(aesKey){
+    return window.crypto.subtle.exportKey("jwk", aesKey);
+}
+
+async function handleKeyAES(publicKeyJwk, socket){
+    let key = window.crypto.getRandomValues(new Uint8Array(16));
+    let iv = window.crypto.getRandomValues(new Uint8Array(16));
+    const publicKey = await importPublicKey(publicKeyJwk);
+    const aesKey = await generateAESKey(key.buffer);
+    socket.secretKey = aesKey;
+    socket.iv = iv;
+    const aesJWK = await exportKeyAES(aesKey);
+    console.log("aesJWK", publicKey, aesJWK);
+    const message = await encryptMessage(aesJWK, publicKey);
+    console.log("message", message);
+    socket.sendEvent("secretKey", {key:message, buffer:key.buffer, iv: iv});
+}
+
 function setSocketEncryption(boolean){
     localStorage.setItem("socketEncryption", boolean);
 }
 
 function encryptionAvailable(){
-    if(window.crypto){
+    if(window.isSecureContext){
         setSocketEncryption(true);
     } else{
         setSocketEncryption(false);

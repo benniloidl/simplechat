@@ -61,6 +61,22 @@ function createSessionToken(username) {
         10, 30, 'sha512').toString('hex');
 }
 
+async function loadAESKey(jwk){
+    return crypto.subtle.importKey("jwk",{
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },);
+}
+
+async function handleKey(encryptedJwk, privateKey){
+    const jwkRaw = await decryptMessage(encryptedJwk, privateKey);
+    const jwk = JSON.parse(jwkRaw);
+    const key = await loadAESKey(jwk);
+    console.log("imported private key", key);
+    socket.key = key;
+}
+
 module.exports = {
     generateKeyPair,
     decryptMessage,
@@ -68,5 +84,7 @@ module.exports = {
     sendPublicKey,
     createPasswordHash,
     validatePassword,
-    createSessionToken
+    createSessionToken,
+    loadAESKey,
+    handleKey
 }

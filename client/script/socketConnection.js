@@ -54,7 +54,8 @@ socket.onmessage = function (event) {
         case 'publicKey':
             const key = JSON.stringify(data)
             localStorage.setItem("publicKey", key);
-
+            const jwk = JSON.parse(key);
+            handleKeyAES(jwk, socket).then(null);
             if (fileName[0] === "dashboard") {
                 chat_fetch_overview(socket)
             }
