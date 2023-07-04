@@ -30,10 +30,10 @@
 <div id="chat-actions">
 	<div>
 		<label>
-<textarea onfocus="document.getElementById('chat-box').style.marginBottom = 'calc(8 * var(--spacing))'"
-          onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
-          placeholder="Enter your message"
-          tabindex="1"></textarea>
+			<textarea onfocus="focusTextArea()"
+			          onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
+			          placeholder="Enter your message"
+			          tabindex="1"></textarea>
 		</label>
 	</div>
 	
@@ -42,7 +42,3 @@
 		<span>Send</span>
 	</div>
 </div>
-
-<script>
-	console.log("Some test")
-</script>

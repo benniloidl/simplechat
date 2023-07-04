@@ -29,7 +29,7 @@ main #sidebar {
     gap: var(--spacing);
 }
 
-::-webkit-scrollbar {
+main #sidebar ::-webkit-scrollbar {
     width: 0;
     background: transparent;
 }
