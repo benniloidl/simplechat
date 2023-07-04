@@ -27,13 +27,14 @@ socket.sendEvent = async (eventName, eventData) => {
         data: eventData,
     };
 
-    if (publicKey && encryption==="true") {
+    if (socket.secretKey && encryption==="true") {
         //* Encryption *//
         let parsedPublicKey = JSON.parse(publicKey);
         let parsedEventData = JSON.stringify(message);
 
-        const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
-        // console.log("encryptedMessage", encryptedData)
+        // const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
+        const encryptedData = await encryptMessageAES(socket.secretKey, socket.iv, parsedEventData);
+        console.log("encryptedMessage", encryptedData)
         console.log("encryptedFetch: ", parsedEventData);
         // let username = getCookie("username");
         socket.send(JSON.stringify({
@@ -57,15 +58,24 @@ socket.onopen = function () {
     localStorage.setItem("publicKey", "null");
 };
 
-socket.onmessage = function (event) {
-    const parsedEvent = JSON.parse(event.data);
+socket.onmessage = async function (event) {
+    let parsedEvent = JSON.parse(event.data);
+    if(parsedEvent.encryptedData){
+        // console.log("enrypted Data", parsedEvent.encryptedData);
+        let data = await decryptMessageAES(parsedEvent.encryptedData, socket.secretKey, socket.iv);
+        parsedEvent = JSON.parse(data);
+        console.log("encrypted data received")
+    } else {
+        console.log("not encrypted data received:", parsedEvent)
+    }
     const data = parsedEvent.data;
-    console.log("onMessage", parsedEvent.event, data)
+
     switch (parsedEvent.event) {
         case 'publicKey':
             const key = JSON.stringify(data)
             localStorage.setItem("publicKey", key);
-
+            const jwk = JSON.parse(key);
+            handleKeyAES(jwk, socket).then(null);
             if (fileName[0] === "dashboard") {
                 chat_fetch_overview(socket)
             }

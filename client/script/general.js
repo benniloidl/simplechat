@@ -124,8 +124,65 @@ function bytesToBase64(bytes){
     return btoa(binString);
 }
 function base64ToBytes(base64) {
-    const binString = atob(base64);
+    const binString = window.atob(base64);
     return Uint8Array.from(binString, (m) => m.codePointAt(0));
+}
+
+async function generateAESKey(buffer){
+    return window.crypto.subtle.generateKey({
+        name: "AES-CTR",
+        length: 256,
+    },
+        true,
+        ["encrypt", "decrypt"]
+    );
+}
+
+async function encryptMessageAES(aesKey, iv, message){
+    // console.log("encyptMessage", aesKey, iv, message);
+    let encoder = new TextEncoder()
+    let encoded = encoder.encode(message);
+    const cipherText = await window.crypto.subtle.encrypt({
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },
+        aesKey,
+        encoded
+        )
+    return bytesToBase64(new Uint8Array(cipherText));
+}
+async function decryptMessageAES(encryptedMessage, aesKey, iv) {
+    // console.log("decryptMessage", aesKey, iv, encryptedMessage);
+    let decoder = new TextDecoder("utf-8");
+    let decrypted = await window.crypto.subtle.decrypt({
+            name: "AES-CTR",
+            counter: iv,
+            length: 128
+        },
+        aesKey,
+        base64ToBytes(encryptedMessage)
+    );
+    return decoder.decode(decrypted);
+}
+async function exportKeyAES(aesKey){
+    return window.crypto.subtle.exportKey("jwk", aesKey);
+}
+
+async function handleKeyAES(publicKeyJwk, socket){
+    let key = window.crypto.getRandomValues(new Uint8Array(16));
+    let iv = window.crypto.getRandomValues(new Uint8Array(16));
+    // const publicKey = await importPublicKey(publicKeyJwk);
+    const aesKey = await generateAESKey(key.buffer);
+    socket.secretKey = aesKey;
+    socket.iv = iv;
+    const aesJWK = await exportKeyAES(aesKey);
+    const aesString = JSON.stringify(aesJWK);
+    // let parsedPublicKey = JSON.parse(localStorage.getItem("publicKey"));
+    const message = await encryptMessage(aesString, publicKeyJwk);
+    console.log("send secret Key (AES) from client to server")
+    const ivString = bytesToBase64(iv);
+    socket.send(JSON.stringify({event:"secretKey", data:{key:message, buffer:key.buffer, iv: ivString}}));
 }
 
 function setSocketEncryption(boolean){
@@ -133,7 +190,7 @@ function setSocketEncryption(boolean){
 }
 
 function encryptionAvailable(){
-    if(window.crypto){
+    if(window.isSecureContext){
         setSocketEncryption(true);
     } else{
         setSocketEncryption(false);

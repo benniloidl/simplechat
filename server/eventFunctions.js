@@ -1,4 +1,5 @@
 const dbFunctions = require('./db');
+const encryption = require('./encryption');
 
 async function validate(username, sessionToken /*password*/) {
     // return await dbFunctions.validateUser(username, password);
@@ -216,11 +217,22 @@ function sendError(socket, message) {
     // socket.send(JSON.stringify({ event: "error", message: message }));
     sendEvent(socket, 'error', {
         message: message
-    });
+    }).then(null);
 }
 
-function sendEvent(socket, event, data) {
-    socket.send(JSON.stringify({ event: event, data: data }));
+async function sendEvent(socket, event, data) {
+    const message = JSON.stringify({ event: event, data: data });
+    if(socket.secretKey){
+        const encryptedMessage = await encryption.encryptMessageAESServer(message, socket.secretKey, socket.iv);
+        console.log("fetchEncrypted", message);
+        socket.send(JSON.stringify({
+            //event: eventName,
+            encryptedData: encryptedMessage,
+        }));
+    }else{
+        console.log("unencrypted: ", message);
+        socket.send(message);
+    }
 }
 
 module.exports = {
