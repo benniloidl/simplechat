@@ -101,8 +101,8 @@ wsSrv.on('connection', (socket, req) => {
             if (event.encryptedData) {
                 let privateKey2 = socket.privateKey;
                 // let data = await decryptMessage(event.encryptedData, privateKey2);
-                console.log("asdfasdf", event.encryptedData, socket.secretKey)
-                let data = await decryptMessageAES(event.encryptedData, socket.secretKey);
+                console.log("asdfasdf", event.encryptedData, socket.secretKey, socket.iv)
+                let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);
                 event = JSON.parse(data);
                 console.log("Decrypted event:",event.event, event.data);
 

@@ -88,10 +88,10 @@ async function handleKey(data, privateKey, socket){
     socket.iv = iv;
 }
 
-async function decryptMessageAES(aesKey, encryptedMessage){
+async function decryptMessageAES(encryptedMessage, aesKey, iv){
     console.log("decryptMessage", aesKey, iv, encryptedMessage);
     let decoder = new TextDecoder("utf-8");
-    // console.log("encryptedMessage", encryptedMessage)
+    console.log("AESencryptedMessage", encryptedMessage)
     let decrypted = await crypto.subtle.decrypt({
         name: "AES-CTR",
         counter: iv,
