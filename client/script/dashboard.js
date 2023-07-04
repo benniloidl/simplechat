@@ -301,7 +301,7 @@ function injectPageAsync(url, execution) {
         if (xhr.readyState === 4 && xhr.status === 200) {
             chatDiv.innerHTML = xhr.responseText;
 
-            execution()
+            execution();
 
             document.querySelectorAll(".username").forEach(function (element) {
                 element.innerHTML = getCookie("username");

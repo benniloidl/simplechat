@@ -66,7 +66,7 @@ async function loadAESKey(jwk){
         "jwk",
         jwk,
         {
-            name: "AES-GCM",
+            name: "AES-CTR",
             length: 256,
         },
         true,
@@ -84,8 +84,37 @@ async function handleKey(data, privateKey, socket){
     const jwk = JSON.parse(jwkRaw);
     const key = await loadAESKey(jwk);
     console.log("imported private key", key);
-    socket.key = key;
+    socket.secretKey = key;
     socket.iv = iv;
+}
+
+async function decryptMessageAES(aesKey, encryptedMessage){
+    console.log("decryptMessage", aesKey, iv, encryptedMessage);
+    let decoder = new TextDecoder("utf-8");
+    // console.log("encryptedMessage", encryptedMessage)
+    let decrypted = await crypto.subtle.decrypt({
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },
+        aesKey,
+        base64ToBytes(encryptedMessage)
+    );
+    return decoder.decode(decrypted);
+}
+
+async function encryptMessageAESServer(aesKey, iv, message){
+    console.log("encyptMessage", aesKey, iv, message);
+    let encoder = new TextEncoder()
+    let encoded = encoder.encode(message);
+    return crypto.subtle.encrypt({
+            name: "AES-CTR",
+            counter: iv,
+            length: 128
+        },
+        aesKey,
+        encoded
+    )
 }
 
 module.exports = {
@@ -97,5 +126,6 @@ module.exports = {
     validatePassword,
     createSessionToken,
     loadAESKey,
-    handleKey
+    handleKey,
+    decryptMessageAES
 }

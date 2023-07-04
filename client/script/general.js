@@ -132,7 +132,7 @@ function base64ToBytes(base64) {
 
 async function generateAESKey(buffer){
     return window.crypto.subtle.generateKey({
-        name: "AES-GCM",
+        name: "AES-CTR",
         length: 256,
     },
         true,
@@ -144,7 +144,7 @@ async function encryptMessageAES(aesKey, iv, message){
     console.log("encyptMessage", aesKey, iv, message);
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
-    return window.crypto.subtle.encrypt({
+    const cipherText = await window.crypto.subtle.encrypt({
         name: "AES-CTR",
         counter: iv,
         length: 128
@@ -152,6 +152,7 @@ async function encryptMessageAES(aesKey, iv, message){
         aesKey,
         encoded
         )
+    return bytesToBase64(new Uint8Array(cipherText));
 }
 
 async function exportKeyAES(aesKey){
