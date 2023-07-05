@@ -163,15 +163,15 @@ async function readChat(socket, data, username, sockets) {
 }
 
 async function fetchMessages(socket, data, username) {
-    const messages = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
+    const messagesObject = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
     let remainingMessages = 0; //TODO
-    if (messages) {
-        // socket.send(JSON.stringify({ event: "fetchMessages", data: { "username": username, "chatID": data.chatID, "messages": messages } }));
+    if (messagesObject.message) {
         sendEvent(socket, 'fetchMessages', {
             "username": username,
             "chatID": data.chatID,
-            "messages": messages,
-            "next": remainingMessages
+            "messages": messagesObject.message,
+            "next": messagesObject.next,
+            "total": messagesObject.total
         });
     } else {
         sendError(socket, "Cannot fetch messages");

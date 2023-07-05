@@ -187,7 +187,11 @@ async function fetchMessages(chatID, start, amount) {
                 return false;
             }
         }
-        return ret;
+        return {
+            message: ret,
+            next: result.messages.length - (start + amount),
+            total: result.messages.length
+        };
     } else {
         return false;
     }
@@ -279,7 +283,7 @@ async function removeUser(chatID, username) {
         if (result.members.length === 0) {
             return await deleteChat(chatID);
         } else if (result.type === "user") {
-            await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": await getOtherUsername(username, chatID) } });
+            await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": result.members[0] } });
         }
         return true;
     } else {
