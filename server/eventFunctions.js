@@ -101,8 +101,9 @@ async function createChat(socket, data, username) {
         }
     } else if (data.name && (data.name.length <= 0 || data.name.length > 16)) {
         sendError(socket, "Length of group name must be between 0 and 16");
+        return false;
     }
-    const chatID = await dbFunctions.createChat(data.type === "user" ? "userChat" : data.name, data.type, data.users);
+    const chatID = await dbFunctions.createChat((data.type === "user") ? "userChat" : data.name, data.type, data.users);
     await dbFunctions.addChat(username, chatID);
     if (data.users.length > 0) {
         for (const user of data.users) {
