@@ -5,30 +5,42 @@
 	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 </div>
 
-<span class="sidebar-callout">Change your password</span>
-<form onsubmit="return changePassword()" style="gap: 0;">
+<div style="overflow-y: auto;">
+	<span class="sidebar-callout">Change your password</span>
+	<form onsubmit="return changePassword()" style="gap: 0; margin-bottom: var(--spacing);">
+		<p>You can change your password by providing your current password and entering a new one twice using the form
+			below. It will have to meet our password requirements:</p>
+		<ul>
+			<li>8 - 16 characters</li>
+			<li>At least one uppercase letter</li>
+			<li>At least one lowercase letter</li>
+			<li>At least one number</li>
+			<li>At least one special character</li>
+		</ul>
+		
+		<div class="input-label" data-label="Enter old password">
+			<label for="old-password" hidden></label>
+			<input type="password" id="old-password" required>
+		</div>
+		
+		<div class="input-label" data-label="Enter new password">
+			<label for="new-password" hidden></label>
+			<input type="password" id="new-password" required>
+		</div>
+		
+		<div class="input-label" data-label="Enter new password again">
+			<label for="new-password-repeat" hidden></label>
+			<input type="password" id="new-password-repeat" required>
+		</div>
+		
+		<input type="submit" value="Change password">
+	</form>
 	
-	<div class="input-label" data-label="Enter old password">
-		<label for="old-password" hidden></label>
-		<input type="password" id="old-password" required>
-	</div>
-	
-	<div class="input-label" data-label="Enter new password">
-		<label for="new-password" hidden></label>
-		<input type="password" id="new-password" required>
-	</div>
-	
-	<div class="input-label" data-label="Enter new password again">
-		<label for="new-password-repeat" hidden></label>
-		<input type="password" id="new-password-repeat" required>
-	</div>
-	
-	<input type="submit" value="Change password">
-</form>
-
-<span class="sidebar-callout">Delete your account</span>
-<form>
-	<p>Please note that your account deletion will be followed by a deletion of your basic user data. Some of your data
-		might still be available to SimpleChat and to other users, for as long as it is relevant.</p>
-	<button class="dangerousButton" onclick="deleteUserAccount()">Delete Account</button>
-</form>
+	<span class="sidebar-callout">Delete your account</span>
+	<form>
+		<p>Please note that your account deletion will be followed by a deletion of your basic user data. Some of your
+			data
+			might still be available to SimpleChat and to other users, for as long as it is relevant.</p>
+		<button class="dangerousButton" onclick="deleteUserAccount()">Delete Account</button>
+	</form>
+</div>
