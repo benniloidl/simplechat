@@ -13,7 +13,6 @@ const PORT = 80;
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
 app.use((req, res, next) => {
-    console.log(req.cookies.sessionToken);
     dbFunctions.checkSessionCookie(req.cookies.username, req.cookies.sessionToken).then((result) => {
         if (result) {
             if (req.path === '/login') {
@@ -63,14 +62,11 @@ wsSrv.on('connection', async (socket, req) => {
         let event;
         try {
             const message = Buffer.from(data).toString('utf-8');
-            // console.log(("%cWebsocket message "+ message), "color: blue;");
             event = JSON.parse(message);
         } catch {
             return -1;
         }
-        // console.log(event)
         if (event.data && event.event === "secretKey") {
-            console.log("event SecretKey");
             handleKey(event.data, socket.privateKey, socket);
             
             return 1;
@@ -98,22 +94,18 @@ wsSrv.on('connection', async (socket, req) => {
                 sockets.push({ socket: socket, "username": username.toLowerCase() });
             }
         }
+
         try {
             if (event.encryptedData) {
                 // let privateKey2 = socket.privateKey;
                 // let data = await decryptMessage(event.encryptedData, privateKey2);
-                console.log("asdfasdf", event.encryptedData, socket.secretKey, socket.iv)
                 let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);
                 event = JSON.parse(data);
-                console.log("Decrypted event:", event.event, event.data);
                 
-            } else {
-                console.log("not encrypted Data")
             }
         } catch (e) {
             console.warn("Something wrong with encryption");
             console.log(e);
-            // console.log("event", event);
             return -1;
         }
         

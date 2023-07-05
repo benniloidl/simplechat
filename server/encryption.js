@@ -28,14 +28,12 @@ function bytesToBase64(bytes){
 }
 async function decryptMessage(encryptedMessage, privateKey){
     let decoder = new TextDecoder("utf-8");
-    // console.log("encryptedMessage", encryptedMessage)
     let decrypted = await crypto.subtle.decrypt({name:"RSA-OAEP"}, privateKey, base64ToBytes(encryptedMessage));
     return decoder.decode(decrypted);
 
 }
 
 async function sendPublicKey(socket){
-    // console.log("Sending new public Key!!!")
     const keyPair = await generateKeyPair();
     socket.privateKey = keyPair.privateKey;
     const publicWebKey = await getPublicWebKey(keyPair.publicKey);
@@ -85,13 +83,11 @@ async function handleKey(data, privateKey, socket){
     const jwkRaw = await decryptMessage(encryptedJwk, privateKey);
     const jwk = JSON.parse(jwkRaw);
     const key = await loadAESKey(jwk);
-    console.log("sucessfully imported secret key from client");
     socket.secretKey = key;
     socket.iv = iv;
 }
 
 async function decryptMessageAES(encryptedMessage, aesKey, iv){
-    // console.log("decryptMessage", aesKey, iv, encryptedMessage);
     let decoder = new TextDecoder("utf-8");
     let decrypted = await crypto.subtle.decrypt({
         name: "AES-CTR",
@@ -105,7 +101,6 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv){
 }
 
 async function encryptMessageAESServer(message, aesKey, iv){
-    // console.log("encyptMessageServer", aesKey, iv, message);
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
     const cipherText = await crypto.subtle.encrypt({

@@ -145,7 +145,6 @@ async function sendMessage(socket, data, username, sockets, messageType) {
 }
 
 async function sendMedia(socket, data, username, sockets){
-    console.log("recieved Media", data.mediaType);
     data.message = data.file;
     await sendMessage(socket,  data, username, sockets, data.mediaType);
 }
@@ -232,13 +231,11 @@ async function sendEvent(socket, event, data) {
     const message = JSON.stringify({ event: event, data: data });
     if(socket.secretKey){
         const encryptedMessage = await encryption.encryptMessageAESServer(message, socket.secretKey, socket.iv);
-        console.log("fetchEncrypted", message);
         socket.send(JSON.stringify({
             //event: eventName,
             encryptedData: encryptedMessage,
         }));
     }else{
-        console.log("unencrypted: ", message);
         socket.send(message);
     }
 }
