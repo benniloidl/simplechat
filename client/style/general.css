@@ -182,10 +182,18 @@ footer .appearanceMode {
 .dangerousButton {
     font-weight: 600;
     padding: var(--spacing);
+    cursor: pointer;
+    transition: all 250ms ease-in-out;
     color: red;
-    border: 4px solid;
+    border: 4px solid red;
     border-radius: var(--border-radius);
     background-color: var(--color-secondary);
+}
+
+.dangerousButton:hover,
+.dangerousButton:focus {
+    color: white;
+    background-color: red;
 }
 
 .error {
