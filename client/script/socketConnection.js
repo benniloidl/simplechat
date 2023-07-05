@@ -143,6 +143,9 @@ socket.onmessage = async function (event) {
             }
             break;
         }
+        case 'changePassword':{
+            console.log("changePassword", data.status);
+        }
 
         case 'error': {
             errorEvent(data.message);
@@ -382,9 +385,25 @@ function chat_get_group_users(socket, groupId){
     });
 }
 
-function chat_delete_account(socket, username){
+function chat_delete_account(socket, username) {
     // username should be redundant, you should only be able to delete your own account
     socket.sendEvent("deleteAccount", {
         username: username
     });
 }
+
+function chat_changePassword(username, oldPassword, newPassword){
+    socket.sendEvent("changePassword", {
+        username: username,
+        oldPassword: oldPassword,
+        newPassword: newPassword
+        });
+    }
+function chat_change_group_name(chatID, newGroupName){
+    socket.sendEvent("changeGroupName", {
+        chatID: chatID,
+        newGroupName: newGroupName
+    });
+
+}
+
