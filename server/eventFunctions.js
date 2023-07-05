@@ -116,9 +116,9 @@ async function createChat(socket, data, username) {
 }
 
 async function sendMessage(socket, data, username, sockets, messageType) {
-    const type = (messageType === undefined)? "text": messageType;
+    const type = (messageType === undefined) ? "text" : messageType;
     // const media = (messageMedia === undefined)? "": messageMedia;
-    if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now(), type: type})) {
+    if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now(), type: type })) {
         const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
         for (const groupMember of groupMembers) {
             if (groupMember !== username) {
@@ -144,9 +144,9 @@ async function sendMessage(socket, data, username, sockets, messageType) {
     }
 }
 
-async function sendMedia(socket, data, username, sockets){
+async function sendMedia(socket, data, username, sockets) {
     data.message = data.file;
-    await sendMessage(socket,  data, username, sockets, data.mediaType);
+    await sendMessage(socket, data, username, sockets, data.mediaType);
 }
 
 async function readChat(socket, data, username, sockets) {
@@ -201,11 +201,11 @@ async function removeUser(socket, data) {
 
 async function addUser(socket, data) {
     const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
-        // socket.send(JSON.stringify({ event: "addUser", data: { "status": true, "chatID": data.chatID  } }));
-        sendEvent(socket, 'addUser', {
-            status: result?true:false,
-            chatID: data.chatID
-        });
+    // socket.send(JSON.stringify({ event: "addUser", data: { "status": true, "chatID": data.chatID  } }));
+    sendEvent(socket, 'addUser', {
+        status: result ? true : false,
+        chatID: data.chatID
+    });
 }
 
 async function deleteAccount(socket, username) {
@@ -220,6 +220,25 @@ async function deleteAccount(socket, username) {
     }
 }
 
+async function changeName(socket, data, username) {
+    const userExists = await dbFunctions.userExists(data.newName);
+    if (!userExists) {
+        if (await dbFunctions.changeName(username, data.newName)) {
+            const chatIDs = await dbFunctions.getAllChatIDs(username);
+            if (chatIDs && chatIDs.chats) {
+                for (const id of chatIDs.chats) {
+                    await dbFunctions.addUser(id, newName);
+                    await dbFunctions.removeUser(id, username);
+                }
+            }
+        } else {
+            sendError(socket, "An error occured during changing the name. Please try again.");
+        }
+    } else {
+        sendError(socket, "Username already exists");
+    }
+}
+
 function sendError(socket, message) {
     // socket.send(JSON.stringify({ event: "error", message: message }));
     sendEvent(socket, 'error', {
@@ -229,17 +248,16 @@ function sendError(socket, message) {
 
 async function sendEvent(socket, event, data) {
     const message = JSON.stringify({ event: event, data: data });
-    if(socket.secretKey){
+    if (socket.secretKey) {
         const encryptedMessage = await encryption.encryptMessageAESServer(message, socket.secretKey, socket.iv);
         socket.send(JSON.stringify({
             //event: eventName,
             encryptedData: encryptedMessage,
         }));
-    }else{
+    } else {
         socket.send(message);
     }
 }
-
 
 
 module.exports = {
@@ -255,5 +273,6 @@ module.exports = {
     sendError,
     removeUser,
     addUser,
-    deleteAccount
+    deleteAccount,
+    changeName
 }

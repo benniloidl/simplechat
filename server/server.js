@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 });
 
 const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${ PORT }\n`);
+    console.log(`Server is running on port ${PORT}\n`);
     dbFunctions.connectToDB().then();
 });
 const wsSrv = new ws.Server({ server });
@@ -68,10 +68,10 @@ wsSrv.on('connection', async (socket, req) => {
         }
         if (event.data && event.event === "secretKey") {
             handleKey(event.data, socket.privateKey, socket);
-            
+
             return 1;
         }
-        
+
         const cookie = req.headers.cookie;
         let JSONCookie = {};
         if (cookie) {
@@ -101,17 +101,17 @@ wsSrv.on('connection', async (socket, req) => {
                 // let data = await decryptMessage(event.encryptedData, privateKey2);
                 let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);
                 event = JSON.parse(data);
-                
+
             }
         } catch (e) {
             console.warn("Something wrong with encryption");
             console.log(e);
             return -1;
         }
-        
+
         // const sessionToken = JSONCookie.password;
         const sessionToken = JSONCookie.sessionToken;
-        
+
         if (event.event === "login") {
             eventFunctions.login(socket, event.data, sockets, "login").then();
             return;
@@ -154,8 +154,11 @@ wsSrv.on('connection', async (socket, req) => {
             case 'deleteAccount':
                 eventFunctions.deleteAccount(socket, username).then();
                 break;
+            case 'changeName':
+                eventFunctions.changeName(socket, event.data, username).then();
+                break;
             default: {
-                eventFunctions.sendError(socket, `unknown event: ${ event.event }`);
+                eventFunctions.sendError(socket, `unknown event: ${event.event}`);
                 return -1;
             }
         }
