@@ -115,8 +115,10 @@ async function createChat(socket, data, username) {
     });
 }
 
-async function sendMessage(socket, data, username, sockets) {
-    if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now() })) {
+async function sendMessage(socket, data, username, sockets, messageType) {
+    const type = (messageType === undefined)? "text": messageType;
+    // const media = (messageMedia === undefined)? "": messageMedia;
+    if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now(), type: type})) {
         const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
         for (const groupMember of groupMembers) {
             if (groupMember !== username) {
@@ -140,6 +142,12 @@ async function sendMessage(socket, data, username, sockets) {
     } else {
         sendError(socket, "Unable to send message!");
     }
+}
+
+async function sendMedia(socket, data, username, sockets){
+    console.log("recieved Media", data.mediaType);
+    data.message = data.file;
+    await sendMessage(socket,  data, username, sockets, data.mediaType);
 }
 
 async function readChat(socket, data, username, sockets) {
@@ -235,12 +243,15 @@ async function sendEvent(socket, event, data) {
     }
 }
 
+
+
 module.exports = {
     validate,
     login,
     fetchchats,
     createChat,
     sendMessage,
+    sendMedia,
     readChat,
     fetchMessages,
     fetchGroupUsers,

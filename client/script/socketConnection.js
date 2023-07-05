@@ -274,6 +274,55 @@ function removeUser(username) {
     }).then(null);
 }
 
+async function loadFile(file){
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        }
+        fileReader.onerror = reject;
+        fileReader.readAsDataURL(file);
+    })
+
+}
+
+async function readAllFiles(files){
+    let fileData =[]
+    for (const file of files) {
+        let data = await loadFile(file);
+        fileData.push(data);
+    }
+    return fileData;
+}
+
+function sendMediaToServer(file){
+    // readAllFiles(files).then((base64EncodedFiles) =>{
+    //     let type = files[0].type
+    //     chat_sendMedia(type, base64EncodedFiles);
+    // })
+    const chatID = sessionStorage.getItem("openedChat");
+    loadFile(file).then((base64EncodedFile) => {
+        let type = file.type;
+        chat_sendMedia(type, base64EncodedFile, chatID);
+    })
+}
+
+function sendMediaToServerTestMethod(){
+    const emitter = document.getElementById("submit-file");
+    if(emitter){
+        sendMediaToServer(emitter.files[0]);
+    }
+}
+
+function chat_sendMedia(mediaType, base64FileContent, chatId){
+    socket.sendEvent('sendMedia',{
+        mediaType: mediaType,
+        file: base64FileContent,
+        chatID: chatId
+    }).then(null);
+}
+
+
 function chat_addUser(username){
     let chatID = sessionStorage.getItem("openedChat");
 

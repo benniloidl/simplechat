@@ -138,6 +138,8 @@ wsSrv.on('connection', async (socket, req) => {
             case 'sendMessage':
                 eventFunctions.sendMessage(socket, event.data, username, sockets).then();
                 break;
+            case 'sendMedia':
+                eventFunctions.sendMedia(socket, event.data, username, sockets).then();
             case 'fetchMessages':
                 eventFunctions.fetchMessages(socket, event.data, username).then();
                 break;

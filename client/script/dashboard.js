@@ -172,17 +172,17 @@ function buildChatMessages(chatData) {
  * Build and get the Message as HTML-object
  * @param messageObject
  * @param username
- * @param type
+ * @param chatType
  * @returns {HTMLDivElement}
  */
-function buildMessageObject(messageObject, username, type) {
+function buildMessageObject(messageObject, username, chatType) {
     let lastAuthor = sessionStorage.getItem("lastAuthor");
     const chatElement = document.createElement("div");
     chatElement.classList.add("chat-element");
     chatElement.classList.add(messageObject.author === username ? "chat-element-right" : "chat-element-left");
 
     // Sender information (only relevant in groups)
-    if (type === 'group' && lastAuthor !== messageObject.author) {
+    if (chatType === 'group' && lastAuthor !== messageObject.author) {
         if (messageObject.author !== username) {
             const senderElement = document.createElement("span");
             senderElement.classList.add("sender");
@@ -194,7 +194,26 @@ function buildMessageObject(messageObject, username, type) {
 
     // message
     const messageElement = document.createElement("p");
-    messageElement.textContent = messageObject.message;
+    const type = (messageObject.type === undefined)? "text": messageObject.type;
+    switch(type) {
+        case "text": {
+            messageElement.textContent = messageObject.message;
+            break;
+
+        }
+        case "image/jpeg": {
+            const img = document.createElement("img");
+            img.classList.add("message-type-image");
+            img.src = messageObject.message;
+            messageElement.appendChild(img);
+            break;
+
+        }
+        default: {
+            console.error(`Message type "${messageObject.type}" is currently not supported`);
+        }
+    }
+
     chatElement.appendChild(messageElement);
 
     // timestamp
