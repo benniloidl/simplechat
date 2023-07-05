@@ -110,7 +110,7 @@ async function createChat(socket, data, username) {
         }
     }
     // socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
-    sendEvent(socket, 'fetchChats', {
+    sendEvent(socket, 'createChat', {
         chats: [{ "chatID": chatID, "name": data.name, "type": data.type }]
     });
 }

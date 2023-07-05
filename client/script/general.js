@@ -230,4 +230,9 @@ function showError(message){
     if(message){
         console.warn(message);
     }
+
+function showPassword(passwordID, value){
+    const pwField = document.getElementById('old-password');
+    pwField.type = value?"password":"text";
+}
 }

@@ -10,7 +10,7 @@ const chatMessageAmount = 10;
 socket.sendEvent = async (eventName, eventData) => {
     let publicKey = localStorage.getItem("publicKey");
     let i = 0;
-    while(publicKey=="null"){
+    while(publicKey==="null"){
         i++;
         publicKey=localStorage.getItem("publicKey");
         await new Promise(r => setTimeout(r, 20));
@@ -19,7 +19,7 @@ socket.sendEvent = async (eventName, eventData) => {
             encryption = false;
         }
     }
-    console.log("event: " + eventName, eventData);
+    // console.log("event: " + eventName, eventData);
     let encryption = localStorage.getItem("socketEncryption");
 
     const message = {
@@ -33,7 +33,7 @@ socket.sendEvent = async (eventName, eventData) => {
 
         // const encryptedData = await encryptMessage(parsedEventData, parsedPublicKey);
         const encryptedData = await encryptMessageAES(socket.secretKey, socket.iv, parsedEventData);
-        console.log("encryptedMessage", encryptedData)
+        // console.log("encryptedMessage", encryptedData)
         console.log("encryptedFetch: ", parsedEventData);
         // let username = getCookie("username");
         socket.send(JSON.stringify({
@@ -63,9 +63,9 @@ socket.onmessage = async function (event) {
         // console.log("enrypted Data", parsedEvent.encryptedData);
         let data = await decryptMessageAES(parsedEvent.encryptedData, socket.secretKey, socket.iv);
         parsedEvent = JSON.parse(data);
-        console.log("encrypted data received")
+        // console.log("encrypted data received")
     } else {
-        console.log("not encrypted data received:", parsedEvent)
+        // console.log("not encrypted data received:", parsedEvent)
     }
     const data = parsedEvent.data;
 
@@ -94,6 +94,17 @@ socket.onmessage = async function (event) {
             } catch (e) { // if the element is not yet loaded
                 setTimeout(() => buildChatOverview(data), 1000);
             }
+            break;
+        case 'createChat':
+            try {
+                buildChatOverview(data);
+                loadChat2(data.chats[0].type, data.chats[0].chatID);
+            } catch (e) { // if the element is not yet loaded
+                setTimeout(() => {
+                    buildChatOverview(data);
+                    loadChat2(data.chats[0].type, data.chats[0].chatID)}, 1000);
+            }
+
             break;
         case 'fetchMessages':
             buildChatMessages(data);
@@ -124,7 +135,7 @@ socket.onmessage = async function (event) {
         }
         case 'addUser':{
             if(data.status){
-                console.log("addUser", data);
+                // console.log("addUser", data);
                 chat_get_group_users(socket, data.chatID);
 
                 // createViewContainer(data)
@@ -145,6 +156,7 @@ socket.onmessage = async function (event) {
         }
         case 'changePassword':{
             console.log("changePassword", data.status);
+            break;
         }
 
         case 'error': {
@@ -170,13 +182,8 @@ function loginUser(data) {
         // const maxAge = 5184000; // 2 months (60 sec * 60 min * 24h * 30d * 2)
         const maxAge = 172800; // 2 days (60 sec * 60 min * 24h * 2)
         document.cookie = `username=${result.username};Max-Age=${maxAge};secure;sameSite=lax`;
-        // document.cookie = "password= " + result.password + ";secure";
         document.cookie = `sessionToken=${data.sessionToken};Max-Age=${maxAge};secure;sameSite=lax`;
-
-        console.log("publicKey", data.publicKey);
-        // let keyData = window.btoa(JSON.stringify(data.publicKey));
         let keyData = JSON.stringify(data.publicKey);
-        console.log("keys-> loginUser", keyData);
         localStorage.setItem("publicKey", keyData);
 
         window.location.href = "/dashboard";
@@ -200,9 +207,6 @@ function errorEvent(message) {
  * @param chatID
  */
 function sendMessage(chatID) {
-    const chatID2 = sessionStorage.getItem("openedChat");
-    console.log("chatIDComp", chatID, chatID2)
-
     let textField = document.querySelector("#chat-actions div textarea")
     let message = textField.value.trim();
     textField.value = "";
@@ -379,7 +383,6 @@ function chat_fetch_overview(socket) {
 }
 
 function chat_get_group_users(socket, groupId){
-    console.log("groupId", groupId);
     socket.sendEvent('fetchGroupUsers', {
         chatID: groupId
     });

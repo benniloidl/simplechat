@@ -6,7 +6,6 @@ let lastMessageElement;
  * @param users
  */
 function createViewContainer(users) {
-    console.log("users", users)
     const ul = document.createElement("ul");
 
     for (const user of users) {
@@ -71,7 +70,7 @@ function buildChatOverview(data) {
 
         // events
         navigator.onclick = () => {
-            loadChat(data, navigator);
+            loadChat2(data.type, data.chatID);
         }
 
         // icon
@@ -92,25 +91,24 @@ function buildChatOverview(data) {
  * Load chat template and inject messages
  *
  * navigator is the chat-node of the side-menu containing important chat-information
- * @param data
- * @param navigator
+ * @param type
+ * @param chatID
  */
-function loadChat(data, navigator) {
-    /* Workaround: If template has to load, execution has to wait till elements are loaded.
-    Otherwise, Script tries to access not existing element
-     */
-
-    const path = (data.type === "user") ? "../subpages/dashboard/chat.html" : "../subpages/dashboard/group.html";
+function loadChat2(type, chatID){
+    const navigator = getChatNodeById(chatID);
+    if(!navigator) return;
+    const path = (type === "user") ? "../subpages/dashboard/chat.html" : "../subpages/dashboard/group.html";
     injectPageAsync(path, () => {
-        sessionStorage.setItem("openedChat", data.chatID.toString())
-        chat_fetchMessage(socket, data.chatID);
+        sessionStorage.setItem("openedChat", chatID.toString())
+        chat_fetchMessage(socket, chatID);
 
         if (elementHasNotification(navigator)) {
-            chat_read_event(socket, data.chatID);
+            chat_read_event(socket, chatID);
             navigator.classList.remove("notification");
             // console.log("remove notification")
         }
     });
+
 }
 
 /**
@@ -227,9 +225,7 @@ function buildMessageObject(messageObject, username, chatType) {
     }
     timeElement.classList.add("subtitle");
     chatElement.appendChild(timeElement);
-    console.log("time", messageElement);
     if(lastTimeElement && lastTimeElement.textContent === timeElement.textContent){
-        console.log("rem", lastMessageElement)
         lastTimeElement.remove();
         if (lastMessageElement){
             lastMessageElement.style.marginBottom = "0";
@@ -252,7 +248,6 @@ function buildMessageObject(messageObject, username, chatType) {
         // resolution 0.1 second 4 Years selected
     let modifiedTime1 = Math.round((messageDate.valueOf() / 100) - 10000000000 - 6880000000);
     chatElement.style.order = modifiedTime1.toString();
-    // console.log(messageDate.valueOf(),modifiedTime, modifiedTime1 , chatElement.style.order);
 
     // read confirmation
     if (messageObject.readConfirmation === true && messageObject.author === username) {
@@ -320,7 +315,6 @@ function notificationHandler(notification) {
         let unreadMessageAmount = chatNode.getAttribute("data-unread-message");
         chatNode.setAttribute("data-unread-messages", unreadMessageAmount + 1);
         chatNode.classList.add("notification");
-        // console.log(chatNode);
     }
 
 }
@@ -377,7 +371,6 @@ function addUserToGroup() {
     if (getChatNodeById(chatID).getAttribute("chatType") !== "group") return false;
 
     let username = field.value.trim();
-    console.log(username)
     if (!checkUsernameSemantic(username)) {
         showError("Username must only contain upper- and lowercase " +
             "letters, digits and the special characters \\+\\-\\_\\.");
@@ -462,7 +455,6 @@ function changeGroupName(){
     const newGroupName = document.getElementById("new-group-name").value;
     if(newGroupName === "") return false;
     const groupId = sessionStorage.getItem("openedChat");
-    console.log("")
     chat_change_group_name(groupId, newGroupName);
     return false;
 }
@@ -472,7 +464,6 @@ function changePassword(){
     const oldPassword = document.getElementById("old-password").value;
     const newPassword = document.getElementById("new-password").value;
     const newPasswordRepeat = document.getElementById("new-password-repeat").value;
-    console.log("changePassword", {username:username, oldPassword:oldPassword, newPassword:newPassword});
     if (newPassword !== newPasswordRepeat){
         return false;
     }
@@ -481,7 +472,7 @@ function changePassword(){
         return false;
     }
 
-    console.log("changePassword", {username:username, oldPassword:oldPassword, newPassword:newPassword});
+    // console.log("changePassword", {username:username, oldPassword:oldPassword, newPassword:newPassword});
     chat_changePassword(username, oldPassword, newPassword)
 
     return false;

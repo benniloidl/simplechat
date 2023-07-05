@@ -5,15 +5,16 @@
 	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 </div>
 
-<button onclick="deleteUserAccount()" class="dangerousButton">Delete Account</button>
-
 <hr>
 <form onsubmit="return changePassword()">
 	<label for="old-password">Enter your old Password</label>
 	<input id="old-password" placeholder="Enter old Password" required type="password">
 	<label for="new-password">Enter your new Password</label>
-	<input id="new-password" placeholder="Enter old Password" required type="password">
+	<input id="new-password" placeholder="Enter new Password" required type="password">
 	<label for="new-password-repeat">Please repeat your new Password</label>
-	<input id="new-password-repeat" placeholder="Enter old Password" required type="password">
-	<input type="submit" value="Change name">
+	<input id="new-password-repeat" placeholder="Repeat new Password" required type="password">
+	<input type="submit" value="Change password">
 </form>
+
+<hr>
+<button onclick="deleteUserAccount()" class="dangerousButton">Delete Account</button>
