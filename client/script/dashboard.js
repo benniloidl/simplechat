@@ -16,6 +16,9 @@ function createViewContainer(users) {
     document.querySelector(".overview-container ul").replaceWith(ul);
 }
 
+/**
+ * Action to remove User from chat, triggered by button to leave chat
+ */
 function overviewContainerAction() {
     let username = getCookie("username");
     removeUser(username);
@@ -223,8 +226,21 @@ function buildMessageObject(messageObject, username, chatType) {
             break;
 
         }
+        case "application/pdf":
         default: {
             console.error(`Message type "${messageObject.type}" is currently not supported`);
+            try {
+
+                let anchor = document.createElement('a');
+                const text = `SimpleChat-${username}-${Date.now()}`
+                anchor.setAttribute('title', text);
+                anchor.setAttribute('href', messageObject.message);
+                anchor.setAttribute('download', text);
+                anchor.textContent = "download"
+                messageElement.appendChild(anchor);
+            } catch (e){
+                console.error(e);
+            }
         }
     }
 
@@ -279,6 +295,11 @@ function markChatAsRead() {
     }
 }
 
+/**
+ * Mark chat as read
+ * Takes element of the sidebar, containing the chat
+ * @param element
+ */
 function readMessage(element) {
     const className = "read-confirmation";
     if (!element.classList.contains(className)) {
@@ -289,6 +310,12 @@ function readMessage(element) {
     }
 }
 
+/**
+ * Injects one message object
+ * @param messageObject
+ * @param username
+ * @param type
+ */
 function injectMessage(messageObject, username, type) {
     let chatObject = buildMessageObject(messageObject, username, type);
     const chatBox = document.getElementById("chat-box");
@@ -423,6 +450,9 @@ function injectFileWithForm(path, formEventFunction, parameter) {
     });
 }
 
+/**
+ * Creates overlay and tries to reconnect to server
+ */
 function serverConnectionLost() {
     const element = document.createElement("div");
     const wrapper = document.createElement("div");
@@ -469,6 +499,10 @@ function focusTextArea() {
     }, 250);
 }
 
+/**
+ * Collect data to change group and send it to server
+ * @returns {false}
+ */
 function changeGroupName(){
     const newGroupName = document.getElementById("new-group-name").value;
     if(newGroupName === "") return false;
@@ -476,8 +510,15 @@ function changeGroupName(){
     chat_change_group_name(groupId, newGroupName);
     return false;
 }
+
+/**
+ * Collects data from Form to change password of profile.html
+ * Checks semantic, if it fails it will give feedback to user
+ * Otherwise sends data to server
+ * @returns {false}
+ */
 function changePassword(){
-    console.error("Not IMPLEMENTED");
+    // console.error("Not IMPLEMENTED");
     const username = getCookie("username");
     const oldPassword = document.getElementById("old-password").value;
     const newPassword = document.getElementById("new-password").value;
@@ -488,7 +529,7 @@ function changePassword(){
         return false;
     }
     if (!(checkPasswordSemantic(oldPassword) && newPassword && newPasswordRepeat)){
-        feedbackChangePassword("Password does not belong to our requirements!", false);
+        feedbackChangePassword("Password violates against our requirements!", false);
         return false;
     }
 
@@ -497,6 +538,11 @@ function changePassword(){
     return false;
 }
 
+/**
+ * Feedback method for form to change password.
+ * @param {string} message
+ * @param {boolean} success
+ */
 function feedbackChangePassword(message, success){
     const element = document.getElementById("change-password-feedback");
     if(!element) return;
@@ -504,13 +550,17 @@ function feedbackChangePassword(message, success){
     element.style.color = (success)?"green":"red";
 
 }
-function checkChangePassword(){
-    const password = document.getElementById("old-password").value;
+
+/**
+ * Send Feedback to user, if value of password element violates out requirements
+ */
+function checkChangePassword(element){
+    const password = document.getElementById(element).value;
     const res = checkPasswordSemantic(password);
     if(res){
         feedbackChangePassword("", false);
     }else{
-        feedbackChangePassword("This Password does not fit our requirements!", false);
+        feedbackChangePassword("This Password does not match to our requirements!", false);
     }
 
 }
