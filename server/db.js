@@ -1,8 +1,8 @@
 const mongo = require('mongodb');
 const encryption = require('./encryption');
 const { MongoClient } = mongo;
-const uri = "mongodb://127.0.0.1:27017/SimpleChat";
-//const uri = "mongodb+srv://benni:7Mi2duv15aMJeTT4@simplechat.pr3gx85.mongodb.net/";
+// const uri = "mongodb://127.0.0.1:27017/SimpleChat";
+const uri = "mongodb+srv://benni:7Mi2duv15aMJeTT4@simplechat.pr3gx85.mongodb.net/";
 const dbClient = new MongoClient(uri);
 let db, user, chatHistory, sessions;
 
@@ -50,17 +50,16 @@ async function checkSessionCookie(username, sessionToken) {
     //const result = await sessions.findOne({ "username": username.toLowerCase() }, { projection: { _id: 1 } });
     return result ? true : false;
 }
+async function userPasswordMatches(username, password)  {
+    if (!username) return false;
+    username = username.toLowerCase();
+    const pwdObject = await user.findOne({"username": username}, {projection: {password: 1, salt: 1, _id: 0}});
+    if (!pwdObject) return false;
+    return  encryption.validatePassword(password, pwdObject);
+}
 
 async function validateUser(username, password) {
-    if (!username) {
-        return false;
-    }
-    username = username.toLowerCase();
-    const pwdObject = await user.findOne({ "username": username }, { projection: { password: 1, salt: 1, _id: 0 } });
-    if (!pwdObject) return;
-    const result = encryption.validatePassword(password, pwdObject);
-    if (result) return storeSessionCookie(username);
-    return false;
+    return (await userPasswordMatches(username, password))? storeSessionCookie(username):false;
 }
 
 async function createUser(username, password) {
@@ -362,5 +361,6 @@ module.exports = {
     getAllChatIDs,
     chatExists,
     changeGroupName,
-    changePassword
+    changePassword,
+    userPasswordMatches
 };

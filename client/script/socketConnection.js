@@ -162,7 +162,15 @@ socket.onmessage = async function (event) {
             break;
         }
         case 'changePassword':{
-            console.log("changePassword", data.status);
+            console.log("changePassword", data.status, data);
+
+            if(data.status){
+                feedbackChangePassword("Changed Password successfully!", true);
+            } else if(data.message){
+                feedbackChangePassword(data.message, false);
+            } else{
+                feedbackChangePassword("Something went wrong changing your password!", false);
+            }
             break;
         }
 

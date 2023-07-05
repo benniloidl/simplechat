@@ -164,7 +164,6 @@ async function readChat(socket, data, username, sockets) {
 
 async function fetchMessages(socket, data, username) {
     const messagesObject = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
-    let remainingMessages = 0; //TODO
     if (messagesObject.message) {
         sendEvent(socket, 'fetchMessages', {
             "username": username,
@@ -255,6 +254,11 @@ async function changeGroupName(socket, data) {
 }
 
 async function changePassword(socket, data, username) {
+    if(await dbFunctions.userPasswordMatches(username, data.oldPassword)){
+        sendEvent(socket, "changePassword", { status: false, message: "You misspelled your password to authenticate"}).then(null);
+        return;
+    }
+
     const hash = await encryption.createPasswordHash(data.newPassword);
     const result = await dbFunctions.changePassword(username, hash.hash, hash.salt);
     if (result) {

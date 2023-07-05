@@ -213,6 +213,8 @@ function buildMessageObject(messageObject, username, chatType) {
             break;
 
         }
+        case "image/png":
+        case "image/gif":
         case "image/jpeg": {
             const img = document.createElement("img");
             img.classList.add("message-type-image");
@@ -480,16 +482,35 @@ function changePassword(){
     const oldPassword = document.getElementById("old-password").value;
     const newPassword = document.getElementById("new-password").value;
     const newPasswordRepeat = document.getElementById("new-password-repeat").value;
+
     if (newPassword !== newPasswordRepeat){
+        feedbackChangePassword("New Passwords doesn't match, please try again!", false);
         return false;
     }
     if (!(checkPasswordSemantic(oldPassword) && newPassword && newPasswordRepeat)){
-        // Error
+        feedbackChangePassword("Password does not belong to our requirements!", false);
         return false;
     }
 
-    // console.log("changePassword", {username:username, oldPassword:oldPassword, newPassword:newPassword});
     chat_changePassword(username, oldPassword, newPassword)
 
     return false;
+}
+
+function feedbackChangePassword(message, success){
+    const element = document.getElementById("change-password-feedback");
+    if(!element) return;
+    element.textContent = message;
+    element.style.color = (success)?"green":"red";
+
+}
+function checkChangePassword(){
+    const password = document.getElementById("old-password").value;
+    const res = checkPasswordSemantic(password);
+    if(res){
+        feedbackChangePassword("", false);
+    }else{
+        feedbackChangePassword("This Password does not fit our requirements!", false);
+    }
+
 }
