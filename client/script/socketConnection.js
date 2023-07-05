@@ -107,8 +107,15 @@ socket.onmessage = async function (event) {
 
             break;
         case 'fetchMessages':
-            buildChatMessages(data);
+            const messages = sessionStorage.getItem("loadedMessages");
+            buildChatMessages(data, messages);
+            if(!messages){
+                sessionStorage.setItem("loadedMessages", data.messages.length.toString());
+            } else{
+                sessionStorage.setItem("loadedMessages", (parseInt(messages) + data.messages.length).toString());
+            }
             if(data.next && data.next > 0){
+
                 chat_scrolled(socket, data.chatID, data.next);
             }
             break;
@@ -348,10 +355,10 @@ function chat_fetchMessage(socket, chatId) {
 }
 
 function chat_scrolled(socket, chatId) {
-    let times = 2; // TODO
-    socket.sendEvent('loadChatMessages', {
+    const loadedMessages = parseInt(sessionStorage.getItem("loadedMessages"));
+    socket.sendEvent('fetchMessages', {
         chatID: chatId,
-        start: (chatMessageAmount * times),
+        start: (loadedMessages),
         amount: chatMessageAmount
     });
 }

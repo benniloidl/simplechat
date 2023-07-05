@@ -34,6 +34,8 @@
 			<input id="new-group-name" placeholder="Enter new name" required type="text">
 			<input type="submit" value="Change name">
 		</form>
+		<hr>
+		<p>Messages: <i id="total-messages"></i></p>
 	</div>
 </div>
 
@@ -53,7 +55,9 @@
 					onfocus="focusTextArea()"
 					onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
 					placeholder="Enter your message"
-					tabindex="1"></textarea>
+					tabindex="1"
+					maxlength="65535"
+			></textarea>
 		</label>
 	</div>
 	

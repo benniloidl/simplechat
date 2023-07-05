@@ -99,7 +99,8 @@ function loadChat2(type, chatID){
     if(!navigator) return;
     const path = (type === "user") ? "../subpages/dashboard/chat.html" : "../subpages/dashboard/group.html";
     injectPageAsync(path, () => {
-        sessionStorage.setItem("openedChat", chatID.toString())
+        sessionStorage.setItem("openedChat", chatID.toString());
+        sessionStorage.setItem("loadedMessages", "0");
         chat_fetchMessage(socket, chatID);
 
         if (elementHasNotification(navigator)) {
@@ -120,6 +121,17 @@ function buildChatMessages(chatData) {
         console.log("empty message")
         return;
     }
+
+    const loadedMessages = sessionStorage.getItem("loadedMessages");
+    if(loadedMessages && loadedMessages > 0){
+        const chatBox = document.getElementById("chat-box")
+        chatData.messages.forEach(data => {
+            let chatElement = buildMessageObject(data, chatData.username, data.type);
+            chatBox.appendChild(chatElement);
+        });
+        return;
+    }
+
     const chatNode = getChatNodeById(chatData.chatID);
     if (!chatNode) {
         console.log("no Node", chatNode)
@@ -130,6 +142,8 @@ function buildChatMessages(chatData) {
     const chatBox = document.createElement("div");
     chatBox.id = "chat-box";
     sessionStorage.setItem("lastAuthor", null);
+    sessionStorage.setItem("loadedMessages", null);
+    document.getElementById("total-messages").textContent = chatData.total.toString();
     lastTimeElement = null;
     lastMessageElement = null;
     chatData.messages.sort((a, b) => (a.timeStamp - b.timeStamp));
@@ -301,6 +315,8 @@ function getChatNodeById(chatId) {
 function notificationHandler(notification) {
     let openedChatId = sessionStorage.getItem("openedChat");
     let chatNode = getChatNodeById(notification.chatID);
+    const messageCount = parseInt(document.getElementById("total-messages").textContent);
+    document.getElementById("total-messages").textContent = (messageCount + 1).toString();
     if (openedChatId === notification.chatID) {
         // chat is shown
         let chatType = chatNode.getAttribute("chatType");
