@@ -220,10 +220,10 @@ async function deleteAccount(socket, username) {
     }
 }
 
-async function changeName(socket, data, username) {
+async function changeUsername(socket, data, username) {
     const userExists = await dbFunctions.userExists(data.newName);
     if (!userExists) {
-        if (await dbFunctions.changeName(username, data.newName)) {
+        if (await dbFunctions.changeUsername(username, data.newName)) {
             const chatIDs = await dbFunctions.getAllChatIDs(username);
             if (chatIDs && chatIDs.chats) {
                 for (const id of chatIDs.chats) {
@@ -232,10 +232,21 @@ async function changeName(socket, data, username) {
                 }
             }
         } else {
-            sendError(socket, "An error occured during changing the name. Please try again.");
+            sendError(socket, "An error occured during changing the username. Please try again.");
         }
     } else {
         sendError(socket, "Username already exists");
+    }
+}
+
+async function changeGroupName(socket, data) {
+    const chatExists = await dbFunctions.chatExists(data.chatID);
+    if (chatExists) {
+        if(!await dbFunctions.changeGroupName(data.chatID, data.newGroupName)){
+            sendError(socket, "An error occured during changing the group name. Please try again.");
+        }
+    } else {
+        sendError(socket, "Chat does not exist");
     }
 }
 
@@ -274,5 +285,6 @@ module.exports = {
     removeUser,
     addUser,
     deleteAccount,
-    changeName
+    changeUsername,
+    changeGroupName
 }

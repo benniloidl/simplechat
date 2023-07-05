@@ -79,7 +79,7 @@ async function createUser(username, password) {
     }
 }
 
-async function changeName(username, newName) {
+async function changeUsername(username, newName) {
     const result = await user.updateOne({ "username": username }, { $set: { username: newName } });
     return result ? true : false;
 }
@@ -325,6 +325,11 @@ async function deleteAccount(username) {
     return result && result.deletedCount === 1;
 }
 
+async function changeGroupName(chatID,newGroupName) {
+    const result = await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": newGroupName } });
+    return result?true:false;
+}
+
 module.exports = {
     connectToDB,
     validateUser,
@@ -344,6 +349,8 @@ module.exports = {
     deleteAccount,
     userChatExists,
     checkSessionCookie,
-    changeName,
-    getAllChatIDs
+    changeUsername,
+    getAllChatIDs,
+    chatExists,
+    changeGroupName
 };

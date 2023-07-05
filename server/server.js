@@ -154,8 +154,11 @@ wsSrv.on('connection', async (socket, req) => {
             case 'deleteAccount':
                 eventFunctions.deleteAccount(socket, username).then();
                 break;
-            case 'changeName':
-                eventFunctions.changeName(socket, event.data, username).then();
+            case 'changeUsername':
+                eventFunctions.changeUsername(socket, event.data, username).then();
+                break;
+            case 'changeGroupName':
+                eventFunctions.changeGroupName(socket, event.data).then();
                 break;
             default: {
                 eventFunctions.sendError(socket, `unknown event: ${event.event}`);
