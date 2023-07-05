@@ -5,7 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const dbFunctions = require('./db');
 const eventFunctions = require('./eventFunctions');
-const { decryptMessage, sendPublicKey, loadAESKey, handleKey, decryptMessageAES } = require("./encryption");
+const { sendPublicKey, handleKey, decryptMessageAES } = require("./encryption");
 
 let sockets = [];
 const PORT = 80;
@@ -140,6 +140,7 @@ wsSrv.on('connection', async (socket, req) => {
                 break;
             case 'sendMedia':
                 eventFunctions.sendMedia(socket, event.data, username, sockets).then();
+                break;
             case 'fetchMessages':
                 eventFunctions.fetchMessages(socket, event.data, username).then();
                 break;
