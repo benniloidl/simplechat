@@ -1,8 +1,8 @@
 const mongo = require('mongodb');
 const encryption = require('./encryption');
 const { MongoClient } = mongo;
-// const uri = "mongodb://127.0.0.1:27017/SimpleChat";
-const uri = "mongodb+srv://benni:7Mi2duv15aMJeTT4@simplechat.pr3gx85.mongodb.net/";
+const uri = "mongodb://127.0.0.1:27017/SimpleChat";
+// const uri = "mongodb+srv://benni:7Mi2duv15aMJeTT4@simplechat.pr3gx85.mongodb.net/";
 const dbClient = new MongoClient(uri);
 let db, user, chatHistory, sessions;
 

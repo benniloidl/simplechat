@@ -235,8 +235,13 @@ function buildMessageObject(messageObject, username, chatType) {
             lastMessageElement.style.marginBottom = "0";
         }
     }
-    lastTimeElement = timeElement;
-    lastMessageElement = chatElement;
+    if (lastAuthor === messageObject.author){
+        lastTimeElement = timeElement;
+        lastMessageElement = chatElement
+    }else {
+        lastTimeElement = null;
+        lastMessageElement = null;
+    }
 
     /** time calculation to get order
      issue: order has max value of 2147483647
