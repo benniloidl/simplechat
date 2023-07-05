@@ -325,9 +325,14 @@ async function deleteAccount(username) {
     return result && result.deletedCount === 1;
 }
 
-async function changeGroupName(chatID,newGroupName) {
+async function changeGroupName(chatID, newGroupName) {
     const result = await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": newGroupName } });
-    return result?true:false;
+    return result ? true : false;
+}
+
+async function changePassword(username, newPassword, newSalt) {
+    const result = await user.updateOne({ "username": username }, { $set: { "password": newPassword, "salt": newSalt } });
+    return result ? true : false;
 }
 
 module.exports = {
@@ -352,5 +357,6 @@ module.exports = {
     changeUsername,
     getAllChatIDs,
     chatExists,
-    changeGroupName
+    changeGroupName,
+    changePassword
 };
