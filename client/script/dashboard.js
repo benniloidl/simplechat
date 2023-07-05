@@ -457,3 +457,32 @@ function focusTextArea() {
         clearInterval(interval);
     }, 250);
 }
+
+function changeGroupName(){
+    const newGroupName = document.getElementById("new-group-name").value;
+    if(newGroupName === "") return false;
+    const groupId = sessionStorage.getItem("openedChat");
+    console.log("")
+    chat_change_group_name(groupId, newGroupName);
+    return false;
+}
+function changePassword(){
+    console.error("Not IMPLEMENTED");
+    const username = getCookie("username");
+    const oldPassword = document.getElementById("old-password").value;
+    const newPassword = document.getElementById("new-password").value;
+    const newPasswordRepeat = document.getElementById("new-password-repeat").value;
+    console.log("changePassword", {username:username, oldPassword:oldPassword, newPassword:newPassword});
+    if (newPassword !== newPasswordRepeat){
+        return false;
+    }
+    if (!(checkPasswordSemantic(oldPassword) && newPassword && newPasswordRepeat)){
+        // Error
+        return false;
+    }
+
+    console.log("changePassword", {username:username, oldPassword:oldPassword, newPassword:newPassword});
+    chat_changePassword(username, oldPassword, newPassword)
+
+    return false;
+}

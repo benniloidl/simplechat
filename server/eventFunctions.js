@@ -255,7 +255,8 @@ async function changeGroupName(socket, data) {
 }
 
 async function changePassword(socket, data, username) {
-    const result = await dbFunctions.changePassword(username, data.newPassword, data.newSalt);
+    const hash = await encryption.createPasswordHash(data.newPassword);
+    const result = await dbFunctions.changePassword(username, hash.hash, hash.salt);
     if (result) {
         sendEvent(socket, "changePassword", { status: true });
     } else {

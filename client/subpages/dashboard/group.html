@@ -9,6 +9,12 @@
 	<div class="overview-container">
 		<button onclick="overviewContainerAction()">Leave group</button>
 		<hr>
+		<form onsubmit="return changeGroupName()">
+			<label for="new-group-name">Enter your new Name</label>
+			<input id="new-group-name" placeholder="Enter new groupname" required type="text">
+			<input type="submit" value="Change name">
+		</form>
+		<hr>
 		<form onsubmit="return addUserToGroup()">
 			<label for="add-member">Add friend</label>
 			<input id="add-member" placeholder="Enter username" required type="text">
@@ -54,5 +60,6 @@
 	<div class="chat-actions-button" id="submit-message" tabindex="2">
 		<i class="fas fa-paper-plane"></i>
 		<span>Send</span>
+		<input type="file" id="submit-file" accept="image/*" onchange="sendMediaToServerTestMethod()" style="display: none">
 	</div>
 </div>

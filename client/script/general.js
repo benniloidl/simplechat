@@ -101,6 +101,16 @@ function checkUsernameSemantic(username){
     return username.match(/^[a-zA-Z0-9._\-+]*$/g);
 }
 
+function checkPasswordSemantic(passwordField){
+    return (
+        passwordField.match(/[a-z]/g) &&
+        passwordField.match(/[A-Z]/g) &&
+        passwordField.match(/[0-9]/g) &&
+        passwordField.match(/\W/g) &&
+        passwordField.length >= 8
+    );
+}
+
 async function importPublicKey(jwk){
     return await window.crypto.subtle.importKey("jwk", jwk,{
             name: "RSA-OAEP",
