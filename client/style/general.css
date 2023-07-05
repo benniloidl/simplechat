@@ -261,6 +261,10 @@ footer .appearanceMode {
     background-color: var(--color-background);
 }
 
+.input-label:has(input:not(:placeholder-shown):not(:focus))::after {
+    opacity: 0;
+}
+
 #submit {
     font-weight: 600;
     padding: var(--spacing);

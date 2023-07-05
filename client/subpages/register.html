@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 	<title>SimpleChat - Register</title>
-	<link href="../style/logo.png" rel="icon" type="image/x-icon">
+	<link type="image/x-icon" href="../style/logo.png" rel="icon">
 	
 	<style>
 		body {
@@ -23,9 +23,9 @@
 	
 	<link href="../style/general.css" rel="stylesheet">
 	<link href="../style/login.css" rel="stylesheet">
-	<script charset="utf-8" src="../script/general.js" type="text/javascript"></script>
-	<script charset="utf-8" src="../script/socketConnection.js" type="text/javascript"></script>
-	<script charset="utf-8" src="../script/login.js" type="text/javascript"></script>
+	<script type="text/javascript" charset="utf-8" src="../script/general.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../script/socketConnection.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../script/login.js"></script>
 </head>
 <body>
 <article class="loginForm">
@@ -35,24 +35,22 @@
 	<form onsubmit="return loginRequest('register')">
 		<div class="input-label" data-label="Username">
 			<label for="usr" hidden="hidden"></label>
-			<input id="usr" maxlength="16" placeholder="Username" required="required" tabindex="1"
-			       type="text" value="Encryption_Test1"><br>
+			<input type="text" id="usr" placeholder="" required maxlength="16" tabindex="1"
+			       value="Encryption_Test1"><br>
 		</div>
 		
 		<div class="input-label" data-label="Password">
 			<label for="pwd" hidden="hidden"></label>
-			<input id="pwd" placeholder="Password" required="required" tabindex="2"
-			       type="password" value="Test123*345u"><br>
+			<input type="password" id="pwd" placeholder="" required tabindex="2" value="Test123*345u"><br>
 		</div>
 		
 		<div class="input-label" data-label="Password">
 			<label for="pwd2" hidden="hidden"></label>
-			<input id="pwd2" placeholder="Password" required="required" tabindex="2"
-			       type="password" value="Test123*345u"><br>
+			<input type="password" id="pwd2" placeholder="" required tabindex="3" value="Test123*345u"><br>
 		</div>
 		
 		<i class="error" id="pwdError"></i>
-		<input id="submit" tabindex="3" type="submit" value="Create account">
+		<input type="submit" id="submit" tabindex="4" value="Create account">
 		<a href="./login">Login</a>
 	</form>
 </article>
