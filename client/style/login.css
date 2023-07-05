@@ -72,39 +72,3 @@
     outline: none;
     background-color: var(--color-background);
 }
-
-.input-label {
-    position: relative;
-    padding-block: var(--spacing);
-}
-
-.input-label[data-label]::after {
-    position: absolute;
-    top: calc(var(--spacing) + var(--font-size));
-    left: var(--spacing);
-    visibility: hidden;
-    content: attr(data-label);
-    transition: all 0.2s ease-in-out;
-    pointer-events: none;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-}
-
-.input-label:has(input:focus)::after {
-    top: 0;
-    visibility: visible;
-    padding: 0 var(--spacing);
-    background-color: var(--color-background);
-}
-
-#submit {
-    font-weight: 600;
-    padding: var(--spacing);
-    border: 2px solid transparent;
-    border-radius: var(--border-radius);
-    background-color: var(--color-primary);
-    margin-block: var(--spacing);
-}
-
-#submit:hover, #submit:focus {
-    border-color: var(--text-color-normal);
-}

@@ -180,9 +180,11 @@ footer .appearanceMode {
 }
 
 .dangerousButton {
+    font-weight: 600;
     padding: var(--spacing);
     color: red;
-    border: solid;
+    border: 4px solid;
+    border-radius: var(--border-radius);
     background-color: var(--color-secondary);
 }
 

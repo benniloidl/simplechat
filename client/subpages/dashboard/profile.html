@@ -5,16 +5,30 @@
 	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 </div>
 
-<hr>
-<form onsubmit="return changePassword()">
-	<label for="old-password">Enter your old Password</label>
-	<input id="old-password" placeholder="Enter old Password" required type="password">
-	<label for="new-password">Enter your new Password</label>
-	<input id="new-password" placeholder="Enter new Password" required type="password">
-	<label for="new-password-repeat">Please repeat your new Password</label>
-	<input id="new-password-repeat" placeholder="Repeat new Password" required type="password">
+<span class="sidebar-callout">Change your password</span>
+<form onsubmit="return changePassword()" style="gap: 0;">
+	
+	<div class="input-label" data-label="Enter old password">
+		<label for="old-password" hidden></label>
+		<input type="password" id="old-password" required>
+	</div>
+	
+	<div class="input-label" data-label="Enter new password">
+		<label for="new-password" hidden></label>
+		<input type="password" id="new-password" required>
+	</div>
+	
+	<div class="input-label" data-label="Enter new password again">
+		<label for="new-password-repeat" hidden></label>
+		<input type="password" id="new-password-repeat" required>
+	</div>
+	
 	<input type="submit" value="Change password">
 </form>
 
-<hr>
-<button onclick="deleteUserAccount()" class="dangerousButton">Delete Account</button>
+<span class="sidebar-callout">Delete your account</span>
+<form>
+	<p>Please note that your account deletion will be followed by a deletion of your basic user data. Some of your data
+		might still be available to SimpleChat and to other users, for as long as it is relevant.</p>
+	<button class="dangerousButton" onclick="deleteUserAccount()">Delete Account</button>
+</form>
