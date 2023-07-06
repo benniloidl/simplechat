@@ -452,7 +452,7 @@ function chat_fetch_overview(socket) {
 /**
  * Constructs event-data-structure and sends it to server
  * @param socket
- * @param {String|Number}chatId
+ * @param {String|Number}groupId
  * @return {void}
  */
 function chat_get_group_users(socket, groupId){
@@ -464,7 +464,7 @@ function chat_get_group_users(socket, groupId){
 /**
  * Constructs event-data-structure and sends it to server
  * @param socket
- * @param {String|Number}chatId
+ * @param {String}username
  * @return {void}
  */
 function chat_delete_account(socket, username) {
@@ -476,9 +476,9 @@ function chat_delete_account(socket, username) {
 
 /**
  * Constructs event-data-structure and sends it to server
- * @param socket
- * @param {String|Number}chatId
- * @return {void}
+ * @param {string}username
+ * @param {string}oldPassword
+ * @param {string}newPassword
  */
 function chat_changePassword(username, oldPassword, newPassword){
     socket.sendEvent("changePassword", {
@@ -489,8 +489,8 @@ function chat_changePassword(username, oldPassword, newPassword){
     }
 /**
  * Constructs event-data-structure and sends it to server
- * @param socket
- * @param {String|Number}chatId
+ * @param {String|Number}chatID
+ * @param {String}newGroupName
  * @return {void}
  */
 function chat_change_group_name(chatID, newGroupName){
