@@ -1,5 +1,10 @@
 const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
+/**
+ *Method detects preferred color scheme and manual overwrites,
+ * it sets the attribute for CSS
+ * @returns {undefined | false}
+ */
 function detectColorScheme() {
     let theme = "light";    //default to light
     let oldTheme = localStorage.getItem("theme")
@@ -38,6 +43,9 @@ function detectColorScheme() {
     }
 }
 
+/**
+ * manual overwrite for color scheme
+ */
 function changeColorScheme() {
     let oldTheme = document.documentElement.getAttribute("data-theme");
     let theme = "light";
@@ -57,12 +65,22 @@ mediaQuery.addEventListener('change', () => {
 });
 detectColorScheme();
 
+/**
+ * read and parses cookie, returns value of the requestet cookie
+ * if cookie is not set, returns undefined
+ * @param name
+ * @returns {string | undefined}
+ */
 function getCookie(name) {
     const value = `; ${ document.cookie }`;
     const parts = value.split(`; ${ name }=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
+/**
+ * Logout, clears session cookies and sessionStorage
+ * LocalStorage remains
+ */
 function logout() {
     document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -70,6 +88,10 @@ function logout() {
     window.location.href = "/login";
 }
 
+/**
+ * Toggle the chat information overview of the chats.
+ * @param event // TODO event is deprecated
+ */
 function toggleChatOverview(event) {
     const chatOverview = document.querySelector('.chat-overview-wrapper')
 
@@ -85,6 +107,10 @@ function toggleChatOverview(event) {
         event.target.setAttribute("data-selected", "")
 }
 
+/**
+ * request server to delete user account,
+ * server will respond event 'deleteAccount' with status or will send Error
+ */
 function deleteUserAccount(){
     // last chance
     let confirmation = confirm("Are you sure to delete Account?!");
@@ -92,25 +118,37 @@ function deleteUserAccount(){
 
     let username = getCookie("username");
     chat_delete_account(socket, username);
-    // sessionStorage.clear();
-    // localStorage.clear();
-    // logout();
 }
 
+/**
+ * check sematic of username
+ * @param {string}username
+ * @returns {*}matches
+ */
 function checkUsernameSemantic(username){
     return username.match(/^[a-zA-Z0-9._\-+]*$/g);
 }
 
-function checkPasswordSemantic(passwordField){
+/**
+ *
+ * @param {string}password
+ * @returns {boolean}
+ */
+function checkPasswordSemantic(password){
     return (
-        passwordField.match(/[a-z]/g) &&
-        passwordField.match(/[A-Z]/g) &&
-        passwordField.match(/[0-9]/g) &&
-        passwordField.match(/\W/g) &&
-        passwordField.length >= 8
+        password.match(/[a-z]/g) &&
+        password.match(/[A-Z]/g) &&
+        password.match(/[0-9]/g) &&
+        password.match(/\W/g) &&
+        password.length >= 8
     );
 }
 
+/**
+ * Imports public Key from server, jwk has to be in JSON format
+ * @param jwk
+ * @returns {Promise<CryptoKey>}
+ */
 async function importPublicKey(jwk){
     return await window.crypto.subtle.importKey("jwk", jwk,{
             name: "RSA-OAEP",
@@ -123,21 +161,44 @@ async function importPublicKey(jwk){
     );
 }
 
+/**
+ * imports public RSA key, encrypts message with RSA and decode it to base64
+ * Should only be used to encrypt AES Key, because of length restrictions
+ * @param {string} message
+ * @param {JSON} publicKey
+ * @returns {Promise<string>}
+ */
 async function encryptMessage(message, publicKey){
     let enc = new TextEncoder();
     let key = await importPublicKey(publicKey)
     const cipherText = await window.crypto.subtle.encrypt({name: "RSA-OAEP", }, key, enc.encode(message));
     return bytesToBase64(new Uint8Array(cipherText));
 }
+
+/**
+ *
+ * @param {Uint8Array}bytes
+ * @returns {string}
+ */
 function bytesToBase64(bytes){
     const binString = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
     return btoa(binString);
 }
+
+/**
+ *
+ * @param {String}base64
+ * @returns {Uint8Array}
+ */
 function base64ToBytes(base64) {
     const binString = window.atob(base64);
     return Uint8Array.from(binString, (m) => m.codePointAt(0));
 }
 
+/**
+ * Generates new AES Key
+ * @returns {Promise<CryptoKey>}
+ */
 async function generateAESKey(){
     return window.crypto.subtle.generateKey({
         name: "AES-CTR",
@@ -148,6 +209,15 @@ async function generateAESKey(){
     );
 }
 
+/**
+ * encrypts message with AES,
+ * iv should be synchronised between server and client
+ * returns encrypted message base64 encoded
+ * @param {CryptoKey}aesKey
+ * @param {Uint8Array}iv
+ * @param {String}message
+ * @returns {Promise<string>}
+ */
 async function encryptMessageAES(aesKey, iv, message){
     // console.log("encyptMessage", aesKey, iv, message);
     let encoder = new TextEncoder()
@@ -162,6 +232,17 @@ async function encryptMessageAES(aesKey, iv, message){
         )
     return bytesToBase64(new Uint8Array(cipherText));
 }
+
+/**
+ * decrypt message with AES,
+ * iv should be synchronised between server and client
+ * takes encrypted message base64 encoded
+ * returns message as normal String
+ * @param {string}encryptedMessage // base 64
+ * @param {CryptoKey}aesKey
+ * @param {Uint8Array}iv
+ * @returns {Promise<string>}
+ */
 async function decryptMessageAES(encryptedMessage, aesKey, iv) {
     // console.log("decryptMessage", aesKey, iv, encryptedMessage);
     let decoder = new TextDecoder("utf-8");
@@ -175,10 +256,23 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv) {
     );
     return decoder.decode(decrypted);
 }
+
+/**
+ * Exports AES key, should only be used to send key to server
+ * @param {CryptoKey}aesKey
+ * @returns {Promise<JsonWebKey>}
+ */
 async function exportKeyAES(aesKey){
     return window.crypto.subtle.exportKey("jwk", aesKey);
 }
 
+
+/**
+ * Wrapper function, to handle key Exchange
+ * @param {JsonWebKey}publicKeyJwk
+ * @param {socket}socket
+ * @returns {Promise<void>}
+ */
 async function handleKeyAES(publicKeyJwk, socket){
     let key = window.crypto.getRandomValues(new Uint8Array(16));
     let iv = window.crypto.getRandomValues(new Uint8Array(16));
@@ -195,14 +289,26 @@ async function handleKeyAES(publicKeyJwk, socket){
     socket.send(JSON.stringify({event:"secretKey", data:{key:message, buffer:key.buffer, iv: ivString}}));
 }
 
+/**
+ *
+ * @param {boolean}boolean
+ */
 function setSocketEncryption(boolean){
-    localStorage.setItem("socketEncryption", boolean);
+    localStorage.setItem("socketEncryption", boolean.toString());
 }
 
+/**
+ * Should encryption be enabled
+ * @returns {boolean}
+ */
 function isEncryptionEnabled(){
     return localStorage.getItem("socketEncryption") === "true";
 }
 
+/**
+ * Checks ability of system to encrypt and set to local Storage
+ * @returns {void}
+ */
 function encryptionAvailable(){
     if(window.isSecureContext){
         setSocketEncryption(true);
@@ -213,7 +319,7 @@ function encryptionAvailable(){
 
 /**
  * Show or hide error messages in element id: "dashboardError"
- * @param message
+ * @param {string}message
  */
 function showError(message){
     //* reset error message if a message is empty: ""*//
@@ -231,8 +337,8 @@ function showError(message){
         console.warn(message);
     }
 
-function showPassword(passwordID, value){
-    const pwField = document.getElementById('old-password');
-    pwField.type = value?"password":"text";
-}
+// function showPassword(passwordID, value){
+//     const pwField = document.getElementById('old-password');
+//     pwField.type = value?"password":"text";
+// }
 }

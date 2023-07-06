@@ -296,6 +296,11 @@ function removeUser(username) {
     }).then(null);
 }
 
+/**
+ * returns
+ * @param {File}file
+ * @return {Promise<String>}
+ */
 async function loadFile(file){
     return new Promise((resolve, reject) => {
         const fileReader = new FileReader();
@@ -308,15 +313,19 @@ async function loadFile(file){
 
 }
 
-async function readAllFiles(files){
-    let fileData =[]
-    for (const file of files) {
-        let data = await loadFile(file);
-        fileData.push(data);
-    }
-    return fileData;
-}
+// async function readAllFiles(files){
+//     let fileData =[]
+//     for (const file of files) {
+//         let data = await loadFile(file);
+//         fileData.push(data);
+//     }
+//     return fileData;
+// }
 
+/**
+ * Loads file encodes them and sends it to server
+ * @param {File}file
+ */
 function sendMediaToServer(file){
     // readAllFiles(files).then((base64EncodedFiles) =>{
     //     let type = files[0].type
@@ -329,6 +338,9 @@ function sendMediaToServer(file){
     })
 }
 
+/**
+ * TESTMETHOD
+ */
 function sendMediaToServerTestMethod(){
     const emitter = document.getElementById("submit-file");
     if(emitter){
@@ -336,6 +348,12 @@ function sendMediaToServerTestMethod(){
     }
 }
 
+/**
+ *
+ * @param {String}mediaType
+ * @param {String}base64FileContent
+ * @param {String|Number}chatId
+ */
 function chat_sendMedia(mediaType, base64FileContent, chatId){
     socket.sendEvent('sendMedia',{
         mediaType: mediaType,
@@ -344,7 +362,10 @@ function chat_sendMedia(mediaType, base64FileContent, chatId){
     }).then(null);
 }
 
-
+/**
+ *
+ * @param {String}username
+ */
 function chat_addUser(username){
     let chatID = sessionStorage.getItem("openedChat");
 
@@ -354,6 +375,12 @@ function chat_addUser(username){
     }).then(null);
 }
 
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_fetchMessage(socket, chatId) {
     socket.sendEvent('fetchMessages', {
         chatID: chatId,
@@ -362,6 +389,12 @@ function chat_fetchMessage(socket, chatId) {
     });
 }
 
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_scrolled(socket, chatId) {
     const loadedMessages = parseInt(sessionStorage.getItem("loadedMessages"));
     socket.sendEvent('fetchMessages', {
@@ -371,6 +404,13 @@ function chat_scrolled(socket, chatId) {
     });
 }
 
+
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_send_message(socket, chatId, message) {
     socket.sendEvent('sendMessage', {
         message: message,
@@ -379,6 +419,12 @@ function chat_send_message(socket, chatId, message) {
     });
 }
 
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_create_new_chat(socket, name, type, users) {
     socket.sendEvent('createChat', {
         name: name,
@@ -387,6 +433,12 @@ function chat_create_new_chat(socket, name, type, users) {
     });
 }
 
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_read_event(socket, chatId) {
     socket.sendEvent('readChat', {
         chatID: chatId
@@ -397,12 +449,24 @@ function chat_fetch_overview(socket) {
     socket.sendEvent('fetchChats', "")
 }
 
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_get_group_users(socket, groupId){
     socket.sendEvent('fetchGroupUsers', {
         chatID: groupId
     });
 }
 
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_delete_account(socket, username) {
     // username should be redundant, you should only be able to delete your own account
     socket.sendEvent("deleteAccount", {
@@ -410,6 +474,12 @@ function chat_delete_account(socket, username) {
     });
 }
 
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_changePassword(username, oldPassword, newPassword){
     socket.sendEvent("changePassword", {
         username: username,
@@ -417,6 +487,12 @@ function chat_changePassword(username, oldPassword, newPassword){
         newPassword: newPassword
         });
     }
+/**
+ * Constructs event-data-structure and sends it to server
+ * @param socket
+ * @param {String|Number}chatId
+ * @return {void}
+ */
 function chat_change_group_name(chatID, newGroupName){
     socket.sendEvent("changeGroupName", {
         chatID: chatID,

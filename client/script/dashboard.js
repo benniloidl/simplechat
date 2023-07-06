@@ -487,6 +487,9 @@ function serverConnectionLost() {
     timer();
 }
 
+/**
+ * Set size of Textarea in messages and scrolls the chat to last message
+ */
 function focusTextArea() {
     document.getElementById('chat-box').style.marginBottom = 'calc(8 * var(--spacing))';
 
@@ -500,7 +503,7 @@ function focusTextArea() {
 }
 
 /**
- * Collect data to change group and send it to server
+ * Collect data to change a groupname and send it to server
  * @returns {false}
  */
 function changeGroupName(){

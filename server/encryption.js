@@ -1,5 +1,10 @@
+// File also known as masochism.js, handles message encryption and user-validation
 const crypto = require("crypto");
 
+/**
+ * Generates RSA Key
+ * @returns {Promise<CryptoKeyPair>}
+ */
 async function generateKeyPair(){
     return await crypto.subtle.generateKey({
             name: "RSA-OAEP",
@@ -13,19 +18,41 @@ async function generateKeyPair(){
     );
 }
 
+/**
+ * exports public RSA Key as JsonWebKey
+ * @param {CryptoKey}publicKey
+ * @returns {Promise<JsonWebKey>}
+ */
 async function getPublicWebKey(publicKey){
     return await crypto.subtle.exportKey("jwk", publicKey);
 }
 
+/**
+ *
+ * @param {String}base64
+ * @returns {Uint8Array}
+ */
 function base64ToBytes(base64) {
     const binString = atob(base64);
     return Uint8Array.from(binString, (m) => m.codePointAt(0));
 }
 
+/**
+ *
+ * @param {Uint8Array}bytes
+ * @returns {string}
+ */
 function bytesToBase64(bytes){
     const binString = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
     return btoa(binString);
 }
+
+/**
+ * Decrypt message (USE ONLY FOR AES-KEY) with RSA-KEY
+ * @param {String}encryptedMessage
+ * @param {CryptoKey}privateKey
+ * @returns {Promise<string>}
+ */
 async function decryptMessage(encryptedMessage, privateKey){
     let decoder = new TextDecoder("utf-8");
     let decrypted = await crypto.subtle.decrypt({name:"RSA-OAEP"}, privateKey, base64ToBytes(encryptedMessage));
@@ -33,6 +60,11 @@ async function decryptMessage(encryptedMessage, privateKey){
 
 }
 
+/**
+ * Send RSA-Key to client
+ * @param {}socket
+ * @returns {Promise<CryptoKey>}
+ */
 async function sendPublicKey(socket){
     const keyPair = await generateKeyPair();
     socket.privateKey = keyPair.privateKey;
@@ -44,6 +76,13 @@ async function sendPublicKey(socket){
     socket.send(message);
     return keyPair.privateKey;
 }
+
+/**
+ * creates PasswordHash of password.
+ * uses passwordAlgorithm pbkdf2 with random salt of 16 Bytes.
+ * @param {String} password
+ * @returns {Promise<{salt: string, hash: string}>}
+ */
 async function createPasswordHash(password) {
     const salt = crypto.randomBytes(16).toString('hex');
     const hash = crypto.pbkdf2Sync(password, salt,
@@ -51,12 +90,24 @@ async function createPasswordHash(password) {
     return { salt: salt, hash: hash };
 }
 
+/**
+ * validates Password
+ * requires in passwordObject 'salt' and 'password' as Password hash
+ * @param {String}passwordToCheck
+ * @param {Object<{salt:String, hash:String}>}passwordObject
+ * @returns {boolean}
+ */
 function validatePassword(passwordToCheck, passwordObject) {
     const passwordHash = crypto.pbkdf2Sync(passwordToCheck, passwordObject.salt,
         1000, 64, 'sha512').toString('hex');
     return passwordHash === passwordObject.password;
 }
 
+/**
+ * Generates sessionToken for login
+ * @param {string}username
+ * @returns {string}
+ */
 function createSessionToken(username) {
     let key = Date.now().toString() + username;
     const salt = crypto.randomBytes(16).toString('hex');
@@ -64,6 +115,11 @@ function createSessionToken(username) {
         10, 30, 'sha512').toString('hex');
 }
 
+/**
+ *
+ * @param {JsonWebKey}jwk
+ * @returns {Promise<CryptoKey>}
+ */
 async function loadAESKey(jwk){
     return crypto.subtle.importKey(
         "jwk",
@@ -77,6 +133,13 @@ async function loadAESKey(jwk){
     );
 }
 
+/**
+ *
+ * @param {Object<{iv:string}>}data
+ * @param {CryptoKey}privateKey
+ * @param socket
+ * @returns {Promise<void>}
+ */
 async function handleKey(data, privateKey, socket){
     const encryptedJwk = data.key;
     const iv = base64ToBytes(data.iv);
@@ -87,6 +150,13 @@ async function handleKey(data, privateKey, socket){
     socket.iv = iv;
 }
 
+/**
+ *
+ * @param {string}encryptedMessage
+ * @param {CryptoKey}aesKey
+ * @param {Uint8Array}iv
+ * @returns {Promise<string>}
+ */
 async function decryptMessageAES(encryptedMessage, aesKey, iv){
     let decoder = new TextDecoder("utf-8");
     let decrypted = await crypto.subtle.decrypt({
@@ -100,6 +170,13 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv){
     return decoder.decode(decrypted);
 }
 
+/**
+ *
+ * @param {string}message
+ * @param {CryptoKey}aesKey
+ * @param {Uint8Array}iv
+ * @returns {Promise<string>}
+ */
 async function encryptMessageAESServer(message, aesKey, iv){
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
