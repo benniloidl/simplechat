@@ -160,10 +160,10 @@ function buildChatMessages(chatData) {
     if (type === "group") {
         chat_get_group_users(socket, chatData.chatID);
     } else {
-        document.querySelector(".chat-contact").addEventListener("click", () => {
-            let username = getCookie("username");
-            removeUser(username);
-        });
+        // document.querySelector(".chat-contact").addEventListener("click", () => {
+        //     let username = getCookie("username");
+        //     // removeUser(username);
+        // });
     }
     document.getElementById("chat-box").replaceWith(chatBox);
     document.getElementById("chat-name").innerHTML = name;
