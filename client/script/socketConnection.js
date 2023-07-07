@@ -8,11 +8,11 @@ const chatMessageAmount = 10;
  * @param eventData
  */
 socket.sendEvent = async (eventName, eventData) => {
-    let publicKey = localStorage.getItem("publicKey");
+    let publicKey = socket.publicKey;
     let i = 0;
     while(publicKey==="null"){
         i++;
-        publicKey=localStorage.getItem("publicKey");
+        publicKey=socket.publicKey;
         await new Promise(r => setTimeout(r, 20));
         if(i===500){
             console.warn("Encryption timeout");
@@ -51,10 +51,6 @@ socket.sendEvent = async (eventName, eventData) => {
 const fileName = location.href.split("/").slice(-1)
 
 socket.onopen = function () {
-    // if (fileName[0] === "dashboard") {
-    //     chat_fetch_overview(socket)
-    // }
-    localStorage.setItem("publicKey", "null");
 };
 
 socket.onmessage = async function (event) {
@@ -63,7 +59,7 @@ socket.onmessage = async function (event) {
         // console.log("enrypted Data", parsedEvent.encryptedData);
         let data = await decryptMessageAES(parsedEvent.encryptedData, socket.secretKey, socket.iv);
         parsedEvent = JSON.parse(data);
-        // console.log("encrypted data received")
+        console.log("encrypted data received")
     } else {
         // console.log("not encrypted data received:", parsedEvent)
     }
@@ -72,7 +68,6 @@ socket.onmessage = async function (event) {
     switch (parsedEvent.event) {
         case 'publicKey':
             const key = JSON.stringify(data)
-            localStorage.setItem("publicKey", key);
             if(isEncryptionEnabled()) {
                 const jwk = JSON.parse(key);
                 handleKeyAES(jwk, socket).then(null);
@@ -88,6 +83,9 @@ socket.onmessage = async function (event) {
         case 'register':
             loginUser(data);
             break;
+        case 'logout':
+            if(!data.status) console.error("Cannot Logout");
+            else window.location.href = "/login";
         case 'fetchChats':
             try {
                 buildChatOverview(data);
@@ -134,6 +132,7 @@ socket.onmessage = async function (event) {
             break;
         }
         case 'deleteAccount': {
+            console.log("deleteAccount")
             if(data.status) {
                 sessionStorage.clear();
                 localStorage.clear();
@@ -203,9 +202,6 @@ function loginUser(data) {
         const maxAge = 172800; // 2 days (60 sec * 60 min * 24h * 2)
         document.cookie = `username=${result.username};Max-Age=${maxAge};secure;sameSite=lax`;
         document.cookie = `sessionToken=${data.sessionToken};Max-Age=${maxAge};secure;sameSite=lax`;
-        let keyData = JSON.stringify(data.publicKey);
-        localStorage.setItem("publicKey", keyData);
-
         window.location.href = "/dashboard";
     } else {
         pwdError("invalid login credentials");
@@ -504,5 +500,11 @@ function chat_change_group_name(chatID, newGroupName){
         newGroupName: newGroupName
     });
 
+}
+
+function chat_send_logout(username){
+    socket.sendEvent("logout",{
+        username: username
+    });
 }
 

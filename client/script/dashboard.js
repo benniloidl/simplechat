@@ -466,42 +466,6 @@ function injectFileWithForm(path, formEventFunction, parameter) {
     });
 }
 
-/**
- * Creates overlay and tries to reconnect to server
- */
-function serverConnectionLost() {
-    const element = document.createElement("div");
-    const wrapper = document.createElement("div");
-    const heading = document.createElement("h1");
-    const text = document.createElement("p");
-    const button = document.createElement("button");
-    heading.textContent = "You lost connection with our server!";
-    button.textContent = "Reload";
-    text.textContent = "Reconnect will be attempted in 5 seconds."
-
-    wrapper.appendChild(heading);
-    wrapper.appendChild(text);
-    wrapper.appendChild(button);
-
-    // wrapper.innerHTML = "some Text ";
-    element.classList.add("missingConnection");
-
-    element.appendChild(wrapper);
-    document.body.appendChild(element);
-
-    // document.body.replaceWith(element)
-
-    function timer() {
-        setTimeout(() => {
-            console.log("timer");
-            window.location.reload();
-            timer();
-        }, 5000);
-    }
-
-    button.addEventListener("click", () => window.location.reload());
-    timer();
-}
 
 /**
  * Set size of Textarea in messages and scrolls the chat to last message

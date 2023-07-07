@@ -160,6 +160,9 @@ wsSrv.on('connection', async (socket, req) => {
             case 'changePassword':
                 eventFunctions.changePassword(socket, event.data, username).then();
                 break;
+            case 'logout':
+                eventFunctions.logout(socket, username).then();
+                break;
             default: {
                 eventFunctions.sendError(socket, `unknown event: ${event.event}`);
                 return -1;

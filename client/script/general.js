@@ -82,10 +82,11 @@ function getCookie(name) {
  * LocalStorage remains
  */
 function logout() {
+    chat_send_logout(getCookie("username"));
     document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     sessionStorage.clear();
-    window.location.href = "/login";
+    // window.location.href = "/login";
 }
 
 /**
@@ -341,4 +342,41 @@ function showError(message){
 //     const pwField = document.getElementById('old-password');
 //     pwField.type = value?"password":"text";
 // }
+}
+
+/**
+ * Creates overlay and tries to reconnect to server
+ */
+function serverConnectionLost() {
+    const element = document.createElement("div");
+    const wrapper = document.createElement("div");
+    const heading = document.createElement("h1");
+    const text = document.createElement("p");
+    const button = document.createElement("button");
+    heading.textContent = "You lost connection with our server!";
+    button.textContent = "Reload";
+    text.textContent = "Reconnect will be attempted in 5 seconds."
+
+    wrapper.appendChild(heading);
+    wrapper.appendChild(text);
+    wrapper.appendChild(button);
+
+    // wrapper.innerHTML = "some Text ";
+    element.classList.add("missingConnection");
+
+    element.appendChild(wrapper);
+    document.body.appendChild(element);
+
+    // document.body.replaceWith(element)
+
+    function timer() {
+        setTimeout(() => {
+            console.log("timer");
+            window.location.reload();
+            timer();
+        }, 5000);
+    }
+
+    button.addEventListener("click", () => window.location.reload());
+    timer();
 }

@@ -27,20 +27,27 @@ async function connectToDB() {
 
 async function storeSessionCookie(username) {
     const token = encryption.createSessionToken(username);
-    const keyObject = await encryption.generateKeyPair();
-    const publicKey = await encryption.getPublicWebKey(keyObject.publicKey);
+    await deleteSessionCookie(username);
+    await sessions.insertOne({ "username": username, "token": token});
+    return {
+        token: token,
+    };
+}
+
+/**
+ * Delete entry of username and session-cookie in Table sessions
+ * @param {String}username
+ * @return {Promise<boolean>}
+ */
+async function deleteSessionCookie(username){
     try {
         // remove existing tokens
         await sessions.deleteMany({ "username": username });
     } catch (e) {
-        console.warn(e)
+        console.warn(e);
+        return false;
     }
-    await sessions.insertOne({ "username": username, "token": token, "privateKey": keyObject.privateKey });
-
-    return {
-        token: token,
-        publicKey: publicKey
-    };
+    return true;
 }
 
 async function checkSessionCookie(username, sessionToken) {
@@ -323,6 +330,7 @@ async function deleteAccount(username) {
         }
     }
     const result = await user.deleteOne({ "username": username });
+    await deleteSessionCookie(username);
     return result && result.deletedCount === 1;
 }
 
@@ -360,5 +368,6 @@ module.exports = {
     chatExists,
     changeGroupName,
     changePassword,
-    userPasswordMatches
+    userPasswordMatches,
+    deleteSessionCookie
 };

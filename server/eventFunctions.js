@@ -32,7 +32,6 @@ async function login(socket, data, sockets, type) {
         sendEvent(socket, 'login', {
             status: false,
             sessionToken: null,
-            publicKey: null
         });
         return;
     }
@@ -49,7 +48,6 @@ async function login(socket, data, sockets, type) {
         return -1;
     }
     let loginToken = loginObject.token;
-    let publicKey = loginObject.publicKey;
 
     if (loginToken) {
         for (const s of sockets) {
@@ -61,15 +59,25 @@ async function login(socket, data, sockets, type) {
         sendEvent(socket, 'login', {
             status: true,
             sessionToken: loginToken,
-            publicKey: publicKey
         });
     } else {
         sendEvent(socket, 'login', {
             status: false,
             sessionToken: null,
-            publicKey: null
         });
     }
+}
+
+/**
+ * remove session Cookies
+ * @param{WebSocket}socket
+ * @param{string}username
+ * @return {Promise<void>}
+ */
+async function logout(socket, username){
+    const result = await dbFunctions.deleteSessionCookie(username);
+    sendEvent(socket, 'logout', {
+        status: result}).then();
 }
 
 /**
@@ -306,6 +314,7 @@ async function sendEvent(socket, event, data) {
 module.exports = {
     validate,
     login,
+    logout,
     fetchchats,
     createChat,
     sendMessage,
