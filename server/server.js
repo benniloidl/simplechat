@@ -146,7 +146,7 @@ wsSrv.on('connection', async (socket, req) => {
                 eventFunctions.fetchGroupUsers(socket, event.data).then();
                 break;
             case 'removeUser':
-                eventFunctions.removeUser(socket, event.data).then();
+                eventFunctions.removeUser(socket, event.data,username, sockets).then();
                 break;
             case 'addUser':
                 eventFunctions.addUser(socket, event.data).then();

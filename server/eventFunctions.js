@@ -134,8 +134,7 @@ async function createChat(socket, data, username) {
  */
 async function sendMessage(socket, data, username, sockets, messageType) {
     const type = (messageType === undefined) ? "text" : messageType;
-    // const media = (messageMedia === undefined)? "": messageMedia;
-    if (await dbFunctions.addMessage(data.chatID, { message: data.message, author: username, readConfirmation: false, timeStamp: Date.now(), type: type })) {
+    if (await dbFunctions.addMessage(data.chatID, { "message": data.message, "author": username, "readConfirmation": false, "timeStamp": Date.now(), "type": type })) {
         const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
         for (const groupMember of groupMembers) {
             if (groupMember !== username) {
@@ -152,7 +151,8 @@ async function sendMessage(socket, data, username, sockets, messageType) {
                         author: username,
                         readConfirmation: false,
                         timeStamp: Date.now()
-                    }
+                    },
+                    "type": type
                 });
             }
         }
@@ -205,7 +205,7 @@ async function fetchGroupUsers(socket, data) {
     }
 }
 
-async function removeUser(socket, data) {
+async function removeUser(socket, data, username, sockets) {
     const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
     // socket.send(JSON.stringify({ event: "removeUser", data: { "status": true, "chatID": data.chatID } }));
     sendEvent(socket, 'removeUser', {
@@ -213,6 +213,8 @@ async function removeUser(socket, data) {
         chatID: data.chatID,
         username: data.username
     });
+    sendMessage(socket, { chatID: data.chatID, message: `${data.username} has left the chat` },
+        username, sockets, "info");
 }
 
 async function addUser(socket, data) {
@@ -270,8 +272,8 @@ async function changeGroupName(socket, data) {
 }
 
 async function changePassword(socket, data, username) {
-    if(await dbFunctions.userPasswordMatches(username, data.oldPassword)){
-        sendEvent(socket, "changePassword", { status: false, message: "You misspelled your password to authenticate"}).then(null);
+    if (await dbFunctions.userPasswordMatches(username, data.oldPassword)) {
+        sendEvent(socket, "changePassword", { status: false, message: "You misspelled your password to authenticate" }).then(null);
         return;
     }
 
