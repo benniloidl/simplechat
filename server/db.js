@@ -105,8 +105,8 @@ async function addChat(username, chatID) {
 
 async function removeChat(username, chatID) {
     if (await hasChat(username, chatID)) {
-        await user.updateOne({ "username": username }, { $pull: { chats: { "chatID": chatID } } });
         await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $pull: { "members": username } });
+        await user.updateOne({ "username": username }, { $pull: { chats: { "chatID": chatID } } });
         return true;
     } else {
         return false;

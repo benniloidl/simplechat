@@ -210,7 +210,7 @@ async function removeUser(socket, data, username, sockets) {
         chatID: data.chatID,
         username: data.username
     });
-    sendMessage(socket, { chatID: data.chatID, message: `${data.username} has left the chat` },
+    sendMessage(socket, { chatID: data.chatID, message: `${username} removed ${data.username} from chat` },
         username, sockets, "info");
 }
 
@@ -220,7 +220,7 @@ async function addUser(socket, data, username, sockets) {
         status: result ? true : false,
         chatID: data.chatID
     });
-    sendMessage(socket, { chatID: data.chatID, message: `${data.username.toLowerCase()} joined the chat` },
+    sendMessage(socket, { chatID: data.chatID, message: `${username} added ${data.username.toLowerCase()} to chat` },
         username, sockets, "info");
 }
 
