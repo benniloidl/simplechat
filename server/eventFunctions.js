@@ -211,7 +211,7 @@ async function addUser(socket, data, username, sockets) {
         status: result ? true : false,
         chatID: data.chatID
     });
-    sendMessage(socket, { chatID: data.chatID, message: `${data.username} joined the chat` },
+    sendMessage(socket, { chatID: data.chatID, message: `${data.username.toLowerCase()} joined the chat` },
         username, sockets, "info");
 }
 
@@ -251,7 +251,13 @@ async function changeGroupName(socket, data, username, sockets) {
     if (chatExists) {
         if (await dbFunctions.changeGroupName(data.chatID, data.newGroupName)) {
             sendEvent(socket, "changeGroupName", { "chatID": data.chatID, "newGroupName": data.newGroupName });
-            sendMessage(socket, { chatID: data.chatID, message: `${data.username} changed the group name to ${data.newGroupName}` },
+            const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
+            for (const s of sockets) {
+                if (groupMembers.includes(s.username)) {
+                    sendEvent(s.socket, "changeGroupName", { "chatID": data.chatID, "newGroupName": data.newGroupName });
+                }
+            }
+            sendMessage(socket, { chatID: data.chatID, message: `${username} changed the group name to ${data.newGroupName}` },
                 username, sockets, "info");
         } else {
             sendError(socket, "An error occured during changing the group name. Please try again.");

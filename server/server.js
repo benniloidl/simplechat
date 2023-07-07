@@ -97,8 +97,6 @@ wsSrv.on('connection', async (socket, req) => {
 
         try {
             if (event.encryptedData) {
-                // let privateKey2 = socket.privateKey;
-                // let data = await decryptMessage(event.encryptedData, privateKey2);
                 let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);
                 event = JSON.parse(data);
 
@@ -109,7 +107,6 @@ wsSrv.on('connection', async (socket, req) => {
             return -1;
         }
 
-        // const sessionToken = JSONCookie.password;
         const sessionToken = JSONCookie.sessionToken;
 
         if (event.event === "login") {

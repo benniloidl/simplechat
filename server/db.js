@@ -36,8 +36,7 @@ async function storeSessionCookie(username) {
         console.warn(e)
     }
     await sessions.insertOne({ "username": username, "token": token, "privateKey": keyObject.privateKey });
-    // const result = await sessions.findOne({ "username": username }, { projection: { _id: 1 } });
-
+    
     return {
         token: token,
         publicKey: publicKey
@@ -47,7 +46,6 @@ async function storeSessionCookie(username) {
 async function checkSessionCookie(username, sessionToken) {
     if (username === undefined || sessionToken === undefined) return false;
     const result = await sessions.findOne({ "username": username, "token": sessionToken }, { projection: { _id: 1 } });
-    //const result = await sessions.findOne({ "username": username.toLowerCase() }, { projection: { _id: 1 } });
     return result ? true : false;
 }
 async function userPasswordMatches(username, password)  {
