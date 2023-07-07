@@ -174,6 +174,10 @@ socket.onmessage = async function (event) {
             }
             break;
         }
+        case 'changeGroupName': {
+            changeGroupNameEventHandler(data);
+            break;
+        }
 
         case 'error': {
             errorEvent(data.message);

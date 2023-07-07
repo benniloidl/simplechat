@@ -210,9 +210,10 @@ function buildMessageObject(messageObject, username, chatType) {
     // message
 
     const type = (messageObject.type === undefined)? "text": messageObject.type;
+    const messageElement = document.createElement("p");
     switch(type) {
         case "text": {
-            const messageElement = document.createElement("p");
+            //const messageElement = document.createElement("p");
             messageElement.textContent = messageObject.message;
             chatElement.appendChild(messageElement);
             break;
@@ -224,7 +225,8 @@ function buildMessageObject(messageObject, username, chatType) {
             const img = document.createElement("img");
             img.classList.add("message-type-image");
             img.src = messageObject.message;
-            chatElement.appendChild(img);
+            messageElement.appendChild(img);
+            chatElement.appendChild(messageElement);
             break;
 
         }
@@ -250,7 +252,8 @@ function buildMessageObject(messageObject, username, chatType) {
                 anchor.setAttribute('href', messageObject.message);
                 anchor.setAttribute('download', text);
                 anchor.textContent = "download"
-                chatElement.appendChild(anchor);
+                messageElement.appendChild(anchor);
+                chatElement.appendChild(messageElement);
             } catch (e){
                 console.error(e);
             }
@@ -579,4 +582,18 @@ function checkChangePassword(element){
         feedbackChangePassword("This Password does not match to our requirements!", false);
     }
 
+}
+
+/**
+ *
+ * @param data
+ * @return {void}
+ */
+function changeGroupNameEventHandler(data){
+    const element = document.getElementById("chat-name");
+    if(!element) return;
+    element.textContent = data.newGroupName;
+    const node = getChatNodeById(data.chatID);
+    if(!node) return;
+    node.querySelector("p").textContent = data.newGroupName;
 }
