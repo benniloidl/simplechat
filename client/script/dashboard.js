@@ -208,11 +208,13 @@ function buildMessageObject(messageObject, username, chatType) {
     }
 
     // message
-    const messageElement = document.createElement("p");
+
     const type = (messageObject.type === undefined)? "text": messageObject.type;
     switch(type) {
         case "text": {
+            const messageElement = document.createElement("p");
             messageElement.textContent = messageObject.message;
+            chatElement.appendChild(messageElement);
             break;
 
         }
@@ -222,10 +224,21 @@ function buildMessageObject(messageObject, username, chatType) {
             const img = document.createElement("img");
             img.classList.add("message-type-image");
             img.src = messageObject.message;
-            messageElement.appendChild(img);
+            chatElement.appendChild(img);
             break;
 
         }
+        case "info":{
+            const infoElement = document.createElement("p");
+            infoElement.classList.add("message-type-info");
+            infoElement.textContent = messageObject.message;
+            chatElement.appendChild(infoElement);
+            chatElement.classList.add("message-type-info-container");
+            chatElement.classList.remove("chat-element-right");
+            chatElement.classList.remove("chat-element-left");
+            break;
+        }
+
         case "application/pdf":
         default: {
             console.error(`Message type "${messageObject.type}" is currently not supported`);
@@ -237,14 +250,14 @@ function buildMessageObject(messageObject, username, chatType) {
                 anchor.setAttribute('href', messageObject.message);
                 anchor.setAttribute('download', text);
                 anchor.textContent = "download"
-                messageElement.appendChild(anchor);
+                chatElement.appendChild(anchor);
             } catch (e){
                 console.error(e);
             }
         }
     }
 
-    chatElement.appendChild(messageElement);
+
 
     // timestamp
     const timeElement = document.createElement("span");

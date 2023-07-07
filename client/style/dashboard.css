@@ -353,3 +353,10 @@ main #chat form input[type="submit"]:hover {
     max-width: 250px;
     height: auto;
 }
+
+
+.message-type-info-container {
+    /*TODO change Design*/
+    background-color: grey !important;
+    align-self: center;
+}
