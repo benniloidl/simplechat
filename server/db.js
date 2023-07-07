@@ -36,7 +36,7 @@ async function storeSessionCookie(username) {
         console.warn(e)
     }
     await sessions.insertOne({ "username": username, "token": token, "privateKey": keyObject.privateKey });
-    
+
     return {
         token: token,
         publicKey: publicKey
@@ -48,16 +48,16 @@ async function checkSessionCookie(username, sessionToken) {
     const result = await sessions.findOne({ "username": username, "token": sessionToken }, { projection: { _id: 1 } });
     return result ? true : false;
 }
-async function userPasswordMatches(username, password)  {
+async function userPasswordMatches(username, password) {
     if (!username) return false;
     username = username.toLowerCase();
-    const pwdObject = await user.findOne({"username": username}, {projection: {password: 1, salt: 1, _id: 0}});
+    const pwdObject = await user.findOne({ "username": username }, { projection: { password: 1, salt: 1, _id: 0 } });
     if (!pwdObject) return false;
-    return  encryption.validatePassword(password, pwdObject);
+    return encryption.validatePassword(password, pwdObject);
 }
 
 async function validateUser(username, password) {
-    return (await userPasswordMatches(username, password))? storeSessionCookie(username):false;
+    return (await userPasswordMatches(username, password)) ? storeSessionCookie(username) : false;
 }
 
 async function createUser(username, password) {
@@ -131,7 +131,7 @@ async function fetchChats(username) {
             const detail = await getChatDetails(id.chatID);
             if (detail) {
                 const unreadMessages = await getUnreadMessages(username, id.chatID);
-                if (detail.type === "user") {
+                if (detail.type === "user" && detail.members.length === 2) {
                     const otherUsername = await getOtherUsername(username, id.chatID);
                     if (otherUsername) {
                         detail.name = otherUsername;
@@ -280,7 +280,7 @@ async function removeUser(chatID, username) {
         if (result.members.length === 0) {
             return await deleteChat(chatID);
         } else if (result.type === "user") {
-            await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": result.members[0] } });
+            await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": username } });
         }
         return true;
     } else {
@@ -317,9 +317,9 @@ async function userAlreadyInGroup(chatID, username) {
 
 async function deleteAccount(username) {
     const chatIDs = await getAllChatIDs(username);
-    if (chatIDs.chats.length > 0) {
+    if (chatIDs.chats && chatIDs.chats.length > 0) {
         for (const id of chatIDs.chats) {
-            await removeUser(id.chatID);
+            await removeUser(id.chatID, username);
         }
     }
     const result = await user.deleteOne({ "username": username });
