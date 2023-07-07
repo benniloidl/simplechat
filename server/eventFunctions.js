@@ -80,6 +80,13 @@ async function login(socket, data, sockets, type) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{users: Array, type:String, name:String}>}data
+ * @param {String}username
+ * @return {Promise<boolean>}
+ */
 async function createChat(socket, data, username) {
     for (let i = 0; i < data.users.length; i++) {
         data.users[i] = data.users[i].toLowerCase();
@@ -116,6 +123,15 @@ async function createChat(socket, data, username) {
     });
 }
 
+/**
+ *
+ * @param socket
+ * @param {Object<{ChatID:string, message:String}>}data
+ * @param {String}username
+ * @param {Array<WebSocket>}sockets
+ * @param {String}messageType
+ * @return {Promise<void>}
+ */
 async function sendMessage(socket, data, username, sockets, messageType) {
     const type = (messageType === undefined) ? "text" : messageType;
     // const media = (messageMedia === undefined)? "": messageMedia;
