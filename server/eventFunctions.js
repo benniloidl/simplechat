@@ -2,12 +2,7 @@ const dbFunctions = require('./db');
 const encryption = require('./encryption');
 
 async function validate(username, sessionToken /*password*/) {
-    // return await dbFunctions.validateUser(username, password);
-    const result = await dbFunctions.checkSessionCookie(username, sessionToken);
-    if (!result) {
-        // redirect to log in
-    }
-    return result;
+    return await dbFunctions.checkSessionCookie(username, sessionToken);
 }
 
 async function fetchchats(socket, username) {
@@ -34,7 +29,6 @@ async function login(socket, data, sockets, type) {
             data.username.length <= 16
         )
     ) {
-        // socket.send(JSON.stringify({ event: 'login', status: false }));
         sendEvent(socket, 'login', {
             status: false,
             sessionToken: null,
@@ -64,14 +58,12 @@ async function login(socket, data, sockets, type) {
                 break;
             }
         }
-        // socket.send(JSON.stringify({ event: 'login', status: true, sessionToken: loginToken, publicKey: publicKey}));
         sendEvent(socket, 'login', {
             status: true,
             sessionToken: loginToken,
             publicKey: publicKey
         });
     } else {
-        // socket.send(JSON.stringify({ event: 'login', status: false, sessionToken: null}));
         sendEvent(socket, 'login', {
             status: false,
             sessionToken: null,
@@ -117,7 +109,6 @@ async function createChat(socket, data, username) {
             await dbFunctions.addChat(user, chatID);
         }
     }
-    // socket.send(JSON.stringify({ event: 'fetchChats', "chats": [{ "chatID": chatID, "name": data.name, "type": data.type }] }));
     sendEvent(socket, 'createChat', {
         chats: [{ "chatID": chatID, "name": data.name, "type": data.type }]
     });
@@ -170,7 +161,6 @@ async function readChat(socket, data, username, sockets) {
     await dbFunctions.resetUnreadMessages(username, data.chatID);
     for (const s of sockets) {
         if (s.socket !== socket && await dbFunctions.hasChat(s.username, data.chatID)) {
-            // s.socket.send(JSON.stringify({ event: "messagesRead", chatID: data.chatID }));
             sendEvent(s.socket, 'messagesRead', {
                 chatID: data.chatID
             });
@@ -196,7 +186,6 @@ async function fetchMessages(socket, data, username) {
 async function fetchGroupUsers(socket, data) {
     const users = await dbFunctions.fetchGroupUsers(data.chatID);
     if (users.members && users.members.length > 0) {
-        // socket.send(JSON.stringify({ event: "fetchGroupUsers", data: { "users": users.members } }));
         sendEvent(socket, 'fetchGroupUsers', {
             users: users.members
         });
@@ -207,7 +196,6 @@ async function fetchGroupUsers(socket, data) {
 
 async function removeUser(socket, data, username, sockets) {
     const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
-    // socket.send(JSON.stringify({ event: "removeUser", data: { "status": true, "chatID": data.chatID } }));
     sendEvent(socket, 'removeUser', {
         status: result ? true : false,
         chatID: data.chatID,
@@ -217,19 +205,19 @@ async function removeUser(socket, data, username, sockets) {
         username, sockets, "info");
 }
 
-async function addUser(socket, data) {
+async function addUser(socket, data, username, sockets) {
     const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
-    // socket.send(JSON.stringify({ event: "addUser", data: { "status": true, "chatID": data.chatID  } }));
     sendEvent(socket, 'addUser', {
         status: result ? true : false,
         chatID: data.chatID
     });
+    sendMessage(socket, { chatID: data.chatID, message: `${data.username.toLowerCase()} joined the chat` },
+        username, sockets, "info");
 }
 
 async function deleteAccount(socket, username) {
     const result = await dbFunctions.deleteAccount(username);
     if (result) {
-        // socket.send(JSON.stringify({ event: "deleteAccount", data: { "status": true } }));
         sendEvent(socket, 'deleteAccount', {
             status: true,
         });
@@ -258,11 +246,19 @@ async function changeUsername(socket, data, username) {
     }
 }
 
-async function changeGroupName(socket, data) {
+async function changeGroupName(socket, data, username, sockets) {
     const chatExists = await dbFunctions.chatExists(data.chatID);
     if (chatExists) {
         if (await dbFunctions.changeGroupName(data.chatID, data.newGroupName)) {
             sendEvent(socket, "changeGroupName", { "chatID": data.chatID, "newGroupName": data.newGroupName });
+            const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
+            for (const s of sockets) {
+                if (groupMembers.includes(s.username)) {
+                    sendEvent(s.socket, "changeGroupName", { "chatID": data.chatID, "newGroupName": data.newGroupName });
+                }
+            }
+            sendMessage(socket, { chatID: data.chatID, message: `${username} changed the group name to ${data.newGroupName}` },
+                username, sockets, "info");
         } else {
             sendError(socket, "An error occured during changing the group name. Please try again.");
         }
@@ -287,7 +283,6 @@ async function changePassword(socket, data, username) {
 }
 
 function sendError(socket, message) {
-    // socket.send(JSON.stringify({ event: "error", message: message }));
     sendEvent(socket, 'error', {
         message: message
     }).then(null);

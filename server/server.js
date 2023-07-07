@@ -97,8 +97,6 @@ wsSrv.on('connection', async (socket, req) => {
 
         try {
             if (event.encryptedData) {
-                // let privateKey2 = socket.privateKey;
-                // let data = await decryptMessage(event.encryptedData, privateKey2);
                 let data = await decryptMessageAES(event.encryptedData, socket.secretKey, socket.iv);
                 event = JSON.parse(data);
 
@@ -109,7 +107,6 @@ wsSrv.on('connection', async (socket, req) => {
             return -1;
         }
 
-        // const sessionToken = JSONCookie.password;
         const sessionToken = JSONCookie.sessionToken;
 
         if (event.event === "login") {
@@ -149,7 +146,7 @@ wsSrv.on('connection', async (socket, req) => {
                 eventFunctions.removeUser(socket, event.data,username, sockets).then();
                 break;
             case 'addUser':
-                eventFunctions.addUser(socket, event.data).then();
+                eventFunctions.addUser(socket, event.data, username, sockets).then();
                 break;
             case 'deleteAccount':
                 eventFunctions.deleteAccount(socket, username).then();
@@ -158,7 +155,7 @@ wsSrv.on('connection', async (socket, req) => {
                 eventFunctions.changeUsername(socket, event.data, username).then();
                 break;
             case 'changeGroupName':
-                eventFunctions.changeGroupName(socket, event.data).then();
+                eventFunctions.changeGroupName(socket, event.data, username, sockets).then();
                 break;
             case 'changePassword':
                 eventFunctions.changePassword(socket, event.data, username).then();
