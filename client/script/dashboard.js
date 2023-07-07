@@ -185,7 +185,7 @@ function buildChatMessages(chatData) {
 
 /**
  * Build and get the Message as HTML-object
- * @param messageObject
+ * @param {Object<{author:String, type:String, message:String}>}messageObject
  * @param username
  * @param chatType
  * @returns {HTMLDivElement}
@@ -325,7 +325,7 @@ function readMessage(element) {
 
 /**
  * Injects one message object
- * @param messageObject
+ * @param {Object<{author:String, type:String, message:String, readConfirmation:boolean, timeStamp:String|Number}>}messageObject
  * @param username
  * @param type
  */

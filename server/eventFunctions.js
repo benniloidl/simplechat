@@ -141,7 +141,8 @@ async function sendMessage(socket, data, username, sockets, messageType) {
                         message: data.message,
                         author: username,
                         readConfirmation: false,
-                        timeStamp: Date.now()
+                        timeStamp: Date.now(),
+                        type:type
                     },
                     "type": type
                 });

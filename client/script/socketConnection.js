@@ -121,6 +121,7 @@ socket.onmessage = async function (event) {
             break;
         case 'messageNotification': {
             //TODO fix unreadMessages counter
+            console.log("notificationData", data.message)
             notificationHandler(data);
             break;
         }
