@@ -44,7 +44,8 @@ async function login(socket, data, sockets, type) {
     }
     if (!loginObject) {
         // Probably user does not exist
-        sendError(socket, "FATAL ERROR during login!");
+        // sendError(socket, "FATAL ERROR during login!");
+        sendError(socket, "Incorrect Username and/or Password, please try again");
         return -1;
     }
     let loginToken = loginObject.token;
