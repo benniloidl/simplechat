@@ -259,9 +259,6 @@ function buildMessageObject(messageObject, username, chatType) {
             }
         }
     }
-
-
-
     // timestamp
     const timeElement = document.createElement("span");
     let messageDate = new Date(messageObject.timeStamp); // eg: "28 Jun 2023 18:50:59"
@@ -298,7 +295,7 @@ function buildMessageObject(messageObject, username, chatType) {
     chatElement.style.order = modifiedTime1.toString();
 
     // read confirmation
-    if (messageObject.readConfirmation === true && messageObject.author === username) {
+    if (messageObject.readConfirmation === true && messageObject.author === username && chatType === "chat") {
         readMessage(chatElement);
     }
     return chatElement;
