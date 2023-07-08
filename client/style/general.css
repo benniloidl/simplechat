@@ -246,7 +246,7 @@ footer .appearanceMode {
 
 .input-label[data-label]::after {
     position: absolute;
-    top: calc(var(--spacing) + var(--font-size));
+    top: calc(var(--spacing) + var(--font-size) - 2px);
     left: var(--spacing);
     content: attr(data-label);
     transition: all 0.2s ease-in-out;
@@ -254,15 +254,11 @@ footer .appearanceMode {
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
-.input-label:has(input:focus)::after {
+.input-label.input-focus::after {
     top: 0;
     visibility: visible;
     padding: 0 var(--spacing);
     background-color: var(--color-background);
-}
-
-.input-label:has(input:not(:placeholder-shown):not(:focus))::after {
-    opacity: 0;
 }
 
 #submit {

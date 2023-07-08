@@ -95,9 +95,9 @@ function logout() {
  */
 function toggleChatOverview(event) {
     const chatOverview = document.querySelector('.chat-overview-wrapper')
-
+    
     if (!chatOverview) return
-
+    
     let attr = chatOverview.getAttribute('data-overview-open')
     attr = (attr === 'true') ? 'false' : 'true'
     chatOverview.setAttribute('data-overview-open', attr)
@@ -112,11 +112,11 @@ function toggleChatOverview(event) {
  * request server to delete user account,
  * server will respond event 'deleteAccount' with status or will send Error
  */
-function deleteUserAccount(){
+function deleteUserAccount() {
     // last chance
     let confirmation = confirm("Are you sure to delete Account?!");
-    if(!confirmation) return;
-
+    if (!confirmation) return;
+    
     let username = getCookie("username");
     chat_delete_account(socket, username);
 }
@@ -126,7 +126,7 @@ function deleteUserAccount(){
  * @param {string}username
  * @returns {*}matches
  */
-function checkUsernameSemantic(username){
+function checkUsernameSemantic(username) {
     return username.match(/^[a-zA-Z0-9._\-+]*$/g);
 }
 
@@ -135,7 +135,7 @@ function checkUsernameSemantic(username){
  * @param {string}password
  * @returns {boolean}
  */
-function checkPasswordSemantic(password){
+function checkPasswordSemantic(password) {
     return (
         password.match(/[a-z]/g) &&
         password.match(/[A-Z]/g) &&
@@ -150,8 +150,8 @@ function checkPasswordSemantic(password){
  * @param jwk
  * @returns {Promise<CryptoKey>}
  */
-async function importPublicKey(jwk){
-    return await window.crypto.subtle.importKey("jwk", jwk,{
+async function importPublicKey(jwk) {
+    return await window.crypto.subtle.importKey("jwk", jwk, {
             name: "RSA-OAEP",
             modulusLength: 2048,
             publicExponent: new Uint8Array([1, 0, 1]),
@@ -169,10 +169,10 @@ async function importPublicKey(jwk){
  * @param {JSON} publicKey
  * @returns {Promise<string>}
  */
-async function encryptMessage(message, publicKey){
+async function encryptMessage(message, publicKey) {
     let enc = new TextEncoder();
     let key = await importPublicKey(publicKey)
-    const cipherText = await window.crypto.subtle.encrypt({name: "RSA-OAEP", }, key, enc.encode(message));
+    const cipherText = await window.crypto.subtle.encrypt({ name: "RSA-OAEP", }, key, enc.encode(message));
     return bytesToBase64(new Uint8Array(cipherText));
 }
 
@@ -181,7 +181,7 @@ async function encryptMessage(message, publicKey){
  * @param {Uint8Array}bytes
  * @returns {string}
  */
-function bytesToBase64(bytes){
+function bytesToBase64(bytes) {
     const binString = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
     return btoa(binString);
 }
@@ -200,11 +200,11 @@ function base64ToBytes(base64) {
  * Generates new AES Key
  * @returns {Promise<CryptoKey>}
  */
-async function generateAESKey(){
+async function generateAESKey() {
     return window.crypto.subtle.generateKey({
-        name: "AES-CTR",
-        length: 256,
-    },
+            name: "AES-CTR",
+            length: 256,
+        },
         true,
         ["encrypt", "decrypt"]
     );
@@ -219,18 +219,18 @@ async function generateAESKey(){
  * @param {String}message
  * @returns {Promise<string>}
  */
-async function encryptMessageAES(aesKey, iv, message){
+async function encryptMessageAES(aesKey, iv, message) {
     // console.log("encyptMessage", aesKey, iv, message);
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
     const cipherText = await window.crypto.subtle.encrypt({
-        name: "AES-CTR",
-        counter: iv,
-        length: 128
-    },
+            name: "AES-CTR",
+            counter: iv,
+            length: 128
+        },
         aesKey,
         encoded
-        )
+    )
     return bytesToBase64(new Uint8Array(cipherText));
 }
 
@@ -263,7 +263,7 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv) {
  * @param {CryptoKey}aesKey
  * @returns {Promise<JsonWebKey>}
  */
-async function exportKeyAES(aesKey){
+async function exportKeyAES(aesKey) {
     return window.crypto.subtle.exportKey("jwk", aesKey);
 }
 
@@ -274,7 +274,7 @@ async function exportKeyAES(aesKey){
  * @param {socket}socket
  * @returns {Promise<void>}
  */
-async function handleKeyAES(publicKeyJwk, socket){
+async function handleKeyAES(publicKeyJwk, socket) {
     let key = window.crypto.getRandomValues(new Uint8Array(16));
     let iv = window.crypto.getRandomValues(new Uint8Array(16));
     // const publicKey = await importPublicKey(publicKeyJwk);
@@ -287,14 +287,14 @@ async function handleKeyAES(publicKeyJwk, socket){
     const message = await encryptMessage(aesString, publicKeyJwk);
     console.log("send secret Key (AES) from client to server")
     const ivString = bytesToBase64(iv);
-    socket.send(JSON.stringify({event:"secretKey", data:{key:message, buffer:key.buffer, iv: ivString}}));
+    socket.send(JSON.stringify({ event: "secretKey", data: { key: message, buffer: key.buffer, iv: ivString } }));
 }
 
 /**
  *
  * @param {boolean}boolean
  */
-function setSocketEncryption(boolean){
+function setSocketEncryption(boolean) {
     localStorage.setItem("socketEncryption", boolean.toString());
 }
 
@@ -302,7 +302,7 @@ function setSocketEncryption(boolean){
  * Should encryption be enabled
  * @returns {boolean}
  */
-function isEncryptionEnabled(){
+function isEncryptionEnabled() {
     return localStorage.getItem("socketEncryption") === "true";
 }
 
@@ -310,10 +310,10 @@ function isEncryptionEnabled(){
  * Checks ability of system to encrypt and set to local Storage
  * @returns {void}
  */
-function encryptionAvailable(){
-    if(window.isSecureContext){
+function encryptionAvailable() {
+    if (window.isSecureContext) {
         setSocketEncryption(true);
-    } else{
+    } else {
         setSocketEncryption(false);
     }
 }
@@ -322,7 +322,7 @@ function encryptionAvailable(){
  * Show or hide error messages in element id: "dashboardError"
  * @param {string}message
  */
-function showError(message){
+function showError(message) {
     //* reset error message if a message is empty: ""*//
     const messageboxList = document.querySelectorAll(".error");
     for (const messagebox of messageboxList) {
@@ -334,10 +334,11 @@ function showError(message){
         }
         messagebox.innerHTML = message;
     }
-    if(message){
+    if (message) {
         console.warn(message);
     }
-
+    
+    // TODO: remove
 // function showPassword(passwordID, value){
 //     const pwField = document.getElementById('old-password');
 //     pwField.type = value?"password":"text";
@@ -356,19 +357,21 @@ function serverConnectionLost() {
     heading.textContent = "You lost connection with our server!";
     button.textContent = "Reload";
     text.textContent = "Reconnect will be attempted in 5 seconds."
-
+    
     wrapper.appendChild(heading);
     wrapper.appendChild(text);
     wrapper.appendChild(button);
-
+    
+    // TODO: remove
     // wrapper.innerHTML = "some Text ";
     element.classList.add("missingConnection");
-
+    
     element.appendChild(wrapper);
     document.body.appendChild(element);
-
+    
+    // TODO: remove
     // document.body.replaceWith(element)
-
+    
     function timer() {
         setTimeout(() => {
             console.log("timer");
@@ -376,7 +379,17 @@ function serverConnectionLost() {
             timer();
         }, 5000);
     }
-
+    
     button.addEventListener("click", () => window.location.reload());
     timer();
+}
+
+/* When an input field reports the event 'onfocusin', the class 'input-focus' will be added to its parent div. */
+focusInputField = (element) => {
+    element.parentNode.classList.add("input-focus")
+}
+
+/* When an input field reports the event 'onfocusout', the class 'input-focus' will be removed from its parent div if the value is empty. */
+loseFocusInputField = (element) => {
+    if (element.value === "") element.parentNode.classList.remove("input-focus")
 }
