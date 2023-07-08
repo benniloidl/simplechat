@@ -32,22 +32,44 @@
 <body>
 <article class="loginForm">
 	<h1>Let's Chat</h1>
-	<p><strong>Login now to start chatting.</strong></p>
+	<p>
+		<strong>Login now to start chatting.</strong>
+	</p>
 	
 	<form onsubmit="return loginRequest('login')">
-		<div class="input-label" data-label="Username">
-			<label for="usr" hidden="hidden"></label>
-			<input type="text" id="usr" placeholder=" " required maxlength="16" tabindex="1"
+		<div class="input-label"
+		     data-label="Username">
+			<label for="usr"
+			       hidden></label>
+			<input type="text"
+			       id="usr"
+			       required
+			       maxlength="16"
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)"
+			       tabindex="1"
 			       value="Encryption_Test1"><br>
 		</div>
 		
-		<div class="input-label" data-label="Password">
-			<label for="pwd" hidden="hidden"></label>
-			<input type="password" id="pwd" placeholder=" " required tabindex="2" value="Test123*345u"><br>
+		<div class="input-label"
+		     data-label="Password">
+			<label for="pwd"
+			       hidden></label>
+			<input type="password"
+			       id="pwd"
+			       required
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)"
+			       tabindex="2"
+			       value="Test123*345u"><br>
 		</div>
 		
-		<i class="error" id="pwdError"></i>
-		<input type="submit" id="submit" tabindex="3" value="Login">
+		<i class="error"
+		   id="pwdError"></i>
+		<input type="submit"
+		       id="submit"
+		       tabindex="3"
+		       value="Login">
 		<a href="./register">Create an account</a>
 	</form>
 </article>
@@ -61,6 +83,13 @@
 	<label for="se">Enable Encryption</label>
 </footer>
 <script>encryptionAvailable()</script>
+
+<script>
+	/* do this because the input values are predefined -> label will be properly shown */
+	document.querySelector("#pwd").focus()
+	document.querySelector("#usr").focus()
+</script>
+
 </body>
 
 </html>

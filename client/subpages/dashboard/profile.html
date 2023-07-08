@@ -18,19 +18,40 @@
 			<li>At least one special character</li>
 		</ul>
 		
-		<div class="input-label" data-label="Enter old password">
-			<label for="old-password" hidden></label>
-			<input type="password" id="old-password" placeholder=" " required minlength="8">
+		<div class="input-label"
+		     data-label="Enter old password">
+			<label for="old-password"
+			       hidden></label>
+			<input type="password"
+			       id="old-password"
+			       required
+			       minlength="8"
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)">
 		</div>
 		
-		<div class="input-label" data-label="Enter new password">
-			<label for="new-password" hidden></label>
-			<input type="password" id="new-password" placeholder=" " required minlength="8">
+		<div class="input-label"
+		     data-label="Enter new password">
+			<label for="new-password"
+			       hidden></label>
+			<input type="password"
+			       id="new-password"
+			       required
+			       minlength="8"
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)">
 		</div>
 		
-		<div class="input-label" data-label="Enter new password again">
-			<label for="new-password-repeat" hidden></label>
-			<input type="password" id="new-password-repeat" placeholder=" " required minlength="8">
+		<div class="input-label"
+		     data-label="Enter new password again">
+			<label for="new-password-repeat"
+			       hidden></label>
+			<input type="password"
+			       id="new-password-repeat"
+			       required
+			       minlength="8"
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)">
 		</div>
 		<i id="change-password-feedback"></i>
 		<input type="submit" value="Change password">
