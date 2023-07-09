@@ -21,6 +21,7 @@ Bei einem Klick auf den Chat oder Gruppe wird der bisherige Verlauf angezeigt. H
 
 ## Technische Umsetzung
 ### Backend
+
 ---
 #### Grundstruktur 
 Das Backend unserer Simple Chat App befindet sich im Ordner "Server". In diesem Ordner sind vier Javascript-Dateien zu finden. Die Datei `server.js` ist die Javascript-Datei, die das Projekt initiiert. Sie beinhaltet den Express-Server mit den entsprechenden Routen (Login, Registrieren, Dashboard) und den WebSocket, der für den Nachrichtenaustausch nach dem Login verantwortlich ist. Um die `server.js` nicht zu überfüllen, haben wir "*eventfunctions*" und *"dbfunctions"* in separate Dateien ausgelagert (`db.js`, `eventFunctions.js`), die exportiert und in der `server.js` importiert werden. So können diese Funktionen auch dann aufgerufen werden, wenn sie in einer anderen Datei implementiert sind. Die Datei `db.js` enthält Methoden, die genutzt werden, um eine Datenbankverbindung zu etablieren und Datenbankabfragen durchzuführen. *"Eventfunctions"* sind Funktionen, die ausgeführt werden, wenn das entsprechende Event getriggert wurde, und es werden dann Datenbankabfragen ausgeführt, mithilfe der *"dbfunctions"* und an den Client gesendet. In der Datei `encryption.js` befinden sich Methoden, die für die Ver- und Entschlüsselung von Daten verwendet werden.
@@ -34,8 +35,8 @@ Die MongoDB ist eine objektorientierte Datenbank. Dies bedeutet das die Datenban
 Die chatHistory-Collection speichert die Objekte von Chatverläufen. In einem Chatverlauf-Objekt sind die *ChatID, der Name, der Chat-Typ, die Mitglieder und die Nachrichten-Objekte* hinterlegt. Ein Nachrichten-Objekt besteht aus der *Nachricht, dem Autor, einem Zeitstempel und einer Lesebestätigung*. 
 In der Session-Collection werden Session-Objekte gespeichert, welche aus dem Nutzernamen, so wie einem Sessiontoken besteht.
 
-
 ### Frontend
+
 ---
 Im Frontend sind die HTML Dateien in Hauptdateien und in Templates aufgeteilt. Die Templates werden bei Bedarf geladen und in die Seite eingefügt.
 Die HTML-Dateien liegen in dem Ordner subpages, die templates liegen im dem Unterordner dashboard.
@@ -120,6 +121,8 @@ Die genutzte Verschlüsselung wird, wenn das System oder der Nutzer das Feature 
 Dennoch ist dieses Feature nur unzureichend gegen Angriffe sicher, da die Daten auf der Datenbank unverschlüsselt eingelesen werden können und Angriffe auf die Sandbox des Users das den Schlüssel und andere Daten extrahieren können.
 
 ## Anhang
-<img src="Loading.PNG" alt="Schematische Darstellung der Dashboardseite" width="350" style="float:right">
-<img src="Login.PNG" alt="Schematische Darstellung der Dashboardseite" width="350" style="float:right">
-<img src="Dashboard.PNG" alt="Schematische Darstellung der Dashboardseite" width="350" style="float:right">
+<img src="Loading.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">
+
+<img src="Login.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">
+
+<img src="Dashboard.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">
