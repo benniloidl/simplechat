@@ -30,34 +30,60 @@
 </head>
 
 <body>
-	<article class="loginForm">
-		<h1>Let's Chat</h1>
-		<p><strong>Create your free account now to start chatting. It is very simple.</strong></p>
+<main class="loginForm">
+	<h1>Let's Chat</h1>
+	<p><strong>Create your free account now to start chatting. It is very simple.</strong></p>
 
-		<form onsubmit="return loginRequest('register')">
-			<div class="input-label" data-label="Username">
-				<label for="usr" hidden="hidden"></label>
-				<input type="text" id="usr" required maxlength="16" onfocusin="focusInputField(this)"
-					onfocusout="loseFocusInputField(this)" tabindex="1" value="Encryption_Test1"><br>
-			</div>
+	<form onsubmit="return loginRequest('register')">
+		<div class="input-label"
+		     data-label="Username">
+			<label for="usr"
+			       hidden="hidden"></label>
+			<input type="text"
+			       id="usr"
+			       required
+			       maxlength="16"
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)"
+			       tabindex="1"
+			       value="Encryption_Test1"><br>
+		</div>
 
-			<div class="input-label" data-label="Password">
-				<label for="pwd" hidden="hidden"></label>
-				<input type="password" id="pwd" required onfocusin="focusInputField(this)"
-					onfocusout="loseFocusInputField(this)" tabindex="2" value="Test123*345u"><br>
-			</div>
+		<div class="input-label"
+		     data-label="Password">
+			<label for="pwd"
+			       hidden="hidden"></label>
+			<input type="password"
+			       id="pwd"
+			       required
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)"
+			       tabindex="2"
+			       value="Test123*345u"><br>
+		</div>
 
-			<div class="input-label" data-label="Password">
-				<label for="pwd2" hidden="hidden"></label>
-				<input type="password" id="pwd2" required onfocusin="focusInputField(this)"
-					onfocusout="loseFocusInputField(this)" tabindex="3" value="Test123*345u"><br>
-			</div>
+		<div class="input-label"
+		     data-label="Password">
+			<label for="pwd2"
+			       hidden="hidden"></label>
+			<input type="password"
+			       id="pwd2"
+			       required
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)"
+			       tabindex="3"
+			       value="Test123*345u"><br>
+		</div>
 
-			<i class="error" id="pwdError"></i>
-			<input type="submit" id="submit" tabindex="4" value="Create account">
-			<a href="./login">Login</a>
-		</form>
-	</article>
+		<i class="error"
+		   id="pwdError"></i>
+		<input type="submit"
+		       id="submit"
+		       tabindex="4"
+		       value="Create account">
+		<a href="./login">Login</a>
+	</form>
+</main>
 
 	<footer>
 		<span class="appearanceMode" onclick="changeColorScheme()"></span>

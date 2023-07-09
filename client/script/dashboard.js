@@ -65,7 +65,7 @@ function buildChatOverview(data) {
         navigator.setAttribute("data-unread-messages", unreadMessages);
         navigator.classList.add("chat-contact");
         navigator.setAttribute("data-chat-id", data.chatID);
-        navigator.setAttribute("chatType", data.type);
+        navigator.setAttribute("data-chattype", data.type);
 
         // notification
         if (unreadMessages > 0) {
@@ -145,7 +145,7 @@ function buildChatMessages(chatData) {
         console.log("no Node", chatNode)
         return;
     }
-    let type = chatNode.getAttribute("chatType");
+    let type = chatNode.getAttribute("data-chattype");
     let name = chatNode.lastChild.textContent;
     const chatBox = document.createElement("div");
     chatBox.id = "chat-box";
@@ -366,7 +366,7 @@ function notificationHandler(notification) {
     document.getElementById("total-messages").textContent = (messageCount + 1).toString();
     if (openedChatId === notification.chatID) {
         // chat is shown
-        let chatType = chatNode.getAttribute("chatType");
+        let chatType = chatNode.getAttribute("data-chattype");
         injectMessage(notification.message, notification.username, chatType);
         chat_read_event(socket, notification.chatID);
         return;
@@ -431,7 +431,7 @@ function addUserToGroup() {
     const field = document.getElementById("add-member");
     if (!field) return false;
     let chatID = sessionStorage.getItem("openedChat");
-    if (getChatNodeById(chatID).getAttribute("chatType") !== "group") return false;
+    if (getChatNodeById(chatID).getAttribute("data-chattype") !== "group") return false;
 
     let username = field.value.trim();
     if (!checkUsernameSemantic(username)) {

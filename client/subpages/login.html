@@ -30,30 +30,49 @@
 </head>
 
 <body>
-	<article class="loginForm">
-		<h1>Let's Chat</h1>
-		<p>
-			<strong>Login now to start chatting.</strong>
-		</p>
+<article class="loginForm">
+	<h1>Let's Chat</h1>
+	<p>
+		<strong>Login now to start chatting.</strong>
+	</p>
 
-		<form onsubmit="return loginRequest('login')">
-			<div class="input-label" data-label="Username">
-				<label for="usr" hidden></label>
-				<input type="text" id="usr" required maxlength="16" onfocusin="focusInputField(this)"
-					onfocusout="loseFocusInputField(this)" tabindex="1" value="Encryption_Test1"><br>
-			</div>
+	<form onsubmit="return loginRequest('login')">
+		<div class="input-label"
+		     data-label="Username">
+			<label for="usr"
+			       hidden></label>
+			<input type="text"
+			       id="usr"
+			       required
+			       maxlength="16"
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)"
+			       tabindex="1"
+			       value="Encryption_Test1"><br>
+		</div>
 
-			<div class="input-label" data-label="Password">
-				<label for="pwd" hidden></label>
-				<input type="password" id="pwd" required onfocusin="focusInputField(this)"
-					onfocusout="loseFocusInputField(this)" tabindex="2" value="Test123*345u"><br>
-			</div>
+		<div class="input-label"
+		     data-label="Password">
+			<label for="pwd"
+			       hidden></label>
+			<input type="password"
+			       id="pwd"
+			       required
+			       onfocusin="focusInputField(this)"
+			       onfocusout="loseFocusInputField(this)"
+			       tabindex="2"
+			       value="Test123*345u"><br>
+		</div>
 
-			<i class="error" id="pwdError"></i>
-			<input type="submit" id="submit" tabindex="3" value="Login">
-			<a href="./register">Create an account</a>
-		</form>
-	</article>
+		<i class="error"
+		   id="pwdError"></i>
+		<input type="submit"
+		       id="submit"
+		       tabindex="3"
+		       value="Login">
+		<a href="./register">Create an account</a>
+	</form>
+</article>
 
 	<footer>
 		<span class="appearanceMode" onclick="changeColorScheme()"></span>
