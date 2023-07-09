@@ -71,8 +71,8 @@ async function login(socket, data, sockets, type) {
 
 /**
  * remove session Cookies
- * @param {WebSocket}socket
- * @param {string}username
+ * @param{WebSocket}socket
+ * @param{string}username
  * @return {Promise<void>}
  */
 async function logout(socket, username) {
