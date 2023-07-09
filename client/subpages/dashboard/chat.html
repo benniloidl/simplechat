@@ -2,9 +2,9 @@
 	<i class="fas fa-user"></i>
 	<p id="chat-name">Loading...</p>
 	<i class="fas fa-bars menu-open"
-	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
-<!--	<p style="position: absolute; right: var(&#45;&#45;spacing); white-space: nowrap; color: red;">-->
-<!--		Delete Chat</p>-->
+		onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
+	<!--	<p style="position: absolute; right: var(&#45;&#45;spacing); white-space: nowrap; color: red;">-->
+	<!--		Delete Chat</p>-->
 </div>
 <div class="chat-overview-wrapper" data-overview-open="false">
 	<div class="overview-container">
@@ -20,7 +20,7 @@
 		<p>Loading... </p>
 		<span class="subtitle">10m ago</span>
 	</div>
-	
+
 	<div class="chat-element chat-element-right loading">
 		<p>Loading... </p>
 		<span class="subtitle">Now</span>
@@ -32,12 +32,11 @@
 	<div>
 		<label>
 			<textarea onfocus="focusTextArea()"
-			          onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
-			          placeholder="Enter your message"
-			          tabindex="1"></textarea>
+				onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
+				placeholder="Enter your message" tabindex="1"></textarea>
 		</label>
 	</div>
-	
+
 	<div class="chat-actions-button" id="submit-message" tabindex="2">
 		<i class="fas fa-paper-plane"></i>
 		<span>Send</span>

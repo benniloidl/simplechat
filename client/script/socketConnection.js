@@ -10,11 +10,11 @@ const chatMessageAmount = 10;
 socket.sendEvent = async (eventName, eventData) => {
     let publicKey = socket.publicKey;
     let i = 0;
-    while(publicKey==="null"){
+    while (publicKey === "null") {
         i++;
-        publicKey=socket.publicKey;
+        publicKey = socket.publicKey;
         await new Promise(r => setTimeout(r, 20));
-        if(i===500){
+        if (i === 500) {
             console.warn("Encryption timeout");
             encryption = false;
         }
@@ -27,7 +27,7 @@ socket.sendEvent = async (eventName, eventData) => {
         data: eventData,
     };
 
-    if (socket.secretKey && encryption==="true") {
+    if (socket.secretKey && encryption === "true") {
         //* Encryption *//
         let parsedEventData = JSON.stringify(message);
 
@@ -43,7 +43,7 @@ socket.sendEvent = async (eventName, eventData) => {
 
     } else {
         // not encrypted
-        console.warn("Events are not encrypted", encryption!=="true"?"Encryption disabled":"Other error");
+        console.warn("Events are not encrypted", encryption !== "true" ? "Encryption disabled" : "Other error");
         socket.send(JSON.stringify(message));
     }
 }
@@ -55,7 +55,7 @@ socket.onopen = function () {
 
 socket.onmessage = async function (event) {
     let parsedEvent = JSON.parse(event.data);
-    if(parsedEvent.encryptedData){
+    if (parsedEvent.encryptedData) {
         // console.log("enrypted Data", parsedEvent.encryptedData);
         let data = await decryptMessageAES(parsedEvent.encryptedData, socket.secretKey, socket.iv);
         parsedEvent = JSON.parse(data);
@@ -68,7 +68,7 @@ socket.onmessage = async function (event) {
     switch (parsedEvent.event) {
         case 'publicKey':
             const key = JSON.stringify(data)
-            if(isEncryptionEnabled()) {
+            if (isEncryptionEnabled()) {
                 const jwk = JSON.parse(key);
                 handleKeyAES(jwk, socket).then(null);
             }
@@ -84,7 +84,7 @@ socket.onmessage = async function (event) {
             loginUser(data);
             break;
         case 'logout':
-            if(!data.status) console.error("Cannot Logout");
+            if (!data.status) console.error("Cannot Logout");
             else window.location.href = "/login";
         case 'fetchChats':
             try {
@@ -100,19 +100,20 @@ socket.onmessage = async function (event) {
             } catch (e) { // if the element is not yet loaded
                 setTimeout(() => {
                     buildChatOverview(data);
-                    loadChat2(data.chats[0].type, data.chats[0].chatID)}, 1000);
+                    loadChat2(data.chats[0].type, data.chats[0].chatID)
+                }, 1000);
             }
 
             break;
         case 'fetchMessages':
             const messages = sessionStorage.getItem("loadedMessages");
             buildChatMessages(data, messages);
-            if(!messages){
+            if (!messages) {
                 sessionStorage.setItem("loadedMessages", data.messages.length.toString());
-            } else{
+            } else {
                 sessionStorage.setItem("loadedMessages", (parseInt(messages) + data.messages.length).toString());
             }
-            if(data.next && data.next > 0){
+            if (data.next && data.next > 0) {
 
                 chat_scrolled(socket, data.chatID, data.next);
             }
@@ -123,25 +124,25 @@ socket.onmessage = async function (event) {
             notificationHandler(data);
             break;
         }
-        case 'messagesRead':{
+        case 'messagesRead': {
             markChatAsRead(data);
             break
         }
-        case 'fetchGroupUsers':{
+        case 'fetchGroupUsers': {
             createViewContainer(data.users);
             break;
         }
         case 'deleteAccount': {
             console.log("deleteAccount")
-            if(data.status) {
+            if (data.status) {
                 sessionStorage.clear();
                 localStorage.clear();
                 logout();
             }
             break;
         }
-        case 'addUser':{
-            if(data.status){
+        case 'addUser': {
+            if (data.status) {
                 // console.log("addUser", data);
                 chat_get_group_users(socket, data.chatID);
 
@@ -151,24 +152,24 @@ socket.onmessage = async function (event) {
             }
             break;
         }
-        case 'removeUser':{
-            if(data.status && data.username===getCookie("username")){
+        case 'removeUser': {
+            if (data.status && data.username === getCookie("username")) {
                 const a = getChatNodeById(data.chatID);
-                if(a) a.remove();
+                if (a) a.remove();
                 injectPageAsync("../subpages/dashboard/profile.html", cleanStorage);
-            }else{
+            } else {
                 chat_get_group_users(socket, data.chatID);
             }
             break;
         }
-        case 'changePassword':{
+        case 'changePassword': {
             console.log("changePassword", data.status, data);
 
-            if(data.status){
+            if (data.status) {
                 feedbackChangePassword("Changed Password successfully!", true);
-            } else if(data.message){
+            } else if (data.message) {
                 feedbackChangePassword(data.message, false);
-            } else{
+            } else {
                 feedbackChangePassword("Something went wrong changing your password!", false);
             }
             break;
@@ -255,7 +256,7 @@ function loginRequest(type) {
             password: result.password,
         });
     }
-    
+
     return false;
 }
 
@@ -269,10 +270,10 @@ function newChat(type) {
     let chatName = document.querySelector("input[type=text]").value.trim();
     if (chatName === "") return;
     let users = [];
-    
+
     let name = chatName.trim();
     if (type === "user") {
-        if(!checkUsernameSemantic(chatName)) {
+        if (!checkUsernameSemantic(chatName)) {
             showError("Username must only contain upper- and lowercase " +
                 "letters, digits and the special characters \\+\\-\\_\\.");
             return;
@@ -302,7 +303,7 @@ function removeUser(username) {
  * @param {File}file
  * @return {Promise<String>}
  */
-async function loadFile(file){
+async function loadFile(file) {
     return new Promise((resolve, reject) => {
         const fileReader = new FileReader();
         fileReader.onload = () => {
@@ -327,7 +328,7 @@ async function loadFile(file){
  * Loads file encodes them and sends it to server
  * @param {File}file
  */
-function sendMediaToServer(file){
+function sendMediaToServer(file) {
     // readAllFiles(files).then((base64EncodedFiles) =>{
     //     let type = files[0].type
     //     chat_sendMedia(type, base64EncodedFiles);
@@ -342,9 +343,9 @@ function sendMediaToServer(file){
 /**
  * TESTMETHOD
  */
-function sendMediaToServerTestMethod(){
+function sendMediaToServerTestMethod() {
     const emitter = document.getElementById("submit-file");
-    if(emitter){
+    if (emitter) {
         sendMediaToServer(emitter.files[0]);
     }
 }
@@ -355,8 +356,8 @@ function sendMediaToServerTestMethod(){
  * @param {String}base64FileContent
  * @param {String|Number}chatId
  */
-function chat_sendMedia(mediaType, base64FileContent, chatId){
-    socket.sendEvent('sendMedia',{
+function chat_sendMedia(mediaType, base64FileContent, chatId) {
+    socket.sendEvent('sendMedia', {
         mediaType: mediaType,
         file: base64FileContent,
         chatID: chatId
@@ -367,7 +368,7 @@ function chat_sendMedia(mediaType, base64FileContent, chatId){
  *
  * @param {String}username
  */
-function chat_addUser(username){
+function chat_addUser(username) {
     let chatID = sessionStorage.getItem("openedChat");
 
     socket.sendEvent('addUser', {
@@ -456,7 +457,7 @@ function chat_fetch_overview(socket) {
  * @param {String|Number}groupId
  * @return {void}
  */
-function chat_get_group_users(socket, groupId){
+function chat_get_group_users(socket, groupId) {
     socket.sendEvent('fetchGroupUsers', {
         chatID: groupId
     });
@@ -481,20 +482,20 @@ function chat_delete_account(socket, username) {
  * @param {string}oldPassword
  * @param {string}newPassword
  */
-function chat_changePassword(username, oldPassword, newPassword){
+function chat_changePassword(username, oldPassword, newPassword) {
     socket.sendEvent("changePassword", {
         username: username,
         oldPassword: oldPassword,
         newPassword: newPassword
-        });
-    }
+    });
+}
 /**
  * Constructs event-data-structure and sends it to server
  * @param {String|Number}chatID
  * @param {String}newGroupName
  * @return {void}
  */
-function chat_change_group_name(chatID, newGroupName){
+function chat_change_group_name(chatID, newGroupName) {
     socket.sendEvent("changeGroupName", {
         chatID: chatID,
         newGroupName: newGroupName
@@ -502,8 +503,8 @@ function chat_change_group_name(chatID, newGroupName){
 
 }
 
-function chat_send_logout(username){
-    socket.sendEvent("logout",{
+function chat_send_logout(username) {
+    socket.sendEvent("logout", {
         username: username
     });
 }

@@ -75,10 +75,11 @@ async function login(socket, data, sockets, type) {
  * @param{string}username
  * @return {Promise<void>}
  */
-async function logout(socket, username){
+async function logout(socket, username) {
     const result = await dbFunctions.deleteSessionCookie(username);
     sendEvent(socket, 'logout', {
-        status: result}).then();
+        status: result
+    }).then();
 }
 
 /**
@@ -151,7 +152,7 @@ async function sendMessage(socket, data, username, sockets, messageType) {
                         author: username,
                         readConfirmation: false,
                         timeStamp: Date.now(),
-                        type:type
+                        type: type
                     },
                     "type": type
                 });
@@ -206,23 +207,40 @@ async function fetchGroupUsers(socket, data) {
 
 async function removeUser(socket, data, username, sockets) {
     const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
-    sendEvent(socket, 'removeUser', {
-        status: result ? true : false,
-        chatID: data.chatID,
-        username: data.username
-    });
-    sendMessage(socket, { chatID: data.chatID, message: `${username} removed ${data.username} from chat` },
-        username, sockets, "info");
+    if (result) {
+        sendEvent(socket, 'removeUser', {
+            status: true,
+            chatID: data.chatID,
+            username: data.username
+        });
+        sendMessage(socket, { chatID: data.chatID, message: `${username} removed ${data.username} from chat` },
+            username, sockets, "info");
+
+    } else {
+        sendEvent(socket, 'removeUser', {
+            status: false,
+            chatID: data.chatID,
+            username: data.username
+        });
+    }
 }
 
 async function addUser(socket, data, username, sockets) {
     const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
-    sendEvent(socket, 'addUser', {
-        status: result ? true : false,
-        chatID: data.chatID
-    });
-    sendMessage(socket, { chatID: data.chatID, message: `${username} added ${data.username.toLowerCase()} to chat` },
-        username, sockets, "info");
+    if (result) {
+        sendEvent(socket, 'addUser', {
+            status: true,
+            chatID: data.chatID
+        });
+        sendMessage(socket, { chatID: data.chatID, message: `${username} added ${data.username.toLowerCase()} to chat` },
+            username, sockets, "info");
+
+    } else {
+        sendEvent(socket, 'addUser', {
+            status: false,
+            chatID: data.chatID
+        });
+    }
 }
 
 async function deleteAccount(socket, username) {

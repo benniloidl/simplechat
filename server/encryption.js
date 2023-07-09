@@ -5,14 +5,14 @@ const crypto = require("crypto");
  * Generates RSA Key
  * @returns {Promise<CryptoKeyPair>}
  */
-async function generateKeyPair(){
+async function generateKeyPair() {
     return await crypto.subtle.generateKey({
-            name: "RSA-OAEP",
-            // Consider using a 4096-bit key for systems that require long-term security
-            modulusLength: 2048,
-            publicExponent: new Uint8Array([1, 0, 1]),
-            hash: "SHA-256",
-        },
+        name: "RSA-OAEP",
+        // Consider using a 4096-bit key for systems that require long-term security
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+    },
         true,
         ["encrypt", "decrypt"]
     );
@@ -23,7 +23,7 @@ async function generateKeyPair(){
  * @param {CryptoKey}publicKey
  * @returns {Promise<JsonWebKey>}
  */
-async function getPublicWebKey(publicKey){
+async function getPublicWebKey(publicKey) {
     return await crypto.subtle.exportKey("jwk", publicKey);
 }
 
@@ -42,7 +42,7 @@ function base64ToBytes(base64) {
  * @param {Uint8Array}bytes
  * @returns {string}
  */
-function bytesToBase64(bytes){
+function bytesToBase64(bytes) {
     const binString = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
     return btoa(binString);
 }
@@ -53,9 +53,9 @@ function bytesToBase64(bytes){
  * @param {CryptoKey}privateKey
  * @returns {Promise<string>}
  */
-async function decryptMessage(encryptedMessage, privateKey){
+async function decryptMessage(encryptedMessage, privateKey) {
     let decoder = new TextDecoder("utf-8");
-    let decrypted = await crypto.subtle.decrypt({name:"RSA-OAEP"}, privateKey, base64ToBytes(encryptedMessage));
+    let decrypted = await crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, base64ToBytes(encryptedMessage));
     return decoder.decode(decrypted);
 
 }
@@ -65,13 +65,13 @@ async function decryptMessage(encryptedMessage, privateKey){
  * @param {}socket
  * @returns {Promise<CryptoKey>}
  */
-async function sendPublicKey(socket){
+async function sendPublicKey(socket) {
     const keyPair = await generateKeyPair();
     socket.privateKey = keyPair.privateKey;
     const publicWebKey = await getPublicWebKey(keyPair.publicKey);
     const message = JSON.stringify({
-        event:"publicKey",
-        data:publicWebKey
+        event: "publicKey",
+        data: publicWebKey
     });
     socket.send(message);
     return keyPair.privateKey;
@@ -120,7 +120,7 @@ function createSessionToken(username) {
  * @param {JsonWebKey}jwk
  * @returns {Promise<CryptoKey>}
  */
-async function loadAESKey(jwk){
+async function loadAESKey(jwk) {
     return crypto.subtle.importKey(
         "jwk",
         jwk,
@@ -140,7 +140,7 @@ async function loadAESKey(jwk){
  * @param socket
  * @returns {Promise<void>}
  */
-async function handleKey(data, privateKey, socket){
+async function handleKey(data, privateKey, socket) {
     const encryptedJwk = data.key;
     const iv = base64ToBytes(data.iv);
     const jwkRaw = await decryptMessage(encryptedJwk, privateKey);
@@ -157,7 +157,7 @@ async function handleKey(data, privateKey, socket){
  * @param {Uint8Array}iv
  * @returns {Promise<string>}
  */
-async function decryptMessageAES(encryptedMessage, aesKey, iv){
+async function decryptMessageAES(encryptedMessage, aesKey, iv) {
     let decoder = new TextDecoder("utf-8");
     let decrypted = await crypto.subtle.decrypt({
         name: "AES-CTR",
@@ -177,14 +177,14 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv){
  * @param {Uint8Array}iv
  * @returns {Promise<string>}
  */
-async function encryptMessageAESServer(message, aesKey, iv){
+async function encryptMessageAESServer(message, aesKey, iv) {
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
     const cipherText = await crypto.subtle.encrypt({
-            name: "AES-CTR",
-            counter: iv,
-            length: 128
-        },
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },
         aesKey,
         encoded
     )

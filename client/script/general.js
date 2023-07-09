@@ -30,7 +30,7 @@ function detectColorScheme() {
         // theme = "high-contrast"
     }
     console.log("detected: ", theme)
-    
+
     //dark theme preferred, set document with a `data-theme` attribute
     localStorage.setItem("theme", theme)
     if (theme === "dark") {
@@ -72,8 +72,8 @@ detectColorScheme();
  * @returns {string | undefined}
  */
 function getCookie(name) {
-    const value = `; ${ document.cookie }`;
-    const parts = value.split(`; ${ name }=`);
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
@@ -95,13 +95,13 @@ function logout() {
  */
 function toggleChatOverview(event) {
     const chatOverview = document.querySelector('.chat-overview-wrapper')
-    
+
     if (!chatOverview) return
-    
+
     let attr = chatOverview.getAttribute('data-overview-open')
     attr = (attr === 'true') ? 'false' : 'true'
     chatOverview.setAttribute('data-overview-open', attr)
-    
+
     if (event.target.hasAttribute("data-selected"))
         event.target.removeAttribute("data-selected")
     else
@@ -116,7 +116,7 @@ function deleteUserAccount() {
     // last chance
     let confirmation = confirm("Are you sure to delete Account?!");
     if (!confirmation) return;
-    
+
     let username = getCookie("username");
     chat_delete_account(socket, username);
 }
@@ -152,11 +152,11 @@ function checkPasswordSemantic(password) {
  */
 async function importPublicKey(jwk) {
     return await window.crypto.subtle.importKey("jwk", jwk, {
-            name: "RSA-OAEP",
-            modulusLength: 2048,
-            publicExponent: new Uint8Array([1, 0, 1]),
-            hash: "SHA-256"
-        },
+        name: "RSA-OAEP",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256"
+    },
         true,
         ["encrypt"]
     );
@@ -202,9 +202,9 @@ function base64ToBytes(base64) {
  */
 async function generateAESKey() {
     return window.crypto.subtle.generateKey({
-            name: "AES-CTR",
-            length: 256,
-        },
+        name: "AES-CTR",
+        length: 256,
+    },
         true,
         ["encrypt", "decrypt"]
     );
@@ -224,10 +224,10 @@ async function encryptMessageAES(aesKey, iv, message) {
     let encoder = new TextEncoder()
     let encoded = encoder.encode(message);
     const cipherText = await window.crypto.subtle.encrypt({
-            name: "AES-CTR",
-            counter: iv,
-            length: 128
-        },
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },
         aesKey,
         encoded
     )
@@ -248,10 +248,10 @@ async function decryptMessageAES(encryptedMessage, aesKey, iv) {
     // console.log("decryptMessage", aesKey, iv, encryptedMessage);
     let decoder = new TextDecoder("utf-8");
     let decrypted = await window.crypto.subtle.decrypt({
-            name: "AES-CTR",
-            counter: iv,
-            length: 128
-        },
+        name: "AES-CTR",
+        counter: iv,
+        length: 128
+    },
         aesKey,
         base64ToBytes(encryptedMessage)
     );
@@ -337,12 +337,12 @@ function showError(message) {
     if (message) {
         console.warn(message);
     }
-    
+
     // TODO: remove
-// function showPassword(passwordID, value){
-//     const pwField = document.getElementById('old-password');
-//     pwField.type = value?"password":"text";
-// }
+    // function showPassword(passwordID, value){
+    //     const pwField = document.getElementById('old-password');
+    //     pwField.type = value?"password":"text";
+    // }
 }
 
 /**
@@ -357,21 +357,21 @@ function serverConnectionLost() {
     heading.textContent = "You lost connection with our server!";
     button.textContent = "Reload";
     text.textContent = "Reconnect will be attempted in 5 seconds."
-    
+
     wrapper.appendChild(heading);
     wrapper.appendChild(text);
     wrapper.appendChild(button);
-    
+
     // TODO: remove
     // wrapper.innerHTML = "some Text ";
     element.classList.add("missingConnection");
-    
+
     element.appendChild(wrapper);
     document.body.appendChild(element);
-    
+
     // TODO: remove
     // document.body.replaceWith(element)
-    
+
     function timer() {
         setTimeout(() => {
             console.log("timer");
@@ -379,7 +379,7 @@ function serverConnectionLost() {
             timer();
         }, 5000);
     }
-    
+
     button.addEventListener("click", () => window.location.reload());
     timer();
 }

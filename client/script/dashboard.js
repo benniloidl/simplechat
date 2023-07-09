@@ -57,7 +57,8 @@ function buildChatOverview(data) {
     if (!chats) {
         return;
     }
-    
+
+    const openedChatId = sessionStorage.getItem("openedChat");
     chats.forEach(data => {
         const navigator = document.createElement("div");
         let unreadMessages = data.unreadMessages ? data.unreadMessages : 0;
@@ -87,7 +88,11 @@ function buildChatOverview(data) {
         navigator.appendChild(name);
 
         document.getElementById("chats").appendChild(navigator);
+        if (openedChatId === data.chatID) {
+            loadChat2(data.type, data.chatID);
+        }
     });
+
 }
 
 /**
@@ -97,9 +102,9 @@ function buildChatOverview(data) {
  * @param type
  * @param chatID
  */
-function loadChat2(type, chatID){
+function loadChat2(type, chatID) {
     const navigator = getChatNodeById(chatID);
-    if(!navigator) return;
+    if (!navigator) return;
     const path = (type === "user") ? "../subpages/dashboard/chat.html" : "../subpages/dashboard/group.html";
     injectPageAsync(path, () => {
         sessionStorage.setItem("openedChat", chatID.toString());
@@ -126,7 +131,7 @@ function buildChatMessages(chatData) {
     }
 
     const loadedMessages = sessionStorage.getItem("loadedMessages");
-    if(loadedMessages && loadedMessages > 0){
+    if (loadedMessages && loadedMessages > 0) {
         const chatBox = document.getElementById("chat-box")
         chatData.messages.forEach(data => {
             let chatElement = buildMessageObject(data, chatData.username, data.type);
@@ -209,9 +214,9 @@ function buildMessageObject(messageObject, username, chatType) {
 
     // message
 
-    const type = (messageObject.type === undefined)? "text": messageObject.type;
+    const type = (messageObject.type === undefined) ? "text" : messageObject.type;
     const messageElement = document.createElement("p");
-    switch(type) {
+    switch (type) {
         case "text": {
             //const messageElement = document.createElement("p");
             messageElement.textContent = messageObject.message;
@@ -230,7 +235,7 @@ function buildMessageObject(messageObject, username, chatType) {
             break;
 
         }
-        case "info":{
+        case "info": {
             const infoElement = document.createElement("p");
             infoElement.classList.add("message-type-info");
             infoElement.textContent = messageObject.message;
@@ -254,7 +259,7 @@ function buildMessageObject(messageObject, username, chatType) {
                 anchor.textContent = "download"
                 messageElement.appendChild(anchor);
                 chatElement.appendChild(messageElement);
-            } catch (e){
+            } catch (e) {
                 console.error(e);
             }
         }
@@ -270,16 +275,16 @@ function buildMessageObject(messageObject, username, chatType) {
     }
     timeElement.classList.add("subtitle");
     chatElement.appendChild(timeElement);
-    if(lastTimeElement && lastTimeElement.textContent === timeElement.textContent){
+    if (lastTimeElement && lastTimeElement.textContent === timeElement.textContent) {
         lastTimeElement.remove();
-        if (lastMessageElement){
+        if (lastMessageElement) {
             lastMessageElement.style.marginBottom = "0";
         }
     }
-    if (lastAuthor === messageObject.author){
+    if (lastAuthor === messageObject.author) {
         lastTimeElement = timeElement;
         lastMessageElement = chatElement
-    }else {
+    } else {
         lastTimeElement = null;
         lastMessageElement = null;
     }
@@ -288,9 +293,9 @@ function buildMessageObject(messageObject, username, chatType) {
      issue: order has max value of 2147483647
      calculations to fit datetime into this size:
      */
-        // resolution 1 second, 20 Years, reference 29 june 2023
-        // let modifiedTime = Math.round((messageDate.valueOf()/1000) -  1000000000 -  688000000);
-        // resolution 0.1 second 4 Years selected
+    // resolution 1 second, 20 Years, reference 29 june 2023
+    // let modifiedTime = Math.round((messageDate.valueOf()/1000) -  1000000000 -  688000000);
+    // resolution 0.1 second 4 Years selected
     let modifiedTime1 = Math.round((messageDate.valueOf() / 100) - 10000000000 - 6880000000);
     chatElement.style.order = modifiedTime1.toString();
 
@@ -483,11 +488,12 @@ function focusTextArea() {
  * Collect data to change a groupname and send it to server
  * @returns {false}
  */
-function changeGroupName(){
+function changeGroupName() {
     const newGroupName = document.getElementById("new-group-name").value;
-    if(newGroupName === "") return false;
+    if (newGroupName === "") return false;
     const groupId = sessionStorage.getItem("openedChat");
     chat_change_group_name(groupId, newGroupName);
+    document.getElementById("new-group-name").value = "";
     return false;
 }
 
@@ -497,18 +503,18 @@ function changeGroupName(){
  * Otherwise sends data to server
  * @returns {false}
  */
-function changePassword(){
+function changePassword() {
     // console.error("Not IMPLEMENTED");
     const username = getCookie("username");
     const oldPassword = document.getElementById("old-password").value;
     const newPassword = document.getElementById("new-password").value;
     const newPasswordRepeat = document.getElementById("new-password-repeat").value;
 
-    if (newPassword !== newPasswordRepeat){
+    if (newPassword !== newPasswordRepeat) {
         feedbackChangePassword("New Passwords doesn't match, please try again!", false);
         return false;
     }
-    if (!(checkPasswordSemantic(oldPassword) && newPassword && newPasswordRepeat)){
+    if (!(checkPasswordSemantic(oldPassword) && newPassword && newPasswordRepeat)) {
         feedbackChangePassword("Password violates against our requirements!", false);
         return false;
     }
@@ -523,23 +529,23 @@ function changePassword(){
  * @param {string} message
  * @param {boolean} success
  */
-function feedbackChangePassword(message, success){
+function feedbackChangePassword(message, success) {
     const element = document.getElementById("change-password-feedback");
-    if(!element) return;
+    if (!element) return;
     element.textContent = message;
-    element.style.color = (success)?"green":"red";
+    element.style.color = (success) ? "green" : "red";
 
 }
 
 /**
  * Send Feedback to user, if value of password element violates out requirements
  */
-function checkChangePassword(element){
+function checkChangePassword(element) {
     const password = document.getElementById(element).value;
     const res = checkPasswordSemantic(password);
-    if(res){
+    if (res) {
         feedbackChangePassword("", false);
-    }else{
+    } else {
         feedbackChangePassword("This Password does not match to our requirements!", false);
     }
 
@@ -550,11 +556,11 @@ function checkChangePassword(element){
  * @param data
  * @return {void}
  */
-function changeGroupNameEventHandler(data){
+function changeGroupNameEventHandler(data) {
     const element = document.getElementById("chat-name");
-    if(!element) return;
+    if (!element) return;
     element.textContent = data.newGroupName;
     const node = getChatNodeById(data.chatID);
-    if(!node) return;
+    if (!node) return;
     node.querySelector("p").textContent = data.newGroupName;
 }

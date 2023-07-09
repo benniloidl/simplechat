@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 	<title>SimpleChat - Register</title>
 	<link type="image/x-icon" href="../style/logo.png" rel="icon">
-	
+
 	<style>
 		body {
 			font-family: -apple-system, system-ui, sans-serif;
 		}
-		
+
 		article {
 			box-sizing: border-box;
 			width: 90%;
@@ -20,80 +21,56 @@
 			border-radius: 16px;
 		}
 	</style>
-	
+
 	<link href="../style/general.css" rel="stylesheet">
 	<link href="../style/login.css" rel="stylesheet">
-	<script type="text/javascript" charset="utf-8" src="../script/general.js"></script>
-	<script type="text/javascript" charset="utf-8" src="../script/socketConnection.js"></script>
-	<script type="text/javascript" charset="utf-8" src="../script/login.js"></script>
+	<script src="../script/general.js"></script>
+	<script src="../script/socketConnection.js"></script>
+	<script src="../script/login.js"></script>
 </head>
+
 <body>
-<article class="loginForm">
-	<h1>Let's Chat</h1>
-	<p><strong>Create your free account now to start chatting. It is very simple.</strong></p>
-	
-	<form onsubmit="return loginRequest('register')">
-		<div class="input-label"
-		     data-label="Username">
-			<label for="usr"
-			       hidden="hidden"></label>
-			<input type="text"
-			       id="usr"
-			       required
-			       maxlength="16"
-			       onfocusin="focusInputField(this)"
-			       onfocusout="loseFocusInputField(this)"
-			       tabindex="1"
-			       value="Encryption_Test1"><br>
-		</div>
-		
-		<div class="input-label"
-		     data-label="Password">
-			<label for="pwd"
-			       hidden="hidden"></label>
-			<input type="password"
-			       id="pwd"
-			       required
-			       onfocusin="focusInputField(this)"
-			       onfocusout="loseFocusInputField(this)"
-			       tabindex="2"
-			       value="Test123*345u"><br>
-		</div>
-		
-		<div class="input-label"
-		     data-label="Password">
-			<label for="pwd2"
-			       hidden="hidden"></label>
-			<input type="password"
-			       id="pwd2"
-			       required
-			       onfocusin="focusInputField(this)"
-			       onfocusout="loseFocusInputField(this)"
-			       tabindex="3"
-			       value="Test123*345u"><br>
-		</div>
-		
-		<i class="error"
-		   id="pwdError"></i>
-		<input type="submit"
-		       id="submit"
-		       tabindex="4"
-		       value="Create account">
-		<a href="./login">Login</a>
-	</form>
-</article>
+	<article class="loginForm">
+		<h1>Let's Chat</h1>
+		<p><strong>Create your free account now to start chatting. It is very simple.</strong></p>
 
-<footer>
-	<span class="appearanceMode" onclick="changeColorScheme()"></span>
-	<a class="footerLink" href="../subpages/imprint.html">Imprint</a>
-	<a class="footerLink" href="../subpages/privacy.html">Privacy</a>
-</footer>
+		<form onsubmit="return loginRequest('register')">
+			<div class="input-label" data-label="Username">
+				<label for="usr" hidden="hidden"></label>
+				<input type="text" id="usr" required maxlength="16" onfocusin="focusInputField(this)"
+					onfocusout="loseFocusInputField(this)" tabindex="1" value="Encryption_Test1"><br>
+			</div>
 
-<script>
-	/* do this because the input values are predefined -> label will be properly shown */
-	document.querySelector("#pwd2").focus()
-	document.querySelector("#pwd").focus()
-	document.querySelector("#usr").focus()
-</script>
+			<div class="input-label" data-label="Password">
+				<label for="pwd" hidden="hidden"></label>
+				<input type="password" id="pwd" required onfocusin="focusInputField(this)"
+					onfocusout="loseFocusInputField(this)" tabindex="2" value="Test123*345u"><br>
+			</div>
+
+			<div class="input-label" data-label="Password">
+				<label for="pwd2" hidden="hidden"></label>
+				<input type="password" id="pwd2" required onfocusin="focusInputField(this)"
+					onfocusout="loseFocusInputField(this)" tabindex="3" value="Test123*345u"><br>
+			</div>
+
+			<i class="error" id="pwdError"></i>
+			<input type="submit" id="submit" tabindex="4" value="Create account">
+			<a href="./login">Login</a>
+		</form>
+	</article>
+
+	<footer>
+		<span class="appearanceMode" onclick="changeColorScheme()"></span>
+		<a class="footerLink" href="../subpages/imprint.html">Imprint</a>
+		<a class="footerLink" href="../subpages/privacy.html">Privacy</a>
+	</footer>
+
+	<script>
+		/* do this because the input values are predefined -> label will be properly shown */
+		document.querySelector("#pwd2").focus()
+		document.querySelector("#pwd").focus()
+		document.querySelector("#usr").focus()
+	</script>
 </body>
+
 </html>

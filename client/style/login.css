@@ -9,6 +9,13 @@
     --login-accent-color: hsl(calc(var(--login-hue) - 180), 100%, 40%);
 }
 
+body {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    align-items: center;
+}
 
 .loginForm {
     position: relative;
@@ -18,6 +25,7 @@
     box-sizing: border-box;
     max-width: 400px;
     margin: calc(var(--spacing) * 2) auto;
+    margin-top: -1.5rem;
 
     padding: 2em;
     border: none;
@@ -41,9 +49,6 @@
 .loginForm div {
     display: flex;
     justify-content: space-between;
-}
-
-.loginForm div a {
 }
 
 .loginForm h1 {

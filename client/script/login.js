@@ -22,7 +22,7 @@ function getValues() {
     /* Check password semantic,
         because every criterion should match, expression cannot be compressed
      */
-    if ( checkUsernameSemantic(pwd)) {
+    if (checkUsernameSemantic(pwd)) {
         pwdError("Password must have at least 8 characters, containing an upper- and lowercase letter, " +
             "digit and a special character");
         return null;

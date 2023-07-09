@@ -2,7 +2,7 @@
 	<i class="fas fa-users"></i>
 	<p id="chat-name">Loading...</p>
 	<i class="fas fa-bars menu-open"
-	   onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
+		onclick="document.querySelector('main').setAttribute('data-menu-open', 'true')"></i>
 </div>
 
 <div class="chat-overview-wrapper" data-overview-open="false">
@@ -11,7 +11,7 @@
 		<hr>
 		<form onsubmit="return addUserToGroup()">
 			<label for="add-member">Add friend</label>
-			<input id="add-member" placeholder="Enter username" required type="text">
+			<input id="add-member" maxlength="16" placeholder="Enter username" required type="text">
 			<input type="submit" value="Add">
 		</form>
 		<i class="error" id="dashboardError"></i>
@@ -31,7 +31,7 @@
 		<hr>
 		<form onsubmit="return changeGroupName()">
 			<label for="new-group-name">Change name of group</label>
-			<input id="new-group-name" placeholder="Enter new name" required type="text">
+			<input id="new-group-name" maxlength="32" placeholder="Enter new name" required type="text">
 			<input type="submit" value="Change name">
 		</form>
 		<hr>
@@ -51,19 +51,16 @@
 <div id="chat-actions">
 	<div>
 		<label>
-			<textarea
-					onfocus="focusTextArea()"
-					onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
-					placeholder="Enter your message"
-					tabindex="1"
-					maxlength="65535"
-			></textarea>
+			<textarea onfocus="focusTextArea()"
+				onfocusout="document.getElementById('chat-box').style.marginBottom = '0'"
+				placeholder="Enter your message" tabindex="1" maxlength="65535"></textarea>
 		</label>
 	</div>
-	
+
 	<div class="chat-actions-button" id="submit-message" tabindex="2">
 		<i class="fas fa-paper-plane"></i>
 		<span>Send</span>
-		<input type="file" id="submit-file" accept="image/*" onchange="sendMediaToServerTestMethod()" style="display: none">
+		<input type="file" id="submit-file" accept="image/*" onchange="sendMediaToServerTestMethod()"
+			style="display: none">
 	</div>
 </div>

@@ -28,7 +28,7 @@ async function connectToDB() {
 async function storeSessionCookie(username) {
     const token = encryption.createSessionToken(username);
     await deleteSessionCookie(username);
-    await sessions.insertOne({ "username": username, "token": token});
+    await sessions.insertOne({ "username": username, "token": token });
     return {
         token: token,
     };
@@ -39,7 +39,7 @@ async function storeSessionCookie(username) {
  * @param {String}username
  * @return {Promise<boolean>}
  */
-async function deleteSessionCookie(username){
+async function deleteSessionCookie(username) {
     try {
         // remove existing tokens
         await sessions.deleteMany({ "username": username });
@@ -130,7 +130,7 @@ async function getChatDetails(chatID) {
 }
 
 async function fetchChats(username) {
-    const chatIDs = await getAllChatIDs(username)??[];
+    const chatIDs = await getAllChatIDs(username) ?? [];
     let chats = [];
     if (chatIDs.chats.length > 0) {
         for (let i = 0; i < chatIDs.chats.length; i++) {
