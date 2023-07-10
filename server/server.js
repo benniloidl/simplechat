@@ -1,5 +1,6 @@
 const ws = require('ws');
 const express = require('express');
+const configData = require('../config.json');
 const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -8,7 +9,7 @@ const eventFunctions = require('./eventFunctions');
 const { sendPublicKey, handleKey, decryptMessageAES } = require("./encryption");
 
 let sockets = [];
-const PORT = 80;
+const PORT = configData.port;
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
