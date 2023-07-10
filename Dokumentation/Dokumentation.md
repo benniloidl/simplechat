@@ -23,13 +23,20 @@ Bei einem Klick auf den Chat oder Gruppe wird der bisherige Verlauf angezeigt. H
 ### Backend
 
 ---
-#### Grundstruktur 
+#### Grundstruktur
 Das Backend unserer Simple Chat App befindet sich im Ordner "Server". In diesem Ordner sind vier Javascript-Dateien zu finden. Die Datei `server.js` ist die Javascript-Datei, die das Projekt initiiert. Sie beinhaltet den Express-Server mit den entsprechenden Routen (Login, Registrieren, Dashboard) und den WebSocket, der für den Nachrichtenaustausch nach dem Login verantwortlich ist. Um die `server.js` nicht zu überfüllen, haben wir "*eventfunctions*" und *"dbfunctions"* in separate Dateien ausgelagert (`db.js`, `eventFunctions.js`), die exportiert und in der `server.js` importiert werden. So können diese Funktionen auch dann aufgerufen werden, wenn sie in einer anderen Datei implementiert sind. Die Datei `db.js` enthält Methoden, die genutzt werden, um eine Datenbankverbindung zu etablieren und Datenbankabfragen durchzuführen. *"Eventfunctions"* sind Funktionen, die ausgeführt werden, wenn das entsprechende Event getriggert wurde, und es werden dann Datenbankabfragen ausgeführt, mithilfe der *"dbfunctions"* und an den Client gesendet. In der Datei `encryption.js` befinden sich Methoden, die für die Ver- und Entschlüsselung von Daten verwendet werden.
 
 Für HTTP-Anfragen werden drei Middlewares verwendet. Zuerst „express.static“, um einen statischen Zugriff auf Dateien vom Server zu ermöglichen. Mittels „cookieParser“ werden danach die Cookies vom Client geparsed. Diese werden dann in der dritten Middleware verwendet, um die Sessionvalidierung durchzuführen. Sollte die Validierung fehlschlagen, wird der Nutzer auf die Login-Seite weitergeleitet.
 
 Für die Kommunikation zwischen Client und Webserver wird einen WebSocket verwendet.
-Die Funktionalität des Websockets wurde durch eine Eventschnittstelle erweitert. Hierbei werden die Nachrichten in ein JSON-Objekt in dem Schema `{event: "eventsample", data: Object}` versendet. Beim Empfangen eines Events wird mittels einer Switch-Verzweigung unser benutzerdefiniertes Event unterschieden und die entsprechende Methode in `eventfunctions.js` aufgerufen. Dasselbe Event-Handling-Prinzip wird ebenfalls im Frontend verwendet.
+Die Funktionalität des Websockets wurde durch eine Eventschnittstelle erweitert. Hierbei werden die Nachrichten in ein JSON-Objekt in dem Schema
+```
+{
+  event: "eventsample",
+  data: Object
+}
+```
+versendet. Beim Empfangen eines Events wird mittels einer Switch-Verzweigung unser benutzerdefiniertes Event unterschieden und die entsprechende Methode in `eventfunctions.js` aufgerufen. Dasselbe Event-Handling-Prinzip wird ebenfalls im Frontend verwendet.
 
 Die MongoDB ist eine objektorientierte Datenbank. Dies bedeutet das die Datenbank in Collections aufgeteilt ist, in denen einzelne Objekte abgespeichert werden können. Bei diesem Project werden drei Collections verwendet: *user, chatHistory und sessions*. In der User-Collection wird für jeden Nutzer ein Objekt angelegt. In diesem Objekt ist der Nutzername, das Passwort und ein Array von Chat-Objekten gespeichert. Ein Chat-Objekt besteht aus einer ChatID und der Anzahl ungelesener Nachrichten des zugehörigen Chats.
 Die chatHistory-Collection speichert die Objekte von Chatverläufen. In einem Chatverlauf-Objekt sind die *ChatID, der Name, der Chat-Typ, die Mitglieder und die Nachrichten-Objekte* hinterlegt. Ein Nachrichten-Objekt besteht aus der *Nachricht, dem Autor, einem Zeitstempel und einer Lesebestätigung*. 
