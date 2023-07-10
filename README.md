@@ -2,10 +2,6 @@
 
 This is a simple responsive student project featuring basic chat functionality. It is meant to be as lightweight as possible, therefore it only relies on plain **HTML**, **CSS**, **JavaScript** and **NodeJS**.
 
-> **Important info:** SimpleChat has been tested on Chromium-based browsers and works absolutely perfect. There are known issues with Firefox, primarily due to the lack of a *:has selector*. It might be fixed in the future.
-
-![image](https://github.com/altetaube/simplechat/assets/116595379/1628ecdb-9205-480f-84f2-c93965dd3bb2)
-
 ## Setup
 
 This project requires a **NodeJS** installation (v.18) or higher. Please make sure you have it installed prior to setting up SimpleChat.
