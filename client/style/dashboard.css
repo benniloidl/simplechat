@@ -187,20 +187,20 @@ main #chat #chat-actions {
     gap: var(--spacing);
 }
 
-main #chat #chat-actions>div {
+main #chat #chat-actions > div {
     padding: var(--spacing);
     border-radius: var(--border-radius);
     background: var(--color-secondary);
 }
 
-main #chat #chat-actions>div:first-of-type {
+main #chat #chat-actions > div:first-of-type {
     position: relative;
     flex: 1;
     height: 100%;
     padding: 0;
 }
 
-main #chat #chat-actions>div:first-of-type textarea {
+main #chat #chat-actions > div:first-of-type textarea {
     font-family: inherit;
     font-size: var(--font-size);
     position: absolute;
@@ -217,22 +217,22 @@ main #chat #chat-actions>div:first-of-type textarea {
     background: var(--color-background);
 }
 
-main #chat #chat-actions>div:first-of-type textarea:focus {
+main #chat #chat-actions > div:first-of-type textarea:focus {
     height: calc(100% + 8 * var(--spacing));
     border-color: var(--color-primary);
     filter: drop-shadow(0 0 0.5rem var(--color-primary));
 }
 
-main #chat #chat-actions>.chat-actions-button {
+main #chat #chat-actions > .chat-actions-button {
     cursor: pointer;
     transition: all .2s ease-in-out;
 }
 
-main #chat #chat-actions>.chat-actions-button span {
+main #chat #chat-actions > .chat-actions-button span {
     margin-left: 4px;
 }
 
-main #chat #chat-actions>.chat-actions-button:hover {
+main #chat #chat-actions > .chat-actions-button:hover {
     background-color: var(--color-primary);
     filter: drop-shadow(0 0 0.5rem var(--color-primary));
 }
@@ -363,7 +363,6 @@ main #chat form input[type="submit"]:hover {
 
 
 .message-type-info-container {
-    /*TODO change Design*/
-    background-color: grey !important;
     align-self: center;
+    background-color: var(--color-secondary) !important;
 }
