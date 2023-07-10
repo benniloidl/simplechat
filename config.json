@@ -1,0 +1,10 @@
+{
+  "port": 80,
+  "db": {
+    "Hostname": "simplechat.pr3gx85.mongodb.net",
+    "Username": "benni",
+    "Password": "7Mi2duv15aMJeTT4",
+
+    "uri": "mongodb://127.0.0.1:27017/SimpleChat"
+  }
+}
