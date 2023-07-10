@@ -1,6 +1,6 @@
 # SimpleChat
 
-This is a simple responsive student project featuring basic chat functionality. It is meant to be as lightweight as possible, therefore it only relies on plain **HTML**, **CSS**, **JavaScript** and **NodeJS**.
+This is a lightweight student project that features basic chat functionality. It is built using plain **HTML**, **CSS**, **JavaScript** and **NodeJS**. Users can chat with other users and create groups to chat with many users at once.
 
 ## Setup
 
