@@ -9,7 +9,7 @@ const eventFunctions = require('./eventFunctions');
 const { sendPublicKey, handleKey, decryptMessageAES } = require("./encryption");
 
 let sockets = [];
-const PORT = configData.port;
+const PORT = configData["express-port"];
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(cookieParser());
