@@ -150,6 +150,12 @@ async function addChat(username, chatID) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function removeChat(username, chatID) {
     if (await hasChat(username, chatID)) {
         await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $pull: { "members": username } });
@@ -160,10 +166,20 @@ async function removeChat(username, chatID) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @return {Promise<void>}
+ */
 async function getAllChatIDs(username) {
     return await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
 }
 
+/**
+ *
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function getChatDetails(chatID) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
