@@ -50,7 +50,7 @@ function generateUsers(username) {
 
 /**
  * Builds the side menu of chats in your Chats
- * @param data
+ * @param {Object<{chats:Object<Array>, name:String, unreadMessages: int}>} data
  */
 function buildChatOverview(data) {
     const chats = data.chats;
@@ -58,41 +58,47 @@ function buildChatOverview(data) {
         return;
     }
 
+    chats.forEach(chat => {buildChatNavigator(chat)});
+}
+
+/**
+ *
+ * @param {Object<{unreadMessages:int, type:String: chatID:String, name:String}>}}data
+ * @returns {void}
+ */
+function buildChatNavigator(data){
     const openedChatId = sessionStorage.getItem("openedChat");
-    chats.forEach(data => {
-        const navigator = document.createElement("div");
-        let unreadMessages = data.unreadMessages ? data.unreadMessages : 0;
-        navigator.setAttribute("data-unread-messages", unreadMessages);
-        navigator.classList.add("chat-contact");
-        navigator.setAttribute("data-chat-id", data.chatID);
-        navigator.setAttribute("data-chattype", data.type);
+    const navigator = document.createElement("div");
+    let unreadMessages = data.unreadMessages ? data.unreadMessages : 0;
+    navigator.setAttribute("data-unread-messages", unreadMessages);
+    navigator.classList.add("chat-contact");
+    navigator.setAttribute("data-chat-id", data.chatID);
+    navigator.setAttribute("data-chattype", data.type);
 
-        // notification
-        if (unreadMessages > 0) {
-            navigator.classList.add("notification");
-        }
+    // notification
+    if (unreadMessages > 0) {
+        navigator.classList.add("notification");
+    }
 
-        // events
-        navigator.onclick = () => {
-            loadChat2(data.type, data.chatID);
-        }
+    // events
+    navigator.onclick = () => {
+        loadChat2(data.type, data.chatID);
+    }
 
-        // icon
-        const icon = document.createElement("i");
-        icon.classList.add("fas", data.type === "user" ? "fa-user" : "fa-users");
-        navigator.appendChild(icon);
+    // icon
+    const icon = document.createElement("i");
+    icon.classList.add("fas", data.type === "user" ? "fa-user" : "fa-users");
+    navigator.appendChild(icon);
 
-        // chat name
-        const name = document.createElement("p");
-        name.innerHTML = data.name;
-        navigator.appendChild(name);
+    // chat name
+    const name = document.createElement("p");
+    name.innerHTML = data.name;
+    navigator.appendChild(name);
 
-        document.getElementById("chats").appendChild(navigator);
-        if (openedChatId === data.chatID) {
-            loadChat2(data.type, data.chatID);
-        }
-    });
-
+    document.getElementById("chats").appendChild(navigator);
+    if (openedChatId === data.chatID) {
+        loadChat2(data.type, data.chatID);
+    }
 }
 
 /**
@@ -226,6 +232,7 @@ function buildMessageObject(messageObject, username, chatType) {
         }
         case "image/png":
         case "image/gif":
+        case "image/jpg":
         case "image/jpeg": {
             const img = document.createElement("img");
             img.classList.add("message-type-image");

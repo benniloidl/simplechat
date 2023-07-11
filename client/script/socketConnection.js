@@ -178,11 +178,17 @@ socket.onmessage = async function (event) {
             changeGroupNameEventHandler(data);
             break;
         }
-
-        case 'error': {
-            errorEvent(data.message);
+        case 'addChat': {
+            buildChatNavigator(data);
             break;
         }
+
+        case 'error':
+            errorEvent(data.message);
+            break;
+        default:
+            errorEvent("unknown event: " + event);
+
     }
 };
 

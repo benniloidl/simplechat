@@ -25,14 +25,6 @@ async function fetchchats(socket, username) {
     });
 }
 
-/**
- *
- * @param {WebSocket}socket
- * @param {Object<{username:string, password:string}>}data
- * @param {Array<WebSocket>}sockets
- * @param {String}type
- * @return {Promise<void>}
- */
 async function login(socket, data, sockets, type) {
     if (!data.username || !data.password) {
         return false;
@@ -162,16 +154,12 @@ async function sendMessage(socket, data, username, sockets, messageType) {
                 await dbFunctions.incrementUnreadMessages(groupMember, data.chatID);
             }
         }
+        const special = handleSpecial(data.message)
+if(special){
+    data.message = special.message;
+    type = special.type
+}
 
-        if(data.message.startsWith('/')){
-            let specialName = data.message.substring(1);
-            for (const special of specials) {
-                if(special.name === specialName){
-                    data.message = special.message;
-                    type = special.type;
-                }
-            }
-        }
         for (const s of sockets) {
             if (groupMembers.includes(s.username)) {
                 sendEvent(s.socket, 'messageNotification', {
@@ -192,6 +180,18 @@ async function sendMessage(socket, data, username, sockets, messageType) {
         sendError(socket, "Unable to send message!");
     }
 }
+
+function handleSpecial(message){
+    if(message.startsWith('/')){
+    let specialName = message.substring(1);
+    for (const special of specials) {
+        if(special.name === specialName){
+            return {"message":special.message,"type":special.type}
+        }
+    }
+    return false;
+}}
+
 
 /**
  *
@@ -234,6 +234,13 @@ async function readChat(socket, data, username, sockets) {
  */
 async function fetchMessages(socket, data, username) {
     const messagesObject = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
+    for (const message of messagesObject.message) {
+        const special = handleSpecial(message.message)
+        if(special){
+            message.message = special.message;
+            message.type = special.type
+        }
+    }
     if (messagesObject.message) {
         sendEvent(socket, 'fetchMessages', {
             "username": username,
@@ -310,6 +317,18 @@ async function addUser(socket, data, username, sockets) {
         sendMessage(socket, { chatID: data.chatID, message: `${username} added ${data.username.toLowerCase()} to chat` },
             username, sockets, "info");
 
+        for (const s of sockets) {
+            if (s.username===data.username.toLowerCase()) {
+                const detail = await dbFunctions.getChatDetails(data.chatID);
+                sendEvent(s.socket, 'addChat', {
+                    "chatID": data.chatID,
+                    "name": detail.name,
+                    "type": detail.type,
+                    "unreadMessages":1
+                });
+            }
+        }
+
     } else {
         sendEvent(socket, 'addUser', {
             status: false,
@@ -335,13 +354,6 @@ async function deleteAccount(socket, username) {
     }
 }
 
-/**
- *
- * @param {WebSocket}socket
- * @param {Object<{newName:string}>}data
- * @param {String}username
- * @return {Promise<void>}
- */
 async function changeUsername(socket, data, username) {
     const userExists = await dbFunctions.userExists(data.newName);
     if (!userExists) {
@@ -362,14 +374,6 @@ async function changeUsername(socket, data, username) {
     }
 }
 
-/**
- *
- * @param {WebSocket}socket
- * @param {Object<{chatID:string, newGroupName:string}>}data
- * @param {String}username
- * @param {Array<WebSocket>}sockets
- * @return {Promise<void>}
- */
 async function changeGroupName(socket, data, username, sockets) {
     const chatExists = await dbFunctions.chatExists(data.chatID);
     if (chatExists) {
@@ -391,13 +395,6 @@ async function changeGroupName(socket, data, username, sockets) {
     }
 }
 
-/**
- *
- * @param {WebSocket}socket
- * @param {Object<{oldPassword:string, newPassword:string}>}data
- * @param {String}username
- * @return {Promise<void>}
- */
 async function changePassword(socket, data, username) {
     if (await dbFunctions.userPasswordMatches(username, data.oldPassword)) {
         sendEvent(socket, "changePassword", { status: false, message: "You misspelled your password to authenticate" }).then(null);
@@ -413,25 +410,12 @@ async function changePassword(socket, data, username) {
     }
 }
 
-/**
- *
- * @param {WebSocket}socket
- * @param {message:string}>}message
- * @return {Promise<void>}
- */
 function sendError(socket, message) {
     sendEvent(socket, 'error', {
         message: message
     }).then(null);
 }
 
-/**
- *
- * @param {WebSocket}socket
- * @param {Object<>}data
- * @param {Object<>}event
- * @return {Promise<void>}
- */
 async function sendEvent(socket, event, data) {
     const message = JSON.stringify({ event: event, data: data });
     if (socket.secretKey) {
