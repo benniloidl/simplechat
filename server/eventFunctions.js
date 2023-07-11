@@ -14,7 +14,7 @@ async function fetchchats(socket, username) {
 
 async function login(socket, data, sockets, type) {
     if (!data.username || !data.password) {
-        return;
+        return false;
     }
     data.username = data.username.toLowerCase();
     if (
@@ -36,19 +36,18 @@ async function login(socket, data, sockets, type) {
         return;
     }
 
-    let loginObject;
     if (type === "login") {
-        loginObject = await dbFunctions.validateUser(data.username, data.password);
+        if(!await dbFunctions.validateUser(data.username, data.password)){
+            sendError(socket, "Incorrect username and/or password, please try again.");
+            return false;
+        }
     } else {
-        loginObject = await dbFunctions.createUser(data.username, data.password);
+        if(!await dbFunctions.createUser(data.username, data.password)){
+            sendError(socket, "Username already exists.");
+            return false;
+        }
     }
-    if (!loginObject) {
-        // Probably user does not exist
-        // sendError(socket, "FATAL ERROR during login!");
-        sendError(socket, "Incorrect Username and/or Password, please try again");
-        return -1;
-    }
-    let loginToken = loginObject.token;
+    let loginToken = await dbFunctions.storeSessionCookie(data.username.toLowerCase());
 
     if (loginToken) {
         for (const s of sockets) {
@@ -71,8 +70,8 @@ async function login(socket, data, sockets, type) {
 
 /**
  * remove session Cookies
- * @param{WebSocket}socket
- * @param{string}username
+ * @param {WebSocket}socket
+ * @param {string}username
  * @return {Promise<void>}
  */
 async function logout(socket, username) {

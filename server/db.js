@@ -31,9 +31,7 @@ async function storeSessionCookie(username) {
     const token = encryption.createSessionToken(username);
     await deleteSessionCookie(username);
     await sessions.insertOne({ "username": username, "token": token });
-    return {
-        token: token,
-    };
+    return token;
 }
 
 /**
@@ -66,7 +64,7 @@ async function userPasswordMatches(username, password) {
 }
 
 async function validateUser(username, password) {
-    return (await userPasswordMatches(username, password)) ? storeSessionCookie(username) : false;
+    return (await userPasswordMatches(username, password)) ? true : false;
 }
 
 async function createUser(username, password) {
@@ -81,7 +79,7 @@ async function createUser(username, password) {
             chats: []
         });
         if (!res.acknowledged) console.error("Creation of user went wrong!", pwObject, res, username);
-        return storeSessionCookie(username);
+        return true;
     }
 }
 
@@ -371,5 +369,6 @@ module.exports = {
     changeGroupName,
     changePassword,
     userPasswordMatches,
-    deleteSessionCookie
+    deleteSessionCookie,
+    storeSessionCookie
 };
