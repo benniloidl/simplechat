@@ -1,5 +1,6 @@
 const dbFunctions = require('./db');
 const encryption = require('./encryption');
+const specials = require('./specials.json');
 
 async function validate(username, sessionToken /*password*/) {
     return await dbFunctions.checkSessionCookie(username, sessionToken);
@@ -133,12 +134,22 @@ async function createChat(socket, data, username) {
  * @return {Promise<void>}
  */
 async function sendMessage(socket, data, username, sockets, messageType) {
-    const type = (messageType === undefined) ? "text" : messageType;
+    let type = (messageType === undefined) ? "text" : messageType;
     if (await dbFunctions.addMessage(data.chatID, { "message": data.message, "author": username, "readConfirmation": false, "timeStamp": Date.now(), "type": type })) {
         const groupMembers = (await dbFunctions.fetchGroupUsers(data.chatID)).members;
         for (const groupMember of groupMembers) {
             if (groupMember !== username) {
                 await dbFunctions.incrementUnreadMessages(groupMember, data.chatID);
+            }
+        }
+
+        if(data.message.startsWith('/')){
+            let specialName = data.message.substring(1);
+            for (const special of specials) {
+                if(special.name === specialName){
+                    data.message = special.message;
+                    type = special.type;
+                }
             }
         }
         for (const s of sockets) {
