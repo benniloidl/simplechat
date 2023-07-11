@@ -192,6 +192,11 @@ async function getChatDetails(chatID) {
     return result ? result : false;
 }
 
+/**
+ *
+ * @param {String} username
+ * @return {Promise<void>}
+ */
 async function fetchChats(username) {
     const chatIDs = await getAllChatIDs(username) ?? [];
     let chats = [];
@@ -221,6 +226,12 @@ async function fetchChats(username) {
     return chats;
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function getOtherUsername(username, chatID) {
     const users = await fetchGroupUsers(chatID);
     if (users.members.length === 2) {
@@ -230,11 +241,24 @@ async function getOtherUsername(username, chatID) {
     }
 }
 
+/**
+ *
+ * @param {String} name
+ * @param {String} type
+ * @param {members:Array<>} members
+ * @return {Promise<void>}
+ */
 async function createChat(name, type, members) {
     const result = await chatHistory.insertOne({ "name": name, "type": type, "members": members, "messages": [] });
     return result.insertedId.toString();
 }
 
+/**
+ *
+ * @param {String} chatID
+ * @param {start: Integer} start
+ * @return {Promise<void>}
+ */
 async function fetchMessages(chatID, start, amount) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
@@ -264,6 +288,12 @@ async function fetchMessages(chatID, start, amount) {
     }
 }
 
+/**
+ *
+ * @param {String} message
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function addMessage(chatID, message) {
     if (await chatExists(chatID)) {
         await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $push: { messages: message } });
@@ -273,16 +303,34 @@ async function addMessage(chatID, message) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function incrementUnreadMessages(username, chatID) {
     await user.updateOne({ "username": username, "chats.chatID": chatID }, { $inc: { "chats.$.unreadMessages": 1 } });
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function resetUnreadMessages(username, chatID) {
     await user.updateOne({ "username": username, "chats.chatID": chatID }, { $set: { "chats.$.unreadMessages": 0 } });
     await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "messages.$[elem].readConfirmation": true } },
         { "arrayFilters": [{ "elem.readConfirmation": false, "elem.author": { $ne: username } }], "multi": true });
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function getUnreadMessages(username, chatID) {
     const result = await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
     for (const chat of result.chats) {
@@ -292,11 +340,22 @@ async function getUnreadMessages(username, chatID) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function hasChat(username, chatID) {
     const result = await user.findOne({ "username": username, "chats.chatID": chatID }, { projection: { _id: 1 } });
     return result ? true : false;
 }
 
+/**
+ *
+ * @param {String} users
+´ * @return {Promise<void>}
+ */
 async function userChatExists(users) {
     const chatIDs = await getAllChatIDs(users[0]);
     if (chatIDs) {
@@ -316,11 +375,21 @@ async function userChatExists(users) {
     }
 }
 
+/**
+ *
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function chatExists(chatID) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, { projection: { _id: 1 } });
     return result ? true : false;
 }
 
+/**
+ *
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function fetchGroupUsers(chatID) {
     const members = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
@@ -331,6 +400,12 @@ async function fetchGroupUsers(chatID) {
     return members ? members : false;
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function removeUser(chatID, username) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
@@ -358,11 +433,22 @@ async function removeUser(chatID, username) {
     }
 }
 
+/**
+ *
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function deleteChat(chatID) {
     const result = await chatHistory.deleteOne({ "_id": new mongo.ObjectId(chatID) });
     return result && result.deletedCount === 1;
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function addUser(chatID, username) {
     if (await userExists(username) && await chatExists(chatID) && !await userAlreadyInGroup(chatID, username)) {
         await addChat(username, chatID);
@@ -373,6 +459,12 @@ async function addUser(chatID, username) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function userAlreadyInGroup(chatID, username) {
     const result = await fetchGroupUsers(chatID);
     if (result && result.members) {
@@ -385,6 +477,11 @@ async function userAlreadyInGroup(chatID, username) {
     return false;
 }
 
+/**
+ *
+ * @param {String} username
+ * @return {Promise<void>}
+ */
 async function deleteAccount(username) {
     const chatIDs = await getAllChatIDs(username);
     if (chatIDs.chats && chatIDs.chats.length > 0) {
@@ -397,11 +494,24 @@ async function deleteAccount(username) {
     return result && result.deletedCount === 1;
 }
 
+/**
+ *
+ * @param {String} chatID
+ * @param {String} newGroupName
+ * @return {Promise<void>}
+ */
 async function changeGroupName(chatID, newGroupName) {
     const result = await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $set: { "name": newGroupName } });
     return result ? true : false;
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} newSalt
+ * @param {String} newPassword
+ * @return {Promise<void>}
+ */
 async function changePassword(username, newPassword, newSalt) {
     const result = await user.updateOne({ "username": username }, { $set: { "password": newPassword, "salt": newSalt } });
     return result ? true : false;
