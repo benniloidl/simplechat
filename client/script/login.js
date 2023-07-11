@@ -33,7 +33,7 @@ function getValues() {
         pwdError("Passwords doesn't match");
         return null;
     }
-    pwdError("username and password semantic ok");
+    //pwdError("username and password semantic ok");
     return {
         username: usr,
         password: pwd,
