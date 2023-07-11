@@ -142,16 +142,12 @@ async function sendMessage(socket, data, username, sockets, messageType) {
                 await dbFunctions.incrementUnreadMessages(groupMember, data.chatID);
             }
         }
+        const special = handleSpecial(data.message)
+if(special){
+    data.message = special.message;
+    type = special.type
+}
 
-        if(data.message.startsWith('/')){
-            let specialName = data.message.substring(1);
-            for (const special of specials) {
-                if(special.name === specialName){
-                    data.message = special.message;
-                    type = special.type;
-                }
-            }
-        }
         for (const s of sockets) {
             if (groupMembers.includes(s.username)) {
                 sendEvent(s.socket, 'messageNotification', {
@@ -173,6 +169,18 @@ async function sendMessage(socket, data, username, sockets, messageType) {
     }
 }
 
+function handleSpecial(message){
+    if(message.startsWith('/')){
+    let specialName = message.substring(1);
+    for (const special of specials) {
+        if(special.name === specialName){
+            return {"message":special.message,"type":special.type}
+        }
+    }
+    return false;
+}}
+
+
 async function sendMedia(socket, data, username, sockets) {
     data.message = data.file;
     await sendMessage(socket, data, username, sockets, data.mediaType);
@@ -191,6 +199,13 @@ async function readChat(socket, data, username, sockets) {
 
 async function fetchMessages(socket, data, username) {
     const messagesObject = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
+    for (const message of messagesObject.message) {
+        const special = handleSpecial(message.message)
+        if(special){
+            message.message = special.message;
+            message.type = special.type
+        }
+    }
     if (messagesObject.message) {
         sendEvent(socket, 'fetchMessages', {
             "username": username,

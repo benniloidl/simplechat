@@ -126,7 +126,7 @@ wsSrv.on('connection', async (socket, req) => {
                 eventFunctions.fetchchats(socket, username).then();
                 break;
             case 'sendMessage':
-                eventFunctions.sendMessage(socket, event.data, username, sockets).then();
+                eventFunctions.sendMessage(socket, event.data, username, sockets, undefined).then();
                 break;
             case 'sendMedia':
                 eventFunctions.sendMedia(socket, event.data, username, sockets).then();

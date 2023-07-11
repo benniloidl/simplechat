@@ -226,6 +226,7 @@ function buildMessageObject(messageObject, username, chatType) {
         }
         case "image/png":
         case "image/gif":
+        case "image/jpg":
         case "image/jpeg": {
             const img = document.createElement("img");
             img.classList.add("message-type-image");
