@@ -543,5 +543,6 @@ module.exports = {
     changePassword,
     userPasswordMatches,
     deleteSessionCookie,
-    storeSessionCookie
+    storeSessionCookie,
+    getChatDetails
 };
