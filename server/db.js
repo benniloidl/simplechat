@@ -27,6 +27,12 @@ async function connectToDB() {
     console.log("connected successfully\n");
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {String}username
+ * @return {Promise<void>}
+ */
 async function storeSessionCookie(username) {
     const token = encryption.createSessionToken(username);
     await deleteSessionCookie(username);
@@ -50,11 +56,24 @@ async function deleteSessionCookie(username) {
     return true;
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} sessionToken
+ * @return {Promise<void>}
+ */
 async function checkSessionCookie(username, sessionToken) {
     if (username === undefined || sessionToken === undefined) return false;
     const result = await sessions.findOne({ "username": username, "token": sessionToken }, { projection: { _id: 1 } });
     return result ? true : false;
 }
+
+/**
+ *
+ * @param {String} username
+ * @param {String} password
+ * @return {Promise<void>}
+ */
 async function userPasswordMatches(username, password) {
     if (!username) return false;
     username = username.toLowerCase();
@@ -63,10 +82,22 @@ async function userPasswordMatches(username, password) {
     return encryption.validatePassword(password, pwdObject);
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} password
+ * @return {Promise<void>}
+ */
 async function validateUser(username, password) {
     return (await userPasswordMatches(username, password)) ? true : false;
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} password
+ * @return {Promise<void>}
+ */
 async function createUser(username, password) {
     if (await userExists(username)) {
         return false;
@@ -83,17 +114,33 @@ async function createUser(username, password) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} newName
+ * @return {Promise<void>}
+ */
 async function changeUsername(username, newName) {
     const result = await user.updateOne({ "username": username }, { $set: { username: newName } });
     return result ? true : false;
 }
 
+/**
+ *
+ * @param {String} username
+ * @return {Promise<void>}
+ */
 async function userExists(username) {
     const result = await user.findOne({ "username": username }, { projection: { _id: 1 } });
     return result ? true : false;
 }
 
-
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function addChat(username, chatID) {
     if (await hasChat(username, chatID)) {
         return false;
@@ -103,6 +150,12 @@ async function addChat(username, chatID) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function removeChat(username, chatID) {
     if (await hasChat(username, chatID)) {
         await chatHistory.updateOne({ "_id": new mongo.ObjectId(chatID) }, { $pull: { "members": username } });
@@ -113,10 +166,20 @@ async function removeChat(username, chatID) {
     }
 }
 
+/**
+ *
+ * @param {String} username
+ * @return {Promise<void>}
+ */
 async function getAllChatIDs(username) {
     return await user.findOne({ "username": username }, { projection: { _id: 0, chats: 1 } });
 }
 
+/**
+ *
+ * @param {String} chatID
+ * @return {Promise<void>}
+ */
 async function getChatDetails(chatID) {
     const result = await chatHistory.findOne({ "_id": new mongo.ObjectId(chatID) }, {
         projection: {
