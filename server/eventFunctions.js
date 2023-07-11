@@ -1,10 +1,22 @@
 const dbFunctions = require('./db');
 const encryption = require('./encryption');
 
+/**
+ *
+ * @param {String}username
+ * @param {String}sessionToken
+ * @return {Promise<void>}
+ */
 async function validate(username, sessionToken /*password*/) {
     return await dbFunctions.checkSessionCookie(username, sessionToken);
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {String}username
+ * @return {Promise<void>}
+ */
 async function fetchchats(socket, username) {
     const chats = await dbFunctions.fetchChats(username);
     sendEvent(socket, 'fetchChats', {
@@ -12,6 +24,14 @@ async function fetchchats(socket, username) {
     });
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{username:string, password:string}>}data
+ * @param {Array<WebSocket>}sockets
+ * @param {String}type
+ * @return {Promise<void>}
+ */
 async function login(socket, data, sockets, type) {
     if (!data.username || !data.password) {
         return false;
@@ -162,11 +182,27 @@ async function sendMessage(socket, data, username, sockets, messageType) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{message:string, file:String, mediaType}>}data
+ * @param {String}username
+ * @param {Array<WebSocket>}sockets
+ * @return {Promise<void>}
+ */
 async function sendMedia(socket, data, username, sockets) {
     data.message = data.file;
     await sendMessage(socket, data, username, sockets, data.mediaType);
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{chatID:string}>}data
+ * @param {String}username
+ * @param {Array<WebSocket>}sockets
+ * @return {Promise<void>}
+ */
 async function readChat(socket, data, username, sockets) {
     await dbFunctions.resetUnreadMessages(username, data.chatID);
     for (const s of sockets) {
@@ -178,6 +214,13 @@ async function readChat(socket, data, username, sockets) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{chatID:string}>}data
+ * @param {String}username
+ * @return {Promise<void>}
+ */
 async function fetchMessages(socket, data, username) {
     const messagesObject = await dbFunctions.fetchMessages(data.chatID, data.start, data.amount);
     if (messagesObject.message) {
@@ -193,6 +236,12 @@ async function fetchMessages(socket, data, username) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{chatID:string}>}data
+ * @return {Promise<void>}
+ */
 async function fetchGroupUsers(socket, data) {
     const users = await dbFunctions.fetchGroupUsers(data.chatID);
     if (users.members && users.members.length > 0) {
@@ -204,6 +253,14 @@ async function fetchGroupUsers(socket, data) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{chatID:string}>}data
+ * @param {String}username
+ * @param {Array<WebSocket>}sockets
+ * @return {Promise<void>}
+ */
 async function removeUser(socket, data, username, sockets) {
     const result = await dbFunctions.removeUser(data.chatID, data.username.toLowerCase());
     if (result) {
@@ -224,6 +281,14 @@ async function removeUser(socket, data, username, sockets) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{chatID:string}>}data
+ * @param {String}username
+ * @param {Array<WebSocket>}sockets
+ * @return {Promise<void>}
+ */
 async function addUser(socket, data, username, sockets) {
     const result = await dbFunctions.addUser(data.chatID, data.username.toLowerCase());
     if (result) {
@@ -242,6 +307,12 @@ async function addUser(socket, data, username, sockets) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {String}username
+ * @return {Promise<void>}
+ */
 async function deleteAccount(socket, username) {
     const result = await dbFunctions.deleteAccount(username);
     if (result) {
@@ -253,6 +324,13 @@ async function deleteAccount(socket, username) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{newName:string}>}data
+ * @param {String}username
+ * @return {Promise<void>}
+ */
 async function changeUsername(socket, data, username) {
     const userExists = await dbFunctions.userExists(data.newName);
     if (!userExists) {
@@ -273,6 +351,14 @@ async function changeUsername(socket, data, username) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{chatID:string, newGroupName:string}>}data
+ * @param {String}username
+ * @param {Array<WebSocket>}sockets
+ * @return {Promise<void>}
+ */
 async function changeGroupName(socket, data, username, sockets) {
     const chatExists = await dbFunctions.chatExists(data.chatID);
     if (chatExists) {
@@ -294,6 +380,13 @@ async function changeGroupName(socket, data, username, sockets) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<{oldPassword:string, newPassword:string}>}data
+ * @param {String}username
+ * @return {Promise<void>}
+ */
 async function changePassword(socket, data, username) {
     if (await dbFunctions.userPasswordMatches(username, data.oldPassword)) {
         sendEvent(socket, "changePassword", { status: false, message: "You misspelled your password to authenticate" }).then(null);
@@ -309,12 +402,25 @@ async function changePassword(socket, data, username) {
     }
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {message:string}>}message
+ * @return {Promise<void>}
+ */
 function sendError(socket, message) {
     sendEvent(socket, 'error', {
         message: message
     }).then(null);
 }
 
+/**
+ *
+ * @param {WebSocket}socket
+ * @param {Object<>}data
+ * @param {Object<>}event
+ * @return {Promise<void>}
+ */
 async function sendEvent(socket, event, data) {
     const message = JSON.stringify({ event: event, data: data });
     if (socket.secretKey) {
