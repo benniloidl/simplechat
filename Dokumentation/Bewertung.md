@@ -1,36 +1,58 @@
-# Bewertungsbogen
+# Bewertungsdokumentation
+Simplechat ist ein Messenger, der für die einfache Nutzung geschaffen wurde.
 
-# Frontend
 Für SimpleChat wurde ausschließlich HTML, CSS und JavaScript und im Backend zusätzlich NodeJS, Express und MongoDB verwendet.
+Die Verbindungen zwischen dem Client und Server erfolgen über HTTP und Websocket.
+Chaties sind die Endnutzer, die mit anderen Chaties über unsere Plattform kommunizieren wollen.
 
-#### Farbschema
+## Aufbau der Webseite
+### Login & Register
+Wird die Webseite geladen und es besteht kein gültiger Sessiontoken, wird die Loginseite angezeigt.
+Von der Loginseite kann der Chatie in der Fußzeile auf das Impressum und die Datenschutzseite zugreifen.
+In der Eingabemaske kann der Chatie auf eine Registrierungsseite zugreifen.
+
+### Dashboard
+<img src="image-1.png" alt="Darstellung des Logins" width="400" style="float:right">
+Sobald ein Chattie erfolgreich eingeloggt ist, wird dieser auf das Dashboard weitergeleitet.
+Der Inhalt wird im Form von Templates nachgeladen und entsprechend eingefügt.
+Die jeweiligen personalisierten Daten werden vom Server per Websocket an den Client gesendet und in das Dashboard eingefügt.
+Hierbei werden die Daten dynamisch in das Template eingefügt und überscheiben Platzhalter. 
+
+Die Trennung der Daten von der Ansicht ermöglicht es eine andere Applikation über dieselbe Schnittstelle kommunizieren zu lassen.
+<img src="image-2.png" alt="Darstellung der Dashboardseite" width="400" style="float:right">
+Die Dashboard-Seite ist zweigeteilt. Auf der linken Seite befindet sich eine Navigationsleite und auf der rechten Seite der geladene Inhalt.
+Für das responsive Design, wird bei unterschreitung einer bestimmten Bildschirmgröße die Navigationsleiste automatisch eingeklappt und kann über ein entsprechendes Symbol in der Kopfzeile des geladenen Inhalts ausgeklappt werden.
+In der Navigationsleiste gibt es drei Abschnitte: Profil, Erstellungsmöglichkeiten und Chats/Gruppen.
+
+Die **Profilansicht** ermöglicht das Ändern des Passwortes, sowie des Löschen des Accounts.
+In den **Erstellungsmöglichkeiten** können neue Einzelchats gestartet und Gruppen erstellt werden.
+Das Hinzufügen der Gruppenmitlieder erfolgt in den Gruppeneinstellung der jeweiligen Gruppe.
+Die **Chatübersicht** bietet ein Überblick über alle Chats und Gruppen.
+Bei einem Klick auf den Chat oder Gruppe wird der bisherige Verlauf angezeigt. Hierbei werden die eigenenen Nachrichten auf der rechten Seite hervorgehoben. Unterhalb des Verlaufs befindet sich die Texteingabe zum Versenden neuer Nachrichten.
+
+
+### Farbschema
 Das Farbschema wird automatisch nach den Benutzerpräferenzen geladen.
 Das präferierte Farbschema wird im lokalen Speicher zwischengespeichert.
 Falls ein Schema nicht zur Verfügung steht, wird automatisch die präferierte Farbgebung mit der Mediaquery geladen.
 Sobald sich das Schema der Mediaquery ändert, wird die Farbgebung automatisch angepasst.
 
-## Login
-<img src="image-1.png" alt="Darstellung des Logins" width="400" style="float:right">
-
-
-## Dashboard
-<img src="image-2.png" alt="Darstellung der Dashboardseite" width="400" style="float:right">
-Das Laden des Inhalts der Dashboardseite erfolgt durch ein clientseitiges Einfügen eines selbstgeschriebenen Templates.
-Wenn die jeweiligen Daten vom Server empfangen wurden, werden diese dynamisch in dieses Template eingefügt und ersetzen Teilweise Platzhalter.
-
-## Hovers
+### Hovers
 Wenn der Mauszeiger über eine Schaltfläche bewegt wird, bekommt der Nutzer ein optisches Feedback
 
-## Fehler
+### Fehler
 ![Connection lost](image-6.png)
 Sobald ein Fehler auftritt, wird dieser jeweils an einer geeigneten Stelle angezeigt.
-Falls die Socketverbindung zum Server unterbrochen wird, erscheint ein Overlay, welches über den Disconnect informiert. Es wird solange versucht die Seite erneut zu laden, bis die Seite wieder erreichbar ist.
+Falls die Socketverbindung zum Server unterbrochen wird, erscheint ein Overlay, welches über den Disconnect informiert. 
+Es wird solange versucht die Seite erneut zu laden, bis die Seite wieder erreichbar ist.
 
 ## Dateien
-Der Chat unterstützt die Übertragung und das Anzeigen von Bildern.
+Der Chat unterstützt eine das Anzeigen von Bildern. 
+Eine zukünftige Erweiterung zum Anzeigen andere Dateitypen und das versenden von Dateien ist ermöglicht.
 
 ## Laden des Chats
-Damit das Laden des Chats zügig erfolgt werden jeweils nur eine bestimmte Anzahl an Chats geladen. Wenn die Antwort eintrifft, werden weitere Nachrichten nachgeladen und in dem Chat eingefügt. 
+Damit das Laden des Chats zügig erfolgt werden jeweils nur eine bestimmte Anzahl an Chats geladen. 
+Wenn die Antwort eintrifft, werden weitere Nachrichten nachgeladen und in dem Chat eingefügt. 
 Dieses Vorgehen ermöglicht ein schnelleres Laden der letzten Nachrichten.
 
 ## Responsive Design
