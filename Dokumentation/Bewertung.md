@@ -6,20 +6,21 @@ Die Verbindungen zwischen dem Client und Server erfolgen über HTTP und Websocke
 Chaties sind die Endnutzer, die mit anderen Chaties über unsere Plattform kommunizieren wollen.
 
 ## Aufbau der Webseite
+Genauere Informationen zur Webseite befinden sich in der Dokumentation.
 ### Login & Register
 Wird die Webseite geladen und es besteht kein gültiger Sessiontoken, wird die Loginseite angezeigt.
 Von der Loginseite kann der Chatie in der Fußzeile auf das Impressum und die Datenschutzseite zugreifen.
 In der Eingabemaske kann der Chatie auf eine Registrierungsseite zugreifen.
 
 ### Dashboard
-<img src="image-1.png" alt="Darstellung des Logins" width="400" style="float:right">
+<img src="image-1.png" alt="Darstellung des Logins" width="300" style="float:right">
 Sobald ein Chattie erfolgreich eingeloggt ist, wird dieser auf das Dashboard weitergeleitet.
 Der Inhalt wird im Form von Templates nachgeladen und entsprechend eingefügt.
 Die jeweiligen personalisierten Daten werden vom Server per Websocket an den Client gesendet und in das Dashboard eingefügt.
 Hierbei werden die Daten dynamisch in das Template eingefügt und überscheiben Platzhalter. 
 
 Die Trennung der Daten von der Ansicht ermöglicht es eine andere Applikation über dieselbe Schnittstelle kommunizieren zu lassen.
-<img src="image-2.png" alt="Darstellung der Dashboardseite" width="400" style="float:right">
+<img src="image-2.png" alt="Darstellung der Dashboardseite" width="300" style="float:right">
 Die Dashboard-Seite ist zweigeteilt. Auf der linken Seite befindet sich eine Navigationsleite und auf der rechten Seite der geladene Inhalt.
 Für das responsive Design, wird bei unterschreitung einer bestimmten Bildschirmgröße die Navigationsleiste automatisch eingeklappt und kann über ein entsprechendes Symbol in der Kopfzeile des geladenen Inhalts ausgeklappt werden.
 In der Navigationsleiste gibt es drei Abschnitte: Profil, Erstellungsmöglichkeiten und Chats/Gruppen.
@@ -41,7 +42,7 @@ Sobald sich das Schema der Mediaquery ändert, wird die Farbgebung automatisch a
 Wenn der Mauszeiger über eine Schaltfläche bewegt wird, bekommt der Nutzer ein optisches Feedback
 
 ### Fehler
-![Connection lost](image-6.png)
+<img src="image-6.png" alt="Connection lost" width="300" style="float:right">
 Sobald ein Fehler auftritt, wird dieser jeweils an einer geeigneten Stelle angezeigt.
 Falls die Socketverbindung zum Server unterbrochen wird, erscheint ein Overlay, welches über den Disconnect informiert. 
 Es wird solange versucht die Seite erneut zu laden, bis die Seite wieder erreichbar ist.
@@ -56,11 +57,15 @@ Wenn die Antwort eintrifft, werden weitere Nachrichten nachgeladen und in dem Ch
 Dieses Vorgehen ermöglicht ein schnelleres Laden der letzten Nachrichten.
 
 ## Responsive Design
-<img src="image-4.png" alt="Responsive Design Overview" width="400">
-<img src="image-5.png" alt="Responsive Design Chat" width="400">
+<div style="display: inline-grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 2em   " >
+<p>
 Um die Seite für Mobilgeräte zu optimieren, passt sich die Seite automatisch der Bildschirmgröße an.
 Wird im Dashboard eine gewisse Größe unterschritten, klappt das Seitenmenü ein.
-Durch Klicken auf das Burger-Symbol wird diese ausgeklappt und nimmt die gesamte Breite ein.
+Durch Klicken auf das Burger-Symbol wird diese ausgeklappt und nimmt die gesamte Breite ein.</p>
+<img src="image-4.png" alt="Responsive Design Overview" height="300" style="">
+<img src="image-5.png" alt="Responsive Design Chat" height="300"style="">
+</div>
+
 
 # Backend
 Als Server wird ein Express Server und Websocket verwendet. Um die Cookies zu verarbeiten, wird die Middleware Cookie-Parser genutzt. Ebenfalls wird eine weitere selbstgeschriebene Middleware zur Validierung der Cookies verwendet. Für den Websocket wurde ein eingenes Eventhandling implementier. Über die Events werden dann auch Anfragen an die Datenbank gestellt.
@@ -74,11 +79,14 @@ Der Client injected HTML-Templates und erzeugt dynamischen Inhalt über Websocke
 
 
 # Anhang
-<img src="Loading.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">
 
-<img src="Login.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">
+[//]: # (<img src="Loading.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">)
 
-<img src="Dashboard.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">
+[//]: # ()
+[//]: # (<img src="Login.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">)
+
+[//]: # ()
+[//]: # (<img src="Dashboard.PNG" alt="Schematische Darstellung der Dashboardseite" width="" style="float:right">)
 
 ## Quellcode
 ```
@@ -191,4 +199,5 @@ Der Client injected HTML-Templates und erzeugt dynamischen Inhalt über Websocke
 	</script>
 </body></html>
 ```
-![Bild des Anhangs](image.png)
+
+<img src="image.png" alt="Seite beschrieben im Anhang" width="400">
