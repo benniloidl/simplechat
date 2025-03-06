@@ -17,7 +17,7 @@
 
     --appearance-switch: '\263E';
 
-    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    --font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
     --color-error: hsl(0deg, 100%, 50%);
 }
 
