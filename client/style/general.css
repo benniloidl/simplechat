@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Inter";
+    src: url(Inter-VariableFont_opsz\,wght.ttf);
+}
+
 :root {
     /* Initializing Variables */
     --width: 100%;
